@@ -1,0 +1,17 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<FKIndexAssociation class="oracle.dbtools.crest.model.design.relational.FKIndexAssociation" directorySegmentName="seg_0" id="94729305-AB5B-38EC-66A0-703207F8EB57" containerWithKeyObject="92357AB0-3043-966F-F7AE-CE230C40638A" localFKIndex="BFCC7B99-7683-87D2-3639-7EBC9F9FFF38" name="Relation_newsDisciplines_News_FK">
+<createdBy>vardo</createdBy>
+<createdTime>2024-08-28 00:57:03 UTC</createdTime>
+<generatorID>4DD539FF-26E9-355C-7BE5-FBF2154402E2</generatorID>
+<ownerDesignName>Modelo de datos Capstone</ownerDesignName>
+<referredTableLongName>News</referredTableLongName>
+<deleteRule>NO ACTION</deleteRule>
+<referredTableID>CA7F31C5-3BAE-9A5A-0259-F30E939AF3BD</referredTableID>
+<keyObject>EC8196AD-480F-371E-7E51-DBD82B406977</keyObject>
+<referredKeyID>EC8196AD-480F-371E-7E51-DBD82B406977</referredKeyID>
+<mandatory>true</mandatory>
+<refColNames>news_id</refColNames>
+<transferable>true</transferable>
+<rely>false</rely>
+<columnDependencyConstraintGenerateInDDL>true</columnDependencyConstraintGenerateInDDL>
+</FKIndexAssociation>

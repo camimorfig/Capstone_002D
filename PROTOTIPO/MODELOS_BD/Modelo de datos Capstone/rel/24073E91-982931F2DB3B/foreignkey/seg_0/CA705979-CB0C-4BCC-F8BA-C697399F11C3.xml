@@ -1,0 +1,17 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<FKIndexAssociation class="oracle.dbtools.crest.model.design.relational.FKIndexAssociation" directorySegmentName="seg_0" id="CA705979-CB0C-4BCC-F8BA-C697399F11C3" containerWithKeyObject="88A4A528-F94D-B5C0-084B-0F2B4F4EBA87" localFKIndex="B6D17FC7-B9A3-9E6A-7ADF-116A31C6D330" name="Main_User_Coach_FK">
+<createdBy>vardo</createdBy>
+<createdTime>2024-08-28 00:57:03 UTC</createdTime>
+<generatorID>62372702-E8E3-6B0C-68FD-7B838B254B0D</generatorID>
+<ownerDesignName>Modelo de datos Capstone</ownerDesignName>
+<referredTableLongName>Coach</referredTableLongName>
+<deleteRule>NO ACTION</deleteRule>
+<referredTableID>FBDC9DB7-9013-20AF-E2DA-0593C9F8AAD6</referredTableID>
+<keyObject>E7A480C4-789B-E349-A753-A295440D3136</keyObject>
+<referredKeyID>E7A480C4-789B-E349-A753-A295440D3136</referredKeyID>
+<mandatory>true</mandatory>
+<refColNames>coach_id</refColNames>
+<transferable>true</transferable>
+<rely>false</rely>
+<columnDependencyConstraintGenerateInDDL>true</columnDependencyConstraintGenerateInDDL>
+</FKIndexAssociation>

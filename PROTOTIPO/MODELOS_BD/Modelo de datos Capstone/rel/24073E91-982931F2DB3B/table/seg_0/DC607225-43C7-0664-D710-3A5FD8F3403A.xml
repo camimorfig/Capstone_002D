@@ -1,0 +1,106 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="DC607225-43C7-0664-D710-3A5FD8F3403A" name="Admin">
+<createdBy>vardo</createdBy>
+<createdTime>2024-08-28 00:57:03 UTC</createdTime>
+<generatorID>67D8086B-6EEF-E0FD-C51B-29A1220963A1</generatorID>
+<ownerDesignName>Modelo de datos Capstone</ownerDesignName>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="admin_id" id="4C454098-3ADA-DFC7-37F7-168C8079732C">
+<createdBy>vardo</createdBy>
+<createdTime>2024-08-28 00:57:03 UTC</createdTime>
+<generatorID>301E19E2-DE0C-440D-B850-E282B8876BFF</generatorID>
+<ownerDesignName>Modelo de datos Capstone</ownerDesignName>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="admin_rut" id="38B62EE8-38C6-3517-E0BA-97155AC98E3D">
+<createdBy>vardo</createdBy>
+<createdTime>2024-08-28 00:57:03 UTC</createdTime>
+<generatorID>C09B8E1B-6D6D-BF5C-C143-3E1EF919AAF9</generatorID>
+<ownerDesignName>Modelo de datos Capstone</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>13</dataTypeSize>
+<ownDataTypeParameters>13,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="admin_name" id="2B2E6E1B-50B8-E118-6233-E68DEA7793E1">
+<createdBy>vardo</createdBy>
+<createdTime>2024-08-28 00:57:03 UTC</createdTime>
+<generatorID>B7919688-B194-30FA-29FF-F848701A57C9</generatorID>
+<ownerDesignName>Modelo de datos Capstone</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>50</dataTypeSize>
+<ownDataTypeParameters>50,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="admin_img" id="05076902-6775-6833-A62E-581FF1B059E6">
+<createdBy>vardo</createdBy>
+<createdTime>2024-08-28 00:57:03 UTC</createdTime>
+<generatorID>5239BB71-28F5-67B5-A067-F41FE22AD5F7</generatorID>
+<ownerDesignName>Modelo de datos Capstone</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT029</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="Main_User_user_id" id="2B172903-E318-4BDC-9CD3-1AB755511B90">
+<createdBy>vardo</createdBy>
+<createdTime>2024-08-28 00:57:03 UTC</createdTime>
+<generatorID>955FB40E-4D29-BEA3-785F-ED0741F5C6D1</generatorID>
+<ownerDesignName>Modelo de datos Capstone</ownerDesignName>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<previousColumn>false</previousColumn>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="5EC8808C-77CD-1D1D-441D-92BE20678385" referredColumn="7BE3AAA5-017C-6B3E-81D1-7A71183B35A4"/>
+</associations>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="7032BE6C-7278-A1B1-A4FE-CF2D00737056" name="Admin_PK">
+<createdBy>vardo</createdBy>
+<createdTime>2024-08-28 00:57:03 UTC</createdTime>
+<generatorID>FE306F95-492A-609E-C3E9-ED95D007EEF2</generatorID>
+<ownerDesignName>Modelo de datos Capstone</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="4C454098-3ADA-DFC7-37F7-168C8079732C"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="E230268A-9072-8E62-218C-6B197E9D65F8" name="Admin__IDX">
+<createdBy>vardo</createdBy>
+<createdTime>2024-08-28 00:57:03 UTC</createdTime>
+<ownerDesignName>Modelo de datos Capstone</ownerDesignName>
+<indexState>Unique Plain Index</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<relationGeneratorID>0D7E999D-8644-AAAA-F2F5-53BF662D3248</relationGeneratorID>
+<indexColumnUsage>
+<colUsage columnID="2B172903-E318-4BDC-9CD3-1AB755511B90"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="08E490FE-5A03-C280-0424-DABCBE957BB3" name="Admin_Main_User_FK">
+<createdBy>vardo</createdBy>
+<createdTime>2024-08-28 00:57:03 UTC</createdTime>
+<generatorID>0D7E999D-8644-AAAA-F2F5-53BF662D3248</generatorID>
+<ownerDesignName>Modelo de datos Capstone</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="2B172903-E318-4BDC-9CD3-1AB755511B90"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

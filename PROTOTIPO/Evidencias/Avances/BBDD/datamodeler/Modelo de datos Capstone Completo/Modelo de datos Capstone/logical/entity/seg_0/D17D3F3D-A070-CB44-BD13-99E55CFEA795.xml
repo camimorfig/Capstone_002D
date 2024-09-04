@@ -1,0 +1,81 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Entity class="oracle.dbtools.crest.model.design.logical.Entity" directorySegmentName="seg_0" id="D17D3F3D-A070-CB44-BD13-99E55CFEA795" name="Discipline">
+<createdBy>jovag</createdBy>
+<createdTime>2024-08-26 22:45:38 UTC</createdTime>
+<ownerDesignName>Modelo de datos Capstone</ownerDesignName>
+<engineerTo>
+<item key="24073E91-CCFF-A12D-9ABC-982931F2DB3B" value="true"/>
+</engineerTo>
+<adequatelyNormalized>NO</adequatelyNormalized>
+<expectedVolumes>0</expectedVolumes>
+<fwdEngineeringStrategyName>Single Table</fwdEngineeringStrategyName>
+<growthPercent>0</growthPercent>
+<growthType>Year</growthType>
+<maxVolumes>9999999</maxVolumes>
+<minVolumes>0</minVolumes>
+<normalForm>Third</normalForm>
+<attributes itemClass="oracle.dbtools.crest.model.design.logical.Attribute">
+<Attribute name="discipline_id" id="1602A226-C09B-9B96-BC2A-394F187C80A6">
+<createdBy>jovag</createdBy>
+<createdTime>2024-08-26 22:46:25 UTC</createdTime>
+<ownerDesignName>Modelo de datos Capstone</ownerDesignName>
+<engineerTo>
+<item key="24073E91-CCFF-A12D-9ABC-982931F2DB3B" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="discipline_name" id="5DBAA4BE-F429-B6AE-9051-C364B6FD2359">
+<createdBy>jovag</createdBy>
+<createdTime>2024-08-26 22:46:38 UTC</createdTime>
+<ownerDesignName>Modelo de datos Capstone</ownerDesignName>
+<engineerTo>
+<item key="24073E91-CCFF-A12D-9ABC-982931F2DB3B" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>50</dataTypeSize>
+<ownDataTypeParameters>50,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="discipline_description" id="F33122D6-6010-DD39-AD06-043A11F59E6C">
+<createdBy>jovag</createdBy>
+<createdTime>2024-08-27 05:51:35 UTC</createdTime>
+<ownerDesignName>Modelo de datos Capstone</ownerDesignName>
+<engineerTo>
+<item key="24073E91-CCFF-A12D-9ABC-982931F2DB3B" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>200</dataTypeSize>
+<ownDataTypeParameters>200,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="coach_id" id="926855FA-4BC9-AF6C-0249-44EC79D391E5">
+<createdBy>jovag</createdBy>
+<createdTime>2024-08-27 00:13:59 UTC</createdTime>
+<generatorID>D0B4989D-41BF-327B-347C-B11FA3BBF629</generatorID>
+<ownerDesignName>Modelo de datos Capstone</ownerDesignName>
+<engineerTo>
+<item key="24073E91-CCFF-A12D-9ABC-982931F2DB3B" value="true"/>
+</engineerTo>
+<referedAttribute>9B71D4C1-EF95-C9A3-4EA3-4D999A156E99</referedAttribute>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+</attributes>
+<identifiers itemClass="oracle.dbtools.crest.model.design.logical.CandidateKey">
+<identifier id="BACBACF9-FC1F-707B-CDDD-887BDBA742EC" name="Discipline PK">
+<createdBy>jovag</createdBy>
+<createdTime>2024-08-26 22:46:38 UTC</createdTime>
+<ownerDesignName>Modelo de datos Capstone</ownerDesignName>
+<engineerTo>
+<item key="24073E91-CCFF-A12D-9ABC-982931F2DB3B" value="true"/>
+</engineerTo>
+<pk>true</pk>
+<usedAttributes>
+<attributeRef>1602A226-C09B-9B96-BC2A-394F187C80A6</attributeRef>
+</usedAttributes>
+</identifier>
+</identifiers>
+</Entity>

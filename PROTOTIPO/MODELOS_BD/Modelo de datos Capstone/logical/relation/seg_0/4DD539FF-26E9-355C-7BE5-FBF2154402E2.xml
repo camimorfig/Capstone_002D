@@ -1,0 +1,18 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Relation class="oracle.dbtools.crest.model.design.logical.Relation" name="Relation_newsDisciplines" directorySegmentName="seg_0" id="4DD539FF-26E9-355C-7BE5-FBF2154402E2">
+<createdBy>jovag</createdBy>
+<createdTime>2024-08-27 05:54:23 UTC</createdTime>
+<ownerDesignName>Modelo de datos Capstone</ownerDesignName>
+<engineerTo>
+<item key="24073E91-CCFF-A12D-9ABC-982931F2DB3B" value="true"/>
+</engineerTo>
+<identifying>false</identifying>
+<optionalSource>true</optionalSource>
+<optionalTarget>true</optionalTarget>
+<sourceCardinality>*</sourceCardinality>
+<sourceEntity>D17D3F3D-A070-CB44-BD13-99E55CFEA795</sourceEntity>
+<targetCardinalityString>*</targetCardinalityString>
+<targetEntity>79B330E4-6E59-68C6-C6C4-BBD2C9890A8C</targetEntity>
+<transferable>true</transferable>
+<deleteRule>NO ACTION</deleteRule>
+</Relation>

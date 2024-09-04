@@ -1,0 +1,17 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<FKIndexAssociation class="oracle.dbtools.crest.model.design.relational.FKIndexAssociation" directorySegmentName="seg_0" id="DFA748E7-5A4A-9B08-91A7-8ACA49AF0FAF" containerWithKeyObject="0E486C2B-66A3-8DCE-C163-AC1E6DA807DF" localFKIndex="A2D6531C-63F0-673E-C8A2-3EFB0374D834" name="Relation_25_Galery_FK">
+<createdBy>vardo</createdBy>
+<createdTime>2024-08-28 00:57:03 UTC</createdTime>
+<generatorID>409321BF-1FB1-17A0-8D0A-9F2ECBDFB16D</generatorID>
+<ownerDesignName>Modelo de datos Capstone</ownerDesignName>
+<referredTableLongName>Galery</referredTableLongName>
+<deleteRule>NO ACTION</deleteRule>
+<referredTableID>E597BF44-FF6E-2AF2-5686-659AF86BAA83</referredTableID>
+<keyObject>C4BE9975-E300-414F-64E3-03737B544754</keyObject>
+<referredKeyID>C4BE9975-E300-414F-64E3-03737B544754</referredKeyID>
+<mandatory>true</mandatory>
+<refColNames>galery_id</refColNames>
+<transferable>true</transferable>
+<rely>false</rely>
+<columnDependencyConstraintGenerateInDDL>true</columnDependencyConstraintGenerateInDDL>
+</FKIndexAssociation>

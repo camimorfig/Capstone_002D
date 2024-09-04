@@ -1,0 +1,47 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="9ED04027-ACE5-5086-709A-F719CAD84019" name="Game_Position">
+<createdBy>vardo</createdBy>
+<createdTime>2024-08-28 00:57:03 UTC</createdTime>
+<generatorID>91320CA0-DA2B-6B3B-AAD3-4333D01AEA22</generatorID>
+<ownerDesignName>Modelo de datos Capstone</ownerDesignName>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="game_position_id" id="6C1369E8-0A8C-87F3-C8C7-C8051D1BE28A">
+<createdBy>vardo</createdBy>
+<createdTime>2024-08-28 00:57:03 UTC</createdTime>
+<generatorID>3F7605A9-6C87-8B99-2E2E-AF426772FB5A</generatorID>
+<ownerDesignName>Modelo de datos Capstone</ownerDesignName>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="game_position_name" id="C9F557EB-0924-881F-AD58-0807EB1827AA">
+<createdBy>vardo</createdBy>
+<createdTime>2024-08-28 00:57:03 UTC</createdTime>
+<generatorID>A33EA68F-3A52-A614-B5EB-F3D11A3E1333</generatorID>
+<ownerDesignName>Modelo de datos Capstone</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>20</dataTypeSize>
+<ownDataTypeParameters>20,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="45ACB1DB-56DD-A906-7A86-86925DB7486E" name="Game_Position_PK">
+<createdBy>vardo</createdBy>
+<createdTime>2024-08-28 00:57:03 UTC</createdTime>
+<generatorID>7D1DEB4F-75F5-6B78-2FE4-5424CDACB12D</generatorID>
+<ownerDesignName>Modelo de datos Capstone</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="6C1369E8-0A8C-87F3-C8C7-C8051D1BE28A"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

@@ -1,0 +1,55 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Entity class="oracle.dbtools.crest.model.design.logical.Entity" directorySegmentName="seg_0" id="9DF9EB21-D0E5-BC60-3E09-2766827559A8" name="Statistic">
+<createdBy>jovag</createdBy>
+<createdTime>2024-08-27 03:26:32 UTC</createdTime>
+<ownerDesignName>Modelo de datos Capstone</ownerDesignName>
+<engineerTo>
+<item key="24073E91-CCFF-A12D-9ABC-982931F2DB3B" value="true"/>
+</engineerTo>
+<adequatelyNormalized>NO</adequatelyNormalized>
+<expectedVolumes>0</expectedVolumes>
+<fwdEngineeringStrategyName>Single Table</fwdEngineeringStrategyName>
+<growthPercent>0</growthPercent>
+<growthType>Year</growthType>
+<maxVolumes>9999999</maxVolumes>
+<minVolumes>0</minVolumes>
+<normalForm>Third</normalForm>
+<attributes itemClass="oracle.dbtools.crest.model.design.logical.Attribute">
+<Attribute name="statistic_id" id="214E53C7-741E-56E4-881D-29D80875EFD6">
+<createdBy>jovag</createdBy>
+<createdTime>2024-08-27 03:30:06 UTC</createdTime>
+<ownerDesignName>Modelo de datos Capstone</ownerDesignName>
+<engineerTo>
+<item key="24073E91-CCFF-A12D-9ABC-982931F2DB3B" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="player_id" id="8544BA2E-5F0F-D812-77F6-8C64BC415F80">
+<createdBy>jovag</createdBy>
+<createdTime>2024-08-27 03:33:53 UTC</createdTime>
+<generatorID>A2FE232A-3704-50D1-E2B4-B0F5FEF9AE6C</generatorID>
+<ownerDesignName>Modelo de datos Capstone</ownerDesignName>
+<engineerTo>
+<item key="24073E91-CCFF-A12D-9ABC-982931F2DB3B" value="true"/>
+</engineerTo>
+<referedAttribute>D6F95709-5FA3-F779-6D8B-ACC6DBEE0CE6</referedAttribute>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+</attributes>
+<identifiers itemClass="oracle.dbtools.crest.model.design.logical.CandidateKey">
+<identifier id="60DA434A-B208-843C-0A5D-09871B445973" name="Stadistic PK">
+<createdBy>jovag</createdBy>
+<createdTime>2024-08-27 03:30:14 UTC</createdTime>
+<ownerDesignName>Modelo de datos Capstone</ownerDesignName>
+<engineerTo>
+<item key="24073E91-CCFF-A12D-9ABC-982931F2DB3B" value="true"/>
+</engineerTo>
+<pk>true</pk>
+<usedAttributes>
+<attributeRef>214E53C7-741E-56E4-881D-29D80875EFD6</attributeRef>
+</usedAttributes>
+</identifier>
+</identifiers>
+</Entity>

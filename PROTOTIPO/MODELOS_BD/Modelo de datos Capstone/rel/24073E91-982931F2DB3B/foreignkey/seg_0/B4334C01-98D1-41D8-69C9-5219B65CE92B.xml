@@ -1,0 +1,17 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<FKIndexAssociation class="oracle.dbtools.crest.model.design.relational.FKIndexAssociation" directorySegmentName="seg_0" id="B4334C01-98D1-41D8-69C9-5219B65CE92B" containerWithKeyObject="9A186E87-1809-49B7-1968-15E2A720ED53" localFKIndex="5FFB27BB-150E-3BD4-070B-F19E73C71469" name="Relation_EventosDiscipline_Events_FK">
+<createdBy>vardo</createdBy>
+<createdTime>2024-08-28 00:57:03 UTC</createdTime>
+<generatorID>42B95D1B-0CE3-B37F-A7B6-AAC1E7637FE9</generatorID>
+<ownerDesignName>Modelo de datos Capstone</ownerDesignName>
+<referredTableLongName>Events</referredTableLongName>
+<deleteRule>NO ACTION</deleteRule>
+<referredTableID>FA458789-51A2-5859-F618-A795CC9C1228</referredTableID>
+<keyObject>1E3F14A3-5E27-9051-EE3F-C12708C1942B</keyObject>
+<referredKeyID>1E3F14A3-5E27-9051-EE3F-C12708C1942B</referredKeyID>
+<mandatory>true</mandatory>
+<refColNames>events_id</refColNames>
+<transferable>true</transferable>
+<rely>false</rely>
+<columnDependencyConstraintGenerateInDDL>true</columnDependencyConstraintGenerateInDDL>
+</FKIndexAssociation>

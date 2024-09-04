@@ -1,0 +1,17 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<FKIndexAssociation class="oracle.dbtools.crest.model.design.relational.FKIndexAssociation" directorySegmentName="seg_0" id="E2A3CDEA-90D8-5A27-706B-E916C466C572" containerWithKeyObject="FF07FBBC-366D-D782-20B4-8FE504C6C645" localFKIndex="5B725F21-7085-2FDE-BDFE-A329962B32EF" name="Team_Roster_Player_FK">
+<createdBy>vardo</createdBy>
+<createdTime>2024-08-28 00:57:03 UTC</createdTime>
+<generatorID>A48A57AE-CD8F-87F3-8AA1-0FAAE6C5D79C</generatorID>
+<ownerDesignName>Modelo de datos Capstone</ownerDesignName>
+<referredTableLongName>Player</referredTableLongName>
+<deleteRule>NO ACTION</deleteRule>
+<referredTableID>83196257-7E8F-8D3B-6AB9-915C6E908CAB</referredTableID>
+<keyObject>3B9C647F-7AE5-EA31-7C5F-B3CDA2446713</keyObject>
+<referredKeyID>3B9C647F-7AE5-EA31-7C5F-B3CDA2446713</referredKeyID>
+<mandatory>true</mandatory>
+<refColNames>player_id</refColNames>
+<transferable>true</transferable>
+<rely>false</rely>
+<columnDependencyConstraintGenerateInDDL>true</columnDependencyConstraintGenerateInDDL>
+</FKIndexAssociation>

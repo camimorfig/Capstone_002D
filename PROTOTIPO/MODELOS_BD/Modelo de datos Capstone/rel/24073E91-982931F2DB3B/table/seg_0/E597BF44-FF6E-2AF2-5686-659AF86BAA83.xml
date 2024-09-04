@@ -1,0 +1,71 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="E597BF44-FF6E-2AF2-5686-659AF86BAA83" name="Galery">
+<createdBy>vardo</createdBy>
+<createdTime>2024-08-28 00:57:03 UTC</createdTime>
+<generatorID>C145F132-B308-AB35-816A-242B03D662E3</generatorID>
+<ownerDesignName>Modelo de datos Capstone</ownerDesignName>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="galery_id" id="1FF19A78-F832-4A89-26C0-14557C2BB13C">
+<createdBy>vardo</createdBy>
+<createdTime>2024-08-28 00:57:03 UTC</createdTime>
+<generatorID>D8ADCBF4-503E-FF5B-ADD4-DC9101318E9F</generatorID>
+<ownerDesignName>Modelo de datos Capstone</ownerDesignName>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="galery_img" id="29C5A69D-9155-16A0-630C-FF3981B2F401">
+<createdBy>vardo</createdBy>
+<createdTime>2024-08-28 00:57:03 UTC</createdTime>
+<generatorID>C5E1ABA9-AE72-1E9E-4A12-BB699378AE40</generatorID>
+<ownerDesignName>Modelo de datos Capstone</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT029</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="galery_status" id="E196DFAD-E1CC-CF52-A1E0-0A240CF2F170">
+<createdBy>vardo</createdBy>
+<createdTime>2024-08-28 00:57:03 UTC</createdTime>
+<generatorID>9C13D203-A706-2B46-9D3C-F261765006C6</generatorID>
+<ownerDesignName>Modelo de datos Capstone</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>20</dataTypeSize>
+<ownDataTypeParameters>20,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="galery_description" id="19BE9D7E-E7D0-E6F0-1014-9A28B7399FB9">
+<createdBy>vardo</createdBy>
+<createdTime>2024-08-28 00:57:03 UTC</createdTime>
+<generatorID>67CD25A6-292D-696E-D5DD-BC5B0C2A31E2</generatorID>
+<ownerDesignName>Modelo de datos Capstone</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>30</dataTypeSize>
+<ownDataTypeParameters>30,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="C4BE9975-E300-414F-64E3-03737B544754" name="Galery_PK">
+<createdBy>vardo</createdBy>
+<createdTime>2024-08-28 00:57:03 UTC</createdTime>
+<generatorID>167A0E2E-2611-282D-93B9-0A38928D3BD7</generatorID>
+<ownerDesignName>Modelo de datos Capstone</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="1FF19A78-F832-4A89-26C0-14557C2BB13C"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>
