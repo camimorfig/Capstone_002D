@@ -1,0 +1,52 @@
+.section-futbol {
+    padding: 40px;
+    text-align: center;
+    color: #000000;
+    background-color: #ffffff;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.title {
+    font-size: 36px;
+    color:  #f0a500;
+    margin-bottom: 20px;
+}
+
+.description {
+    font-size: 18px;
+    color: #2e2e2e;
+    margin-bottom: 40px;
+}
+
+.image-container {
+    position: relative;
+}
+
+.main-image {
+    width: 100%;
+    height: auto;
+    max-height: 500px;
+    object-fit: cover;
+}
+
+.image-container::before,
+.image-container::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 50px;
+    background-color: #ffffff;
+}
+
+.image-container::before {
+    left: 0;
+}
+
+.image-container::after {
+    right: 0;
+}

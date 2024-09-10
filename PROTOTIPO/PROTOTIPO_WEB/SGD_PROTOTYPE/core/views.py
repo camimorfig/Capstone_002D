@@ -61,6 +61,18 @@ def noticias(request):
 
 def entrenador(request):
     return render (request, 'intranet/entrenador/entrenador.html')
+    
+def administrador(request):
+    return render (request, 'intranet/administrador/administrador.html')
+
+def crear_perfil_entrenador(request):
+    data = {
+        'disciplinas':listado_disciplinas(),
+        'tipo_entrenador':listado_tipo_entrenador()
+
+    }
+
+    return render (request, 'intranet/administrador/crear_perfil_entrenador.html',data)
 
 
 class CoachDashboardView(LoginRequiredMixin, TemplateView):
@@ -170,6 +182,33 @@ def guardar_contacto(nombre,email,descripcion):
     
     return salida.getvalue()
    
+
+def listado_disciplinas():
+    django_cursor = connection.cursor()
+    cursor = django_cursor.connection.cursor()
+    out_cur = django_cursor.connection.cursor()
+
+    cursor.callproc("SP_LIST_DISCIPLINE", [out_cur])
+
+    lista_disciplina = []
+    for fila in out_cur: 
+        lista_disciplina.append(fila)
+
+    return lista_disciplina
+
+def listado_tipo_entrenador():
+    django_cursor = connection.cursor()
+    cursor = django_cursor.connection.cursor()
+    out_cur = django_cursor.connection.cursor()
+
+    cursor.callproc("SP_LIST_COACH_TYPE", [out_cur])
+
+    lista_tipo_entrenador = []
+    for fila in out_cur: 
+        lista_tipo_entrenador.append(fila)
+
+    return lista_tipo_entrenador
+
 
 
 ####################################################
