@@ -11,12 +11,12 @@ from django.contrib.auth import login
 from django.shortcuts import redirect
 
 from django.contrib.auth.decorators import login_required
-
+from django.contrib.auth.hashers import make_password
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView
 from .models import Coach, Admin
 import oracledb
-
+import cx_Oracle
 
 
 
@@ -74,10 +74,27 @@ def crear_perfil_entrenador(request):
     }
 
     if request.method == 'POST':
-        nombre= request.POST.get('nombre')
-        email= request.POST.get('email')
-        descripcion= request.POST.get('descripcion')
-        salida = guardar_contacto(nombre,email,descripcion)
+        rut = request.POST.get('rut')
+        nombre = request.POST.get('nombre')
+        apellido = request.POST.get('apellido')
+        if 'imagen' in request.FILES:
+            imagen = request.FILES['imagen'].read()
+        else:
+            imagen = None 
+        tipo_entrenador = request.POST.get('tipo_entrenador')
+        lista_de_disciplina = request.POST.getlist('lista_de_disciplina')
+        email = request.POST.get('email')
+
+
+        nombre_concatenado = nombre[:2] + apellido[:2]
+        rut_extracto = rut.split('-')[0]
+
+        resultado_pass = nombre_concatenado + rut_extracto
+        print(resultado_pass)
+        hashed_password = make_password(resultado_pass)        
+
+
+        salida = guardar_entrenador(rut,nombre,apellido,imagen,tipo_entrenador ,email, hashed_password)
 
         if salida == 1:
             data['mensaje'] = 'guardado correctamente'
@@ -204,13 +221,16 @@ def listado_tipo_entrenador():
     return lista
 
 
-def guardar_entrenador(rut,nombre,apellido,imagen,tipo_entrenador,email,lista_de_disciplina):
+def guardar_entrenador(rut,nombre,apellido,imagen,tipo_entrenador,email,password):
     django_cursor = connection.cursor()
     cursor = django_cursor.connection.cursor()
 
     salida = cursor.var(oracledb.NUMBER)
-    
-    cursor.callproc('SP_CREATE_COACH_USER',[rut,nombre,apellido,imagen,tipo_entrenador,email,lista_de_disciplina, salida])
+
+
+#    disciplinas_var = cursor.arrayvar(oracledb.NUMBER, disciplinas_lista)
+
+    cursor.callproc('SP_CREATE_COACH_USER',[rut,nombre,apellido,imagen,tipo_entrenador ,email,password, salida])
     
     return salida.getvalue()
 

@@ -6,9 +6,15 @@
 
 <!-- Enlace css -->
 {% block css %}
-<link rel="stylesheet" href="{% static 'core/css/style_intranet.css' %}">
+<link rel="stylesheet" href="{% static 'core/css/style.css' %}">
+<link rel="stylesheet" href="{% static 'core/css/jazz.css' %}">
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+
 {% endblock css %}
 
 <!-- Enlace JS -->
@@ -21,80 +27,134 @@
 {% block contenido %}
     <!-- Main -->
     <main>
-        <div class="General row justify-content-md-left">
-            <!-- Sidebar a la izquierda -->
-            <div class="col col-lg-2">
-                <div class="sidebar h-100 p-2 text-white bg-dark rounded-2">
-                    <ul class="nav flex-column">
+            <div class="main-entrenador d-flex">
+            <div class="d-flex flex-column flex-shrink-0 p-3 bg-light" style="width: 280px;">
+                <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-dark text-decoration-none">
+                    <span class="fs-4">Buen Día {{ nombre_entrenador  }}!</span>
+                </a>
+                <hr>
+                <ul class="nav nav-pills flex-column mb-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="#">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-home"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-                        Inicio <span class="sr-only"></span>
+                        <a class="nav-link" href="entrenador.html">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="feather feather-home">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                            </svg>
+                            Inicio <span class="sr-only"></span>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="asistencia.html">
-                        <svg xmlns="http://www.w3.org/2000/svg"  width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
-                        Asistencia
+                        <a class="nav-link" href="../admin/pages-entrenador/asistencia-entrenador.html">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="feather feather-file">
+                                <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
+                                <polyline points="13 2 13 9 20 9"></polyline>
+                            </svg>
+                            Asistencia
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="perfil-jugador.html">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-users"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                        Perfil Jugadores
+                        <a class="nav-link" href="../admin/pages-entrenador/perfil-jugador.html">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="feather feather-users">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                            </svg>
+                            Perfil Jugadores
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bar-chart-2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
-                        Graficos de Asistencia
+                        <a class="nav-link" href="../pages-entrenador/grafico.html">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="feather feather-bar-chart-2">
+                                <line x1="18" y1="20" x2="18" y2="10"></line>
+                                <line x1="12" y1="20" x2="12" y2="4"></line>
+                                <line x1="6" y1="20" x2="6" y2="14"></line>
+                            </svg>
+                            Graficos de Asistencia
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-layers"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
-                        Documentos
-                        </a>
-                    </li>
-                    </ul>
+                </ul>
+            </div>
+            <!-- Left Sidebar End -->
+            <!-- Start MAIN -->
+            <div class="container-fluid">
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="#">Gestion de Entrenamientos</a></li>
+                                <li class="breadcrumb-item active" aria-current="page">Perfil de Entrenador</li>
+                            </ol>
+                        </nav>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-12">
+
+                        <div class="card mb-5">
+                            <div class="card-body pb-0 m-5">
+                                <div class="row d-flex justify-content-center">
+                                    <h4><i class="bi bi-journal-text text-primary font-size-22"></i> Gestion de
+                                        Entrenamientos</h4>
+                                    <div class="container mt-4">
+                                        <!-- <div class="row mb-3">
+                                            <div class="col-auto">
+                                                <div class="input-group">
+                                                    <span class="input-group-text">Buscar:</span>
+                                                    <input type="text" class="form-control" placeholder="Buscar...">
+                                                </div>
+                                            </div>
+                                        </div> -->
+
+                                        <table class="table table-striped table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Detalles</th>
+                                                    <th>Día de Entrenamiento</th>
+                                                    <th>Disciplina</th>
+                                                    <th>Ubicacion</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>Entrenamiento</td>
+                                                    <td>17/03/2023 16:24:05</td>
+                                                    <td>Futbol Varones</td>
+                                                    <td>Sede Antonio Varas Cancha</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Entrenamiento</td>
+                                                    <td>17/03/2023 16:24:05</td>
+                                                    <td>Futbol Varones</td>
+                                                    <td>Sede Antonio Varas Cancha</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Feriado</td>
+                                                    <td>17/03/2023 16:24:05</td>
+                                                    <td>-</td>
+                                                    <td>Chile</td>
+                                                </tr>
+                                                <!-- Add more rows as needed -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <!-- div nombre entrenador -->
-            <div class="name col-xl">
-                <h1 class="display-5 fw-bold">¡Buen Día {{ nombre_entrenador }}!</h1>
-
-                <!-- Apartado noticias -->
-                <div class="container-d my-5">
-
-                    <div class="row align-items-md-stretch">
-                        <div class="col-md-6">
-                            <div class="h-100 p-5 text-white bg-dark rounded-3">
-                                <h2>Noticia</h2>
-                                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Incidunt quidem enim accusantium sit maxime. Rerum est, ipsa error cumque, incidunt quasi, optio architecto assumenda adipisci dolore esse commodi sequi porro.</p>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="h-100 p-5 bg-light border rounded-3">
-                                <h2>Noticia</h2>
-                                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Incidunt quidem enim accusantium sit maxime. Rerum est, ipsa error cumque, incidunt quasi, optio architecto assumenda adipisci dolore esse commodi sequi porro.</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="p-5 mb-4 bg-light rounded-3">
-                        <div class="container-fluid py-5">
-                            <h1 class="display-5 fw-bold">Últimas Noticias</h1>
-                            <p class="col-md-8 fs-4">Mantente al día con las noticias más recientes relacionadas con nuestras actividades y eventos.</p>
-                            <button class="btn btn-primary btn-lg" type="button">Leer más</button>
-                        </div>
-                    </div>
-                </div> 
-            </div>
         </div>
-        <div>
-            
-        </div>
-
+    
     </main>
     
 {% endblock %}

@@ -155,8 +155,7 @@
                                         class="bi bi-journal-text text-primary font-size-22"></i>
                                     Crear Entrenador Selecciones</h4>
                                 <div style="max-width:50%">
-                                    <form method="POST"
-                                        enctype="multipart/form-data">
+                                    <form method="POST" enctype="multipart/form-data">
                                         {% csrf_token %}
 
                                         <div
@@ -218,7 +217,7 @@
              
                                         <div class="form-group">
                                             <label for="publicar_en"><strong>Tipo de entrenador</strong></label>
-                                            <select class="form-control" id="publicar_en" name="publicar_en" onchange="mostrarDeportes()" required>
+                                            <select class="form-control" id="publicar_en" name="tipo_entrenador" multiple required>
                                                 <option value="" disabled selected>Seleccione una opción</option>
                                                 {% for t in tipo_entrenador %}
                                             
@@ -238,7 +237,8 @@
                                                 <input class="form-check-input"
                                                     type="checkbox"
                                                     id="{{ d.1 }}"
-                                                    value="{{ d.0 }}">
+                                                    value="{{ d.0 }}"
+                                                    name="lista_de_disciplina">
                                                 <label class="form-check-label"
                                                     for="{{ d.1 }}"> {{ d.1 }} </label>
                                             </div>
