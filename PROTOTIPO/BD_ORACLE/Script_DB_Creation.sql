@@ -268,7 +268,7 @@ CREATE TABLE Player (
     player_status VARCHAR(30) NOT NULL,
 ---- IDs ----
     discipline_id INT NOT NULL,
-    game_position_id INT NOT NULL,    
+    game_position_id INT,    
 ----         
     
     CONSTRAINT pk_Player PRIMARY KEY (player_id)

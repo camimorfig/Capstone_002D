@@ -66,13 +66,26 @@ def administrador(request):
     return render (request, 'intranet/administrador/administrador.html')
 
 def crear_perfil_entrenador(request):
+
     data = {
         'disciplinas':listado_disciplinas(),
-        'tipo_entrenador':listado_tipo_entrenador()
+        'tipo_entrenador':listado_tipo_entrenador(),
 
     }
 
-    return render (request, 'intranet/administrador/crear_perfil_entrenador.html',data)
+    if request.method == 'POST':
+        nombre= request.POST.get('nombre')
+        email= request.POST.get('email')
+        descripcion= request.POST.get('descripcion')
+        salida = guardar_contacto(nombre,email,descripcion)
+
+        if salida == 1:
+            data['mensaje'] = 'guardado correctamente'
+        else:
+            data['mensaje'] = 'no se ha podido guardar. ERROR.'            
+
+
+    return render (request, 'intranet/administrador/crear_perfil_entrenador.html', data)
 
 
 class CoachDashboardView(LoginRequiredMixin, TemplateView):
@@ -89,15 +102,6 @@ class CoachDashboardView(LoginRequiredMixin, TemplateView):
 
         return super().dispatch(request, *args, **kwargs)
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        
-        entrenador = Coach.objects.get(user=self.request.user)
-        
-        # Pasamos el nombre al contexto
-        context['nombre_entrenador'] = entrenador.coach_name
-        
-        return context
 
 
 class AdminDashboardView(LoginRequiredMixin, TemplateView):
@@ -113,16 +117,6 @@ class AdminDashboardView(LoginRequiredMixin, TemplateView):
             return HttpResponseForbidden("No tienes permiso para acceder a esta página.")
 
         return super().dispatch(request, *args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        
-        admin = Admin.objects.get(user=self.request.user)
-        
-        # Pasamos el nombre al contexto
-        context['nombre_admin'] = admin.admin_name
-        
-        return context    
 
 
 
@@ -190,11 +184,11 @@ def listado_disciplinas():
 
     cursor.callproc("SP_LIST_DISCIPLINE", [out_cur])
 
-    lista_disciplina = []
+    lista = []
     for fila in out_cur: 
-        lista_disciplina.append(fila)
+        lista.append(fila)
 
-    return lista_disciplina
+    return lista
 
 def listado_tipo_entrenador():
     django_cursor = connection.cursor()
@@ -203,12 +197,22 @@ def listado_tipo_entrenador():
 
     cursor.callproc("SP_LIST_COACH_TYPE", [out_cur])
 
-    lista_tipo_entrenador = []
+    lista= []
     for fila in out_cur: 
-        lista_tipo_entrenador.append(fila)
+        lista.append(fila)
 
-    return lista_tipo_entrenador
+    return lista
 
+
+def guardar_entrenador(rut,nombre,apellido,imagen,tipo_entrenador,email,lista_de_disciplina):
+    django_cursor = connection.cursor()
+    cursor = django_cursor.connection.cursor()
+
+    salida = cursor.var(oracledb.NUMBER)
+    
+    cursor.callproc('SP_CREATE_COACH_USER',[rut,nombre,apellido,imagen,tipo_entrenador,email,lista_de_disciplina, salida])
+    
+    return salida.getvalue()
 
 
 ####################################################

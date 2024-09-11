@@ -51,6 +51,8 @@ BEGIN
         INSERT INTO coach_discipline (coach_id, discipline_id)
         VALUES (v_coach_id, p_discipline(i));
     END LOOP;
-
+    v_salida:= 1;
     COMMIT;
+    
+    v_salida:=0;
 END;

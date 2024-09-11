@@ -50,8 +50,9 @@ body {
     transition: 0.5s;
 }
 
+
 .login-box .form-group input:focus ~ label,
-.login-box .form-group input:valid ~ label {
+.login-box .form-group input:not(:placeholder-shown) ~ label {
     top: -20px;
     font-size: 12px;
     color: #ffffff;
