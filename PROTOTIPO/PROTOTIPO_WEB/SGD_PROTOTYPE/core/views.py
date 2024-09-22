@@ -1,23 +1,20 @@
 from django.shortcuts import render
 from django.urls import reverse
 from django.db import connection
-import base64
 from django.contrib.auth.views import LoginView
 from .forms import CustomLoginForm
-
 from django.http import HttpResponseForbidden
-
 from django.contrib.auth import login
 from django.shortcuts import redirect
-
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib import messages 
 from django.views.generic import TemplateView
 from .models import Coach, Admin
 import oracledb
 import cx_Oracle
-
+import base64
 
 
 ###########  views de Templates  ###########
@@ -59,50 +56,7 @@ def nosotros(request):
 def noticias(request):
     return render (request, 'core/noticias.html')
 
-def entrenador(request):
-    return render (request, 'intranet/entrenador/entrenador.html')
-    
-def administrador(request):
-    return render (request, 'intranet/administrador/administrador.html')
-
-def crear_perfil_entrenador(request):
-
-    data = {
-        'disciplinas':listado_disciplinas(),
-        'tipo_entrenador':listado_tipo_entrenador(),
-
-    }
-
-    if request.method == 'POST':
-        rut = request.POST.get('rut')
-        nombre = request.POST.get('nombre')
-        apellido = request.POST.get('apellido')
-        if 'imagen' in request.FILES:
-            imagen = request.FILES['imagen'].read()
-        else:
-            imagen = None 
-        tipo_entrenador = request.POST.get('tipo_entrenador')
-        lista_de_disciplina = request.POST.getlist('lista_de_disciplina')
-        email = request.POST.get('email')
-
-
-        nombre_concatenado = nombre[:2] + apellido[:2]
-        rut_extracto = rut.split('-')[0]
-
-        resultado_pass = nombre_concatenado + rut_extracto
-        print(resultado_pass)
-        hashed_password = make_password(resultado_pass)        
-
-
-        salida = guardar_entrenador(rut,nombre,apellido,imagen,tipo_entrenador ,email, hashed_password)
-
-        if salida == 1:
-            data['mensaje'] = 'guardado correctamente'
-        else:
-            data['mensaje'] = 'no se ha podido guardar. ERROR.'            
-
-
-    return render (request, 'intranet/administrador/crear_perfil_entrenador.html', data)
+###################### COACH ######################
 
 
 class CoachDashboardView(LoginRequiredMixin, TemplateView):
@@ -120,6 +74,71 @@ class CoachDashboardView(LoginRequiredMixin, TemplateView):
         return super().dispatch(request, *args, **kwargs)
 
 
+def perfil_jugadores(request):
+
+    data = {
+        'disciplinas': listado_disciplinas()
+        }
+    return render (request, 'intranet/entrenador/perfil_jugadores.html', data)
+
+
+def crear_perfil_Jugador(request):
+
+    data = {
+        'disciplinas': listado_disciplinas() 
+        }
+
+    if request.method == 'POST':
+        # Obtener los datos del formulario
+        imagen = request.FILES.get('imagen')
+        if not imagen:
+            data['mensaje_error'] = ["Debes subir una imagen para registrar un jugador."]
+            return render (request, 'intranet/entrenador/crear_perfil_Jugador.html', data)
+
+        rut = request.POST.get('rut')
+        if not rut:
+            data['mensaje_error'] = ["Debes ingresar un Rut para registrar un jugador."]
+            return render (request, 'intranet/entrenador/crear_perfil_Jugador.html', data)
+
+        nombre = request.POST.get('nombre')
+        if not nombre:
+            data['mensaje_error'] = ["Debes ingresar un Nombre para registrar un jugador."]
+            return render (request, 'intranet/entrenador/crear_perfil_Jugador.html', data)
+
+        apellido = request.POST.get('apellido')
+        if not apellido:
+            data['mensaje_error'] = ["Debes ingresar un Apellido para registrar un jugador."]
+            return render (request, 'intranet/entrenador/crear_perfil_Jugador.html', data)
+
+        headquarters = request.POST.get('headquarters')
+        if not headquarters:
+            data['mensaje_error'] = ["Debes ingresar una Sede para registrar un jugador."]
+            return render (request, 'intranet/entrenador/crear_perfil_Jugador.html', data)
+
+        career = request.POST.get('career')
+        if not career:
+            data['mensaje_error'] = ["Debes ingresar una Carrera para registrar un jugador."]
+            return render (request, 'intranet/entrenador/crear_perfil_Jugador.html', data)
+
+     #  position_id = request.POST.get('position_id')
+
+        # Guardar el jugador en la base de datos
+        salida = guardar_jugador(rut, nombre, apellido, headquarters, career, imagen, discipline_id)
+
+        if salida == 1:
+            data['mensaje_exito'] = ["Jugador registrado correctamente."]
+        else:
+            data['mensaje_error'] = ["No se ha podido registrar. ERROR."]
+
+
+    return render (request, 'intranet/entrenador/crear_perfil_Jugador.html', data)
+
+
+#####################################################
+
+
+###################### ADMIN ######################
+
 
 class AdminDashboardView(LoginRequiredMixin, TemplateView):
     template_name = 'intranet/administrador/administrador.html'
@@ -136,16 +155,89 @@ class AdminDashboardView(LoginRequiredMixin, TemplateView):
         return super().dispatch(request, *args, **kwargs)
 
 
+def crear_perfil_entrenador(request):
+    data = {
+        'disciplinas': listado_disciplinas(),
+        'tipo_entrenador': listado_tipo_entrenador(),
+    }
 
-############################################
+    if request.method == 'POST':
 
+        imagen = request.FILES.get('imagen')
+        if not imagen:
+            data['mensaje_error'] = ["Debes subir una imagen para registrar un entrenador."]
+            return render(request, 'intranet/administrador/crear_perfil_entrenador.html', data)
+
+        rut = request.POST.get('rut')
+        if not rut:
+            data['mensaje_error'] = ["Debes ingresar un Rut para registrar un entrenador."]
+            return render(request, 'intranet/administrador/crear_perfil_entrenador.html', data)
+
+        nombre = request.POST.get('nombre')
+        if not nombre:
+            data['mensaje_error'] = ["Debes ingresar un Nombre para registrar un entrenador."]
+            return render(request, 'intranet/administrador/crear_perfil_entrenador.html', data)
+
+        apellido = request.POST.get('apellido')
+        if not apellido:
+            data['mensaje_error'] = ["Debes ingresar un Apellido para registrar un entrenador."]
+            return render(request, 'intranet/administrador/crear_perfil_entrenador.html', data)
+
+        tipo_entrenador = request.POST.get('tipo_entrenador')
+        if not tipo_entrenador:
+            data['mensaje_error'] = ["Debes ingresar un Tipo de Entrenador para registrar un entrenador."]
+            return render(request, 'intranet/administrador/crear_perfil_entrenador.html', data)
+
+        email = request.POST.get('email')
+        if not email:
+            data['mensaje_error'] = ["Debes ingresar un Email para registrar un entrenador."]
+            return render(request, 'intranet/administrador/crear_perfil_entrenador.html', data)
+
+        # Generar contraseña
+        nombre_concatenado = apellido[:2]
+        rut_extracto = rut.split('-')[0]
+        resultado_pass = nombre_concatenado.lower() + rut_extracto
+        hashed_password = make_password(resultado_pass)
+
+        # Llamar a la función para guardar el entrenador
+        salida = guardar_entrenador(rut, nombre, apellido, imagen, tipo_entrenador, email, hashed_password)
+
+        # Manejar el resultado según el valor de salida
+        if salida == -1:
+            data['mensaje_error'] = ["El RUT ya está registrado."]
+        elif salida == -2:
+            data['mensaje_error'] = ["El email ya está registrado."]
+        elif salida == 1:
+            data['mensaje_exito'] = ["Entrenador registrado correctamente."]
+        else:
+            data['mensaje_error'] = ["No se ha podido guardar. ERROR."]
+
+    return render(request, 'intranet/administrador/crear_perfil_entrenador.html', data)
+
+
+def crear_noticias(request):
+    return render (request, 'intranet/administrador/crear_noticias.html')
+
+
+def subir_imagen(request):
+    return render (request, 'intranet/administrador/subir_imagen.html')
+
+
+def asistencia_admin(request):
+    return render (request, 'intranet/administrador/asistencia_admin.html')
+
+#####################################################
 
 
 ##################  LOGIN  ##########################
 
 class CustomLoginView(LoginView):
     form_class = CustomLoginForm
-    template_name = 'registration/login.html' 
+    template_name = 'registration/login.html'
+
+    def form_invalid(self, form):
+        messages.error(self.request, "Credenciales incorrectas. Por favor, intenta de nuevo.")
+        return super().form_invalid(form)
 
 
 
@@ -159,8 +251,8 @@ def profile_redirect(request):
         return redirect('admin_dashboard')  # Redirigir a la página del administrador
     else:
         return redirect('index')  
-    
-############################################
+
+#####################################################
 
 
 ###########  Procedimientos Almacenados  ###########
@@ -228,11 +320,23 @@ def guardar_entrenador(rut,nombre,apellido,imagen,tipo_entrenador,email,password
     salida = cursor.var(oracledb.NUMBER)
 
 
-#    disciplinas_var = cursor.arrayvar(oracledb.NUMBER, disciplinas_lista)
+ #  disciplinas_var = cursor.arrayvar(oracledb.NUMBER, disciplinas_lista)
 
-    cursor.callproc('SP_CREATE_COACH_USER',[rut,nombre,apellido,imagen,tipo_entrenador ,email,password, salida])
+    cursor.callproc('SP_CREATE_COACH_USER',[rut, nombre, apellido, imagen, tipo_entrenador, email, password, salida
+    ])
     
     return salida.getvalue()
 
+def guardar_jugador(rut, nombre, apellido, headquarters, career, imagen, discipline_id):
+    django_cursor = connection.cursor()
+    cursor = django_cursor.connection.cursor()
+
+    salida = cursor.var(oracledb.NUMBER)
+
+    cursor.callproc('SP_CREATE_PLAYER', [
+        rut, nombre, apellido, headquarters, career, imagen, discipline_id, salida
+    ])
+
+    return salida.getvalue()
 
 ####################################################

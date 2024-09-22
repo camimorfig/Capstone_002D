@@ -9,9 +9,11 @@
         {% load static %}
 
         <!-- Enlace css -->
+        <link rel="stylesheet" href="{% static 'core/css/style.css' %}">
         {% block css %}
         {% endblock css %}
         <!-- Enlace JS -->
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         {% block js %}
         {% endblock js %}
 

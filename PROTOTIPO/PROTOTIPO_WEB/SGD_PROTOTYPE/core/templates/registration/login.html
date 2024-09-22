@@ -14,9 +14,6 @@
     <body>
 
 
-
-
-
         <div class="login-box">
             <img src="{% static 'core/media/logo-duoc.png'%}" alt="Login" class="login-logo" height="100">
             <form id="login-form" method="post">
@@ -40,6 +37,20 @@
             </form> 
         </div>
 
-        <script src="% static 'core/js/script-login.js' %}"></script>
+        <script src="{% static 'core/js/script-login.js' %}"></script>
+
+    <!-- MENSAJES -->
+    {% if messages %}
+        {% for message in messages %}
+            <script>
+                Swal.fire({
+                    title: "{% if message.tags == 'error' %}Error{% else %}Felicidades{% endif %}",
+                    text: "{{ message }}",
+                    icon: "{% if message.tags == 'error' %}error{% else %}success{% endif %}",
+                });
+            </script>
+        {% endfor %}
+    {% endif %}
+
     </body>
 </html>

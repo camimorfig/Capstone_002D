@@ -385,8 +385,6 @@ CREATE TABLE Elite_Athlete (
 ----------------USER-----------------------
 -----------------------------------------------      
     INSERT INTO Main_User (email, password, user_type) VALUES ('gu.burgos@duocuc.cl','pbkdf2_sha256$870000$J0J33BXdyXe8pfXZDDAUpg$mymvPrQJReIL6DUdVju9RMKcPJAVzCkejK6dFbUO+bY=','admin01');
-    INSERT INTO Main_User (email, password, user_type) VALUES ('gustav@duocuc.cl','pbkdf2_sha256$870000$J0J33BXdyXe8pfXZDDAUpg$mymvPrQJReIL6DUdVju9RMKcPJAVzCkejK6dFbUO+bY=','coach01');
-    INSERT INTO Main_User (email, password, user_type) VALUES ('pati@duocuc.cl','pbkdf2_sha256$870000$fj1dS3moZBgOgOyLUWjbkr$GazdavvLLIQR9TjJWvXKDk01qX3msCpZUOSpRIw/kVQ=','coach01');
 ---------------------------------------
 
 -----------------------------------------------
@@ -436,7 +434,6 @@ CREATE TABLE Elite_Athlete (
 
     INSERT INTO Discipline (discipline_name, discipline_description) 
     VALUES ('Tenis de Mesa Damas','Consiste en un deporte de oposición, que se realiza en una mesa de juego, separando los dos campos por una red, con dos jugadores/as con sus raquetas respectivas y una bola que hay que pasar al campo contrario después de golpear la mesa. Se pierde el tanto cuando no se pasa la bola al campo contrario.');
-
 
     INSERT INTO Discipline (discipline_name, discipline_description) 
     VALUES ('Fútbol Varones','Se juega mediante una pelota que se debe desplazar a través del campo con cualquier parte del cuerpo que no sean los brazos o las manos, y mayoritariamente con los pies (de ahí su nombre). El objetivo es introducirla dentro de la portería o arco contrario, acción que se denomina marcar un gol');

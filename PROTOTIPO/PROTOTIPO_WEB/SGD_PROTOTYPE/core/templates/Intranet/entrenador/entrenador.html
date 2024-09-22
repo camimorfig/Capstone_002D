@@ -27,7 +27,9 @@
 {% block contenido %}
     <!-- Main -->
     <main>
-            <div class="main-entrenador d-flex">
+        <div class="main-entrenador d-flex">
+            <!-- Sidebar a la izquierda -->
+            <!-- ========== Left Sidebar Start ========== -->
             <div class="d-flex flex-column flex-shrink-0 p-3 bg-light" style="width: 280px;">
                 <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-dark text-decoration-none">
                     <span class="fs-4">Buen Día {{ nombre_entrenador  }}!</span>
@@ -35,7 +37,7 @@
                 <hr>
                 <ul class="nav nav-pills flex-column mb-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="entrenador.html">
+                        <a class="nav-link" href="{% url 'entrenador_dashboard' %}">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                 stroke-linejoin="round" class="feather feather-home">
@@ -46,7 +48,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="../admin/pages-entrenador/asistencia-entrenador.html">
+                        <a class="nav-link" href="#">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                 stroke-linejoin="round" class="feather feather-file">
@@ -57,7 +59,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="../admin/pages-entrenador/perfil-jugador.html">
+                        <a class="nav-link" href="{% url 'perfil_jugadores' %}">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                 stroke-linejoin="round" class="feather feather-users">
@@ -70,7 +72,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="../pages-entrenador/grafico.html">
+                        <a class="nav-link" href="#">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                 stroke-linejoin="round" class="feather feather-bar-chart-2">
@@ -154,7 +156,6 @@
                 </div>
             </div>
         </div>
-    
     </main>
     
 {% endblock %}
