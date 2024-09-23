@@ -120,6 +120,12 @@ def crear_perfil_Jugador(request):
             data['mensaje_error'] = ["Debes ingresar una Carrera para registrar un jugador."]
             return render (request, 'intranet/entrenador/crear_perfil_Jugador.html', data)
 
+        discipline_id = request.POST.get('discipline_id')
+        if not discipline_id:
+            data['mensaje_error'] = ["Debes ingresar una Disciplina para registrar un jugador."]
+            return render (request, 'intranet/entrenador/crear_perfil_Jugador.html', data)
+
+
      #  position_id = request.POST.get('position_id')
 
         # Guardar el jugador en la base de datos
