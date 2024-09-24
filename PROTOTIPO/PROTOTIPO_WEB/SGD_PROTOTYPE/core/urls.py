@@ -1,6 +1,7 @@
 from django.urls import path
 from.views import index, contacto, eventos, galeria, nosotros, noticias, CustomLoginView, CoachDashboardView, AdminDashboardView, \
-profile_redirect, crear_perfil_entrenador, crear_noticias, subir_imagen, asistencia_admin, perfil_jugadores, crear_perfil_Jugador
+profile_redirect, crear_perfil_entrenador, crear_noticias, subir_imagen, asistencia_admin, perfil_jugadores, crear_perfil_Jugador, \
+asistencia_entrenador, tomar_asistencia
 
 
 urlpatterns = [
@@ -22,6 +23,8 @@ urlpatterns = [
     path('asistencia_admin/', asistencia_admin, name='asistencia_admin'),   
     path('perfil_jugadores/', perfil_jugadores, name='perfil_jugadores'),   
     path('perfil_jugadores/crear_perfil/', crear_perfil_Jugador, name='crear_perfil_Jugador'),   
+    path('asistencia_entrenador/', asistencia_entrenador, name='asistencia_entrenador'),   
+    path('asistencia_entrenador/tomar_asistencia/', tomar_asistencia, name='tomar_asistencia'),   
 
 
     

@@ -90,7 +90,7 @@ def crear_perfil_Jugador(request):
 
     if request.method == 'POST':
         # Obtener los datos del formulario
-        imagen = request.FILES.get('imagen')
+        imagen = request.FILES.get('imagen').read()
         if not imagen:
             data['mensaje_error'] = ["Debes subir una imagen para registrar un jugador."]
             return render (request, 'intranet/entrenador/crear_perfil_Jugador.html', data)
@@ -140,6 +140,13 @@ def crear_perfil_Jugador(request):
     return render (request, 'intranet/entrenador/crear_perfil_Jugador.html', data)
 
 
+def asistencia_entrenador(request):
+    return render (request, 'intranet/entrenador/asistencia_entrenador.html')
+
+
+def tomar_asistencia(request):
+    return render (request, 'intranet/entrenador/tomar_asistencia.html')
+
 #####################################################
 
 
@@ -169,7 +176,7 @@ def crear_perfil_entrenador(request):
 
     if request.method == 'POST':
 
-        imagen = request.FILES.get('imagen')
+        imagen = request.FILES.get('imagen').read()
         if not imagen:
             data['mensaje_error'] = ["Debes subir una imagen para registrar un entrenador."]
             return render(request, 'intranet/administrador/crear_perfil_entrenador.html', data)
@@ -226,6 +233,9 @@ def crear_noticias(request):
 
 
 def subir_imagen(request):
+
+
+    
     return render (request, 'intranet/administrador/subir_imagen.html')
 
 

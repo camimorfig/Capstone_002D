@@ -1,0 +1,8 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<OSDM_Design class="oracle.dbtools.crest.model.design.Design" name="Modelo de datos Capstone" id="81FB262B-EFE9-BCD4-3264-71151DF43C6A" version="3.5">
+<createdBy>jovag</createdBy>
+<createdTime>2024-08-26 20:17:30 UTC</createdTime>
+<ownerDesignName>gestionDep1</ownerDesignName>
+<capitalNames>false</capitalNames>
+<designId>81FB262B-EFE9-BCD4-3264-71151DF43C6A</designId>
+</OSDM_Design>

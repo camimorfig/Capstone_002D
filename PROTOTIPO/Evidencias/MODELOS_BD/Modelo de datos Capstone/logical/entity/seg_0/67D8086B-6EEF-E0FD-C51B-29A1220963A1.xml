@@ -1,0 +1,94 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Entity class="oracle.dbtools.crest.model.design.logical.Entity" directorySegmentName="seg_0" id="67D8086B-6EEF-E0FD-C51B-29A1220963A1" name="Admin">
+<createdBy>jovag</createdBy>
+<createdTime>2024-08-26 23:47:05 UTC</createdTime>
+<ownerDesignName>Modelo de datos Capstone</ownerDesignName>
+<engineerTo>
+<item key="24073E91-CCFF-A12D-9ABC-982931F2DB3B" value="true"/>
+</engineerTo>
+<adequatelyNormalized>NO</adequatelyNormalized>
+<expectedVolumes>0</expectedVolumes>
+<fwdEngineeringStrategyName>Single Table</fwdEngineeringStrategyName>
+<growthPercent>0</growthPercent>
+<growthType>Year</growthType>
+<maxVolumes>9999999</maxVolumes>
+<minVolumes>0</minVolumes>
+<normalForm>Third</normalForm>
+<attributes itemClass="oracle.dbtools.crest.model.design.logical.Attribute">
+<Attribute name="admin_id" id="301E19E2-DE0C-440D-B850-E282B8876BFF">
+<createdBy>jovag</createdBy>
+<createdTime>2024-08-26 23:47:05 UTC</createdTime>
+<ownerDesignName>Modelo de datos Capstone</ownerDesignName>
+<engineerTo>
+<item key="24073E91-CCFF-A12D-9ABC-982931F2DB3B" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="admin_rut" id="C09B8E1B-6D6D-BF5C-C143-3E1EF919AAF9">
+<createdBy>jovag</createdBy>
+<createdTime>2024-08-26 23:47:05 UTC</createdTime>
+<ownerDesignName>Modelo de datos Capstone</ownerDesignName>
+<engineerTo>
+<item key="24073E91-CCFF-A12D-9ABC-982931F2DB3B" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>13</dataTypeSize>
+<ownDataTypeParameters>13,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="admin_name" id="B7919688-B194-30FA-29FF-F848701A57C9">
+<createdBy>jovag</createdBy>
+<createdTime>2024-08-26 23:53:13 UTC</createdTime>
+<ownerDesignName>Modelo de datos Capstone</ownerDesignName>
+<engineerTo>
+<item key="24073E91-CCFF-A12D-9ABC-982931F2DB3B" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>50</dataTypeSize>
+<ownDataTypeParameters>50,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="admin_img" id="5239BB71-28F5-67B5-A067-F41FE22AD5F7">
+<createdBy>jovag</createdBy>
+<createdTime>2024-08-27 04:49:51 UTC</createdTime>
+<ownerDesignName>Modelo de datos Capstone</ownerDesignName>
+<engineerTo>
+<item key="24073E91-CCFF-A12D-9ABC-982931F2DB3B" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT029</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="user_id" id="955FB40E-4D29-BEA3-785F-ED0741F5C6D1">
+<createdBy>jovag</createdBy>
+<createdTime>2024-08-27 00:07:17 UTC</createdTime>
+<generatorID>0D7E999D-8644-AAAA-F2F5-53BF662D3248</generatorID>
+<ownerDesignName>Modelo de datos Capstone</ownerDesignName>
+<engineerTo>
+<item key="24073E91-CCFF-A12D-9ABC-982931F2DB3B" value="true"/>
+</engineerTo>
+<referedAttribute>DD84CA34-0C77-C22A-88F4-533779D29447</referedAttribute>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+</attributes>
+<identifiers itemClass="oracle.dbtools.crest.model.design.logical.CandidateKey">
+<identifier id="FE306F95-492A-609E-C3E9-ED95D007EEF2" name="Coach PK">
+<createdBy>jovag</createdBy>
+<createdTime>2024-08-26 23:47:05 UTC</createdTime>
+<ownerDesignName>Modelo de datos Capstone</ownerDesignName>
+<engineerTo>
+<item key="24073E91-CCFF-A12D-9ABC-982931F2DB3B" value="true"/>
+</engineerTo>
+<pk>true</pk>
+<usedAttributes>
+<attributeRef>301E19E2-DE0C-440D-B850-E282B8876BFF</attributeRef>
+</usedAttributes>
+</identifier>
+</identifiers>
+</Entity>

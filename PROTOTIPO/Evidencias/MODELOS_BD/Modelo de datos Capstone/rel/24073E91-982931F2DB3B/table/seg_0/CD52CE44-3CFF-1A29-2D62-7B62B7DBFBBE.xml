@@ -1,0 +1,59 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="CD52CE44-3CFF-1A29-2D62-7B62B7DBFBBE" name="Statistic">
+<createdBy>vardo</createdBy>
+<createdTime>2024-08-28 00:57:03 UTC</createdTime>
+<generatorID>9DF9EB21-D0E5-BC60-3E09-2766827559A8</generatorID>
+<ownerDesignName>Modelo de datos Capstone</ownerDesignName>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="statistic_id" id="3313B613-65F3-5685-B3F4-0FB2CE2BD5BA">
+<createdBy>vardo</createdBy>
+<createdTime>2024-08-28 00:57:03 UTC</createdTime>
+<generatorID>214E53C7-741E-56E4-881D-29D80875EFD6</generatorID>
+<ownerDesignName>Modelo de datos Capstone</ownerDesignName>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="Player_player_id" id="58FC2E88-6D92-ECC6-FA6F-918C51C8B84F">
+<createdBy>vardo</createdBy>
+<createdTime>2024-08-28 00:57:03 UTC</createdTime>
+<generatorID>8544BA2E-5F0F-D812-77F6-8C64BC415F80</generatorID>
+<ownerDesignName>Modelo de datos Capstone</ownerDesignName>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<previousColumn>false</previousColumn>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="413361FC-26C8-5EA1-57A7-BA1D160DB32E" referredColumn="C717DBD8-BD49-8D5B-BAC5-B62E85B29CC8"/>
+</associations>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="94E3AB12-066E-3A1A-1231-4E4676CF60BB" name="Statistic_PK">
+<createdBy>vardo</createdBy>
+<createdTime>2024-08-28 00:57:03 UTC</createdTime>
+<generatorID>60DA434A-B208-843C-0A5D-09871B445973</generatorID>
+<ownerDesignName>Modelo de datos Capstone</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="3313B613-65F3-5685-B3F4-0FB2CE2BD5BA"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="909CFB96-853A-DD60-E7F3-251EDA62FE33" name="Statistic_Player_FK">
+<createdBy>vardo</createdBy>
+<createdTime>2024-08-28 00:57:03 UTC</createdTime>
+<generatorID>A2FE232A-3704-50D1-E2B4-B0F5FEF9AE6C</generatorID>
+<ownerDesignName>Modelo de datos Capstone</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="58FC2E88-6D92-ECC6-FA6F-918C51C8B84F"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

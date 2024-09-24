@@ -1,0 +1,18 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Relation class="oracle.dbtools.crest.model.design.logical.Relation" name="Relation_EventosDiscipline" directorySegmentName="seg_0" id="42B95D1B-0CE3-B37F-A7B6-AAC1E7637FE9">
+<createdBy>jovag</createdBy>
+<createdTime>2024-08-27 04:32:21 UTC</createdTime>
+<ownerDesignName>Modelo de datos Capstone</ownerDesignName>
+<engineerTo>
+<item key="24073E91-CCFF-A12D-9ABC-982931F2DB3B" value="true"/>
+</engineerTo>
+<identifying>false</identifying>
+<optionalSource>true</optionalSource>
+<optionalTarget>true</optionalTarget>
+<sourceCardinality>*</sourceCardinality>
+<sourceEntity>D17D3F3D-A070-CB44-BD13-99E55CFEA795</sourceEntity>
+<targetCardinalityString>*</targetCardinalityString>
+<targetEntity>1468AE33-D88C-4E93-2101-1ADA5F5E2ACB</targetEntity>
+<transferable>true</transferable>
+<deleteRule>NO ACTION</deleteRule>
+</Relation>
