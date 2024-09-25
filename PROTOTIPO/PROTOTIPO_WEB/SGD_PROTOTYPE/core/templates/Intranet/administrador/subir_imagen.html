@@ -97,7 +97,7 @@
                         </a>
                     </li>
                     <li>
-                        <a class="nav-link" href="{% url 'subir_imagen' %}">
+                        <a class="nav-link" href="{% url 'gestion_galeria' %}">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24"
                                 height="24" viewBox="0 0 24 24" fill="none"
                                 stroke="currentColor" stroke-width="2"
@@ -106,7 +106,7 @@
                                     points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline
                                     points="2 17 12 22 22 17"></polyline><polyline
                                     points="2 12 12 17 22 12"></polyline></svg>
-                            Agregar Fotos Galeria
+                            Gestionar Galeria
                         </a>
                     </li>
                 </ul>
@@ -140,34 +140,39 @@
                                 <h4 class="mb-5"><i class="bi bi-journal-text text-primary font-size-22"></i> Subir Fotos estilo Galeria</h4>
                                 <div style="max-width:50%">
                                     <form method="POST" enctype="multipart/form-data">
+                                        {% csrf_token %}
+
                                         <div class="form-outline mb-4 d-flex align-items-center">
                                             <div class="overflow-hidden" style="width: 70px; height: 70px;">
                                                 <img id="avatar-preview" src="{% static 'core/media/equipo.png'%}" alt="Avatar" class="img-fluid rounded-circle border border-3">
                                             </div>
                                             <div class="ms-2">
-                                                <label for="avatar" class="custom-label-class">Subir imagenes</label>
-                                                <input type="file" name="avatar" id="avatar" class="form-control form-control-sm" accept="image/*">
+                                                <label for="avatar" class="custom-label-class"><strong> Subir imagenes </strong></label>
+                                                <input type="file" name="imagen" id="avatar" class="form-control form-control-sm" accept="image/*">
                                             </div>
                                         </div>
                                         <div class="form-group">
                                             <label for="publicar_en"><strong>¿Dónde se va a publicar?</strong></label>
-                                            <select class="form-control" id="publicar_en" name="publicar_en" onchange="mostrarDeportes()" required>
+                                            <select class="form-control" id="publicar_en" name="discipline_id" onchange="mostrarDeportes()" required>
                                                 <option value="" disabled selected>Seleccione una opción</option>
-                                                <option value="disciplina">Disciplina</option>
-                                                <option value="menu_principal">Menú Principal</option>
-                                                <option value="menu_eventos">Menú de Eventos</option>
+
+                                                {% for d in disciplinas %}
+                                                    <option value="{{ d.0 }}">{{ d.1 }}</option>
+                                                {% endfor %}
                                             </select>
                                         </div>
-                                        <div class="form-group">
-                                            <label for="titulo"><strong>Título</strong></label>
-                                            <input type="text" class="form-control" id="titulo" name="titulo" placeholder="Título del evento" required>
-                                        </div>
-                            
+
                                         <div class="form-group">
                                             <label for="descripcion"><strong>Etiqueta</strong></label>
-                                            <input type="text" class="form-control" id="etiqueta" name="etiqueta" placeholder="Etiqueta Foto" required>
-
+                                            <input type="text" class="form-control" id="etiqueta" name="galery_description" placeholder="Etiqueta Foto" required>
                                         </div>
+                                        <hr>
+                                        <div class="form-group form-check">
+                                            <input type="checkbox" class="form-check-input" name="portada" value= "1" id="portada">
+                                            <label class="form-check-label" for="generarContraseña"><strong>Portada</strong></label>
+                                        </div>
+                            
+
                                         <hr>
                                         <button type="submit" class="btn btn-primary btn-block mb-4">Agregar</button>
                                     </form>
@@ -179,5 +184,30 @@
             </div>
         </div>
     </main>
+
+        <!-- MENSAJES -->
+        {% if mensaje_error %}
+        {% for m_eror in mensaje_error %}
+            <script>
+                Swal.fire({
+                    "title": "Error!",
+                    "text": "{{m_eror}}",
+                    "icon": "error",
+                })
+            </script>
+        {% endfor %}
+        {% endif %}
+
+        {% if mensaje_exito %}
+        {% for m_exito in mensaje_exito %}
+            <script>
+                Swal.fire({
+                    "title": "Felicidades!",
+                    "text": "{{m_exito}}",
+                    "icon": "success",
+                })
+            </script>
+        {% endfor %}
+        {% endif %}
 
 {% endblock %}

@@ -28,100 +28,100 @@
 <main>
 
     <div class="main-admin d-flex">
-        <!-- Sidebar a la izquierda -->
-        <!-- ========== Left Sidebar Start ========== -->
-        <div class="d-flex flex-column flex-shrink-0 p-3 bg-light"
-            style="width: 280px;">
-            <a href="/"
-                class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-dark text-decoration-none">
-                <span class="fs-4">Buen Día {{ nombre_admin }}  !</span>
-            </a>
-            <hr>
-            <ul class="nav nav-pills flex-column mb-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'admin_dashboard' %}">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24"
-                            height="24" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round"
-                            class="feather feather-home"><path
-                                d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline
-                                points="9 22 9 12 15 12 15 22"></polyline></svg>
-                        Inicio <span class="sr-only"></span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'asistencia_admin' %}">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24"
-                            height="24" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round"
-                            class="feather feather-file"><path
-                                d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline
-                                points="13 2 13 9 20 9"></polyline></svg>
-                        Asistencia
-                    </a>
-                </li>
-                <li>
-                    <a class="nav-link" href>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24"
-                            height="24" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round"
-                            class="feather feather-users"><path
-                                d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle
-                                cx="9" cy="7" r="4"></circle><path
-                                d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path
-                                d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                        Solicitud Perfil Jugadores
-                    </a>
-                </li>
-                <li>
-                    <a class="nav-link"
-                        href="{% url 'crear_perfil_entrenador' %}">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24"
-                            height="24" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round"
-                            class="feather feather-users"><path
-                                d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle
-                                cx="9" cy="7" r="4"></circle><path
-                                d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path
-                                d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                        Agregar Entrenador
-                    </a>
-                </li>
-                <li>
-                    <a class="nav-link" href="{% url 'crear_noticias' %}">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24"
-                            height="24" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round"
-                            class="feather feather-layers"><polygon
-                                points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline
-                                points="2 17 12 22 22 17"></polyline><polyline
-                                points="2 12 12 17 22 12"></polyline></svg>
-                        Crear Noticias
-                    </a>
-                </li>
-                <li>
-                    <a class="nav-link" href="{% url 'subir_imagen' %}">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24"
-                            height="24" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round"
-                            class="feather feather-layers"><polygon
-                                points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline
-                                points="2 17 12 22 22 17"></polyline><polyline
-                                points="2 12 12 17 22 12"></polyline></svg>
-                        Agregar Fotos Galeria
-                    </a>
-                </li>
-            </ul>
-            <hr>
-        </div>
-        <!-- Left Sidebar End -->
-        <!-- start page title -->
+            <!-- Sidebar a la izquierda -->
+            <!-- ========== Left Sidebar Start ========== -->
+            <div class="d-flex flex-column flex-shrink-0 p-3 bg-light"
+                style="width: 280px;">
+                <a href="/"
+                    class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-dark text-decoration-none">
+                    <span class="fs-4">Buen Día {{ nombre_admin }}  !</span>
+                </a>
+                <hr>
+                <ul class="nav nav-pills flex-column mb-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'admin_dashboard' %}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                height="24" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round"
+                                class="feather feather-home"><path
+                                    d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline
+                                    points="9 22 9 12 15 12 15 22"></polyline></svg>
+                            Inicio <span class="sr-only"></span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'asistencia_admin' %}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                height="24" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round"
+                                class="feather feather-file"><path
+                                    d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline
+                                    points="13 2 13 9 20 9"></polyline></svg>
+                            Asistencia
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-link" href>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                height="24" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round"
+                                class="feather feather-users"><path
+                                    d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle
+                                    cx="9" cy="7" r="4"></circle><path
+                                    d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path
+                                    d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                            Solicitud Perfil Jugadores
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-link"
+                            href="{% url 'crear_perfil_entrenador' %}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                height="24" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round"
+                                class="feather feather-users"><path
+                                    d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle
+                                    cx="9" cy="7" r="4"></circle><path
+                                    d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path
+                                    d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                            Agregar Entrenador
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-link" href="{% url 'crear_noticias' %}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                height="24" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round"
+                                class="feather feather-layers"><polygon
+                                    points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline
+                                    points="2 17 12 22 22 17"></polyline><polyline
+                                    points="2 12 12 17 22 12"></polyline></svg>
+                            Crear Noticias
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-link" href="{% url 'gestion_galeria' %}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                height="24" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round"
+                                class="feather feather-layers"><polygon
+                                    points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline
+                                    points="2 17 12 22 22 17"></polyline><polyline
+                                    points="2 12 12 17 22 12"></polyline></svg>
+                            Gestionar Galeria
+                        </a>
+                    </li>
+                </ul>
+                <hr>
+            </div>
+            <!-- Left Sidebar End -->
+            <!-- start page title -->
 
         <div class="container-fluid">
             <div class="row mt-3">

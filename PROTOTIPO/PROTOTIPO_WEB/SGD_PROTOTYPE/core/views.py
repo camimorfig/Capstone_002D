@@ -1,3 +1,4 @@
+
 from django.shortcuts import render
 from django.urls import reverse
 from django.db import connection
@@ -19,7 +20,10 @@ import base64
 
 ###########  views de Templates  ###########
 def index(request):
-    return render (request, 'core/index.html')
+    data = {
+        'galeria_pf':listado_galeria_portada()
+        }
+    return render (request, 'core/index.html', data)
 
 def contacto(request):
 
@@ -234,13 +238,51 @@ def crear_noticias(request):
 
 def subir_imagen(request):
 
+    data = {
+        'disciplinas': listado_disciplinas()  # Asumiendo que existe una función para listar disciplinas
+    }
+
+    if request.method == 'POST':
+        imagen = request.FILES.get('imagen').read()
+        if not imagen:
+            data['mensaje_error'] = ["Debes subir una imagen para registrar una galería."]
+            return render(request, 'intranet/crear_galeria.html', data)
+ 
+        discipline_id = request.POST.get('discipline_id')
+        if not discipline_id:
+            data['mensaje_error'] = ["Debes ingresar una disciplina para la galería."]
+            return render(request, 'intranet/crear_galeria.html', data)
+
+        galery_description = request.POST.get('galery_description')
+        if not galery_description:
+            data['mensaje_error'] = ["Debes ingresar una descripción para la galería."]
+            return render(request, 'intranet/crear_galeria.html', data)
+
+        portada = request.POST.get('portada')
+        if portada == "on":
+            portada = 1
+        elif portada == None:
+            portada = 0
+
+
+        # Guardar la galería en la base de datos
+        salida = guardar_galeria(imagen, portada, galery_description, discipline_id)
+
+        if salida == 1:
+            data['mensaje_exito'] = ["Imagen registrada correctamente."]
+        else:
+            data['mensaje_error'] = ["No se ha podido registrar la galería. ERROR."]
 
     
-    return render (request, 'intranet/administrador/subir_imagen.html')
+    return render (request, 'intranet/administrador/subir_imagen.html', data)
 
 
 def asistencia_admin(request):
     return render (request, 'intranet/administrador/asistencia_admin.html')
+
+
+def gestion_galeria(request):
+    return render (request, 'intranet/administrador/gestion_galeria.html')
 
 #####################################################
 
@@ -354,5 +396,41 @@ def guardar_jugador(rut, nombre, apellido, headquarters, career, imagen, discipl
     ])
 
     return salida.getvalue()
+
+def guardar_galeria(imagen, portada, galery_description, discipline_id):
+    django_cursor = connection.cursor()
+    cursor = django_cursor.connection.cursor()
+
+    salida = cursor.var(oracledb.NUMBER)
+
+    cursor.callproc('SP_CREATE_GALERY', [
+        imagen, 
+        portada, 
+        galery_description, 
+        discipline_id,
+
+        salida
+    ])
+
+    return salida.getvalue()
+
+def listado_galeria_portada():
+    django_cursor = connection.cursor()
+    cursor = django_cursor.connection.cursor()
+    out_cur = django_cursor.connection.cursor()
+
+    cursor.callproc("sp_list_images_front_page", [out_cur])
+
+    lista = []
+    for fila in out_cur:
+        data={
+            'data':fila,
+            'imagen':str(base64.b64encode(fila[1].read()), 'utf-8'),    
+            
+        }
+
+        lista.append(data)
+
+    return lista
 
 ####################################################
