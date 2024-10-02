@@ -17,6 +17,3 @@ class CustomLoginForm(AuthenticationForm):
             'placeholder': 'Password'
         })
     )
-
-
-    

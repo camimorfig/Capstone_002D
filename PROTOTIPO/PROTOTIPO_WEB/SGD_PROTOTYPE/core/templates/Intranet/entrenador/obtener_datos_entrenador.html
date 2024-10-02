@@ -1,0 +1,32 @@
+
+{% if jugadores %}
+    {% for j in jugadores %}
+    <tbody>
+        <tr>
+            <td>{{ j.0 }}</td> 
+            <td>{{ j.1 }}</td>               
+            <td>{{ j.2 }}</td> 
+            <td>{{ j.3 }}</td> 
+            <td>{{ j.4 }}</td> 
+            <td>{{ j.5 }}</td> 
+            <td>{{ j.6 }}</td> 
+            <td>
+                <span class="badge bg-success">{{ j.7 }}</span> 
+            </td>
+            <td>
+                <div class="dropdown">
+                    <button class="dropdown-item" href="#"><i class="bi bi-trash text-danger"></i> Borrar</button>
+                </div>
+            </td>
+        </tr>
+    <tbody>
+
+    {% endfor %}
+
+{% else  %}
+<tbody>
+        <tr>
+            <td colspan="9" class="text-center">No hay jugadores inscritos en esta disciplina</td>
+        </tr>
+<tbody>
+{% endif %}

@@ -1,7 +1,5 @@
 from django.urls import path
-from.views import index, contacto, eventos, galeria, nosotros, noticias, CustomLoginView, CoachDashboardView, AdminDashboardView, \
-profile_redirect, crear_perfil_entrenador, crear_noticias, subir_imagen, asistencia_admin, perfil_jugadores, crear_perfil_Jugador, \
-asistencia_entrenador, tomar_asistencia, gestion_galeria
+from.views import *
 
 
 urlpatterns = [
@@ -27,6 +25,7 @@ urlpatterns = [
     
     path('gestion_galeria/subir_imagen/', subir_imagen, name='subir_imagen'),   
     path('gestion_galeria/', gestion_galeria, name='gestion_galeria'),   
+    path('jugadores/', jugadores_por_disciplina, name='jugadores_por_disciplina'),   
 
 
     

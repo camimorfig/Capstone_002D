@@ -5,6 +5,7 @@ CREATE OR REPLACE PROCEDURE SP_CREATE_GALERY(
     p_galery_description VARCHAR2,
     p_discipline_id NUMBER,
     
+    
     p_salida OUT NUMBER
 ) AS
     v_galery_status NUMBER;

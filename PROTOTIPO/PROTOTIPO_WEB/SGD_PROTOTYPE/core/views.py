@@ -16,6 +16,7 @@ from .models import Coach, Admin
 import oracledb
 import cx_Oracle
 import base64
+import json
 
 
 ###########  views de Templates  ###########
@@ -24,6 +25,7 @@ def index(request):
         'galeria_pf':listado_galeria_portada()
         }
     return render (request, 'core/index.html', data)
+
 
 def contacto(request):
 
@@ -44,8 +46,10 @@ def contacto(request):
 
     return render (request, 'core/contacto.html',data)
 
+
 def eventos(request):
     return render (request, 'core/eventos.html')
+
 
 def galeria(request):
     return render (request, 'core/galeria.html')
@@ -57,12 +61,12 @@ def nosotros(request):
         }
     return render (request, 'core/nosotros.html', data)
 
+
 def noticias(request):
     return render (request, 'core/noticias.html')
 
+
 ###################### COACH ######################
-
-
 class CoachDashboardView(LoginRequiredMixin, TemplateView):
     template_name = 'intranet/entrenador/entrenador.html'
 
@@ -78,12 +82,31 @@ class CoachDashboardView(LoginRequiredMixin, TemplateView):
         return super().dispatch(request, *args, **kwargs)
 
 
+@login_required
 def perfil_jugadores(request):
+    # Verificar si el usuario tiene entrenadores asociados
+    if not hasattr(request.user, 'coach'):
+        return HttpResponseForbidden("El usuario no está asociado a ningún entrenador.")
+
+    # Obtener el ID del entrenador autenticado, asegurando que hay uno asociado
+    entrenador = request.user.coach.first()  # Si hay múltiples entrenadores, obtén el primero
+
+    if not entrenador:
+        return HttpResponseForbidden("No hay entrenadores asociados a este usuario.")
+
+    # Obtener el ID del entrenador
+    entrenador_id = entrenador.coach_id
+
+    # Llamar al procedimiento almacenado para listar las disciplinas del entrenador
+    disciplinas = listado_disciplinas_por_entrenador(entrenador_id)
 
     data = {
-        'disciplinas': listado_disciplinas()
-        }
-    return render (request, 'intranet/entrenador/perfil_jugadores.html', data)
+        'disciplinas': disciplinas
+    }
+    
+    print(listado_jugador_por_disciplinas(4))
+
+    return render(request, 'intranet/entrenador/perfil_jugadores.html', data)
 
 
 def crear_perfil_Jugador(request):
@@ -145,18 +168,33 @@ def crear_perfil_Jugador(request):
 
 
 def asistencia_entrenador(request):
-    return render (request, 'intranet/entrenador/asistencia_entrenador.html')
+    data = {
+
+
+    }
+
+    return render (request, 'intranet/entrenador/asistencia_entrenador.html', data)
 
 
 def tomar_asistencia(request):
     return render (request, 'intranet/entrenador/tomar_asistencia.html')
 
+
+def jugadores_por_disciplina(request):
+    
+    disciplina = request.GET.get('disciplina') 
+    print(disciplina)
+    data = { 
+        'jugadores':listado_jugador_por_disciplinas(disciplina)
+
+    }
+
+    return render (request, 'intranet/entrenador/obtener_datos_entrenador.html', data)
+
 #####################################################
 
 
 ###################### ADMIN ######################
-
-
 class AdminDashboardView(LoginRequiredMixin, TemplateView):
     template_name = 'intranet/administrador/administrador.html'
 
@@ -179,36 +217,38 @@ def crear_perfil_entrenador(request):
     }
 
     if request.method == 'POST':
-
-        imagen = request.FILES.get('imagen').read()
-        if not imagen:
-            data['mensaje_error'] = ["Debes subir una imagen para registrar un entrenador."]
-            return render(request, 'intranet/administrador/crear_perfil_entrenador.html', data)
-
+        # Obtener los datos del formulario
         rut = request.POST.get('rut')
+        nombre = request.POST.get('nombre')
+        apellido = request.POST.get('apellido')
+        tipo_entrenador = int(request.POST.get('tipo_entrenador')) 
+        email = request.POST.get('email')
+        imagen = request.FILES.get('imagen').read() if request.FILES.get('imagen') else None
+        disciplinas_seleccionadas = request.POST.getlist('lista_de_disciplina')
+
+
+        # Validaciones
         if not rut:
             data['mensaje_error'] = ["Debes ingresar un Rut para registrar un entrenador."]
             return render(request, 'intranet/administrador/crear_perfil_entrenador.html', data)
-
-        nombre = request.POST.get('nombre')
         if not nombre:
             data['mensaje_error'] = ["Debes ingresar un Nombre para registrar un entrenador."]
             return render(request, 'intranet/administrador/crear_perfil_entrenador.html', data)
-
-        apellido = request.POST.get('apellido')
         if not apellido:
             data['mensaje_error'] = ["Debes ingresar un Apellido para registrar un entrenador."]
             return render(request, 'intranet/administrador/crear_perfil_entrenador.html', data)
-
-        tipo_entrenador = request.POST.get('tipo_entrenador')
         if not tipo_entrenador:
             data['mensaje_error'] = ["Debes ingresar un Tipo de Entrenador para registrar un entrenador."]
             return render(request, 'intranet/administrador/crear_perfil_entrenador.html', data)
-
-        email = request.POST.get('email')
         if not email:
             data['mensaje_error'] = ["Debes ingresar un Email para registrar un entrenador."]
             return render(request, 'intranet/administrador/crear_perfil_entrenador.html', data)
+        if not disciplinas_seleccionadas:
+            data['mensaje_error'] = ["Debes seleccionar al menos una disciplina."]
+            return render(request, 'intranet/administrador/crear_perfil_entrenador.html', data)
+
+        disciplinas_seleccionadas = [int(disciplina) for disciplina in disciplinas_seleccionadas]
+
 
         # Generar contraseña
         nombre_concatenado = apellido[:2]
@@ -216,18 +256,31 @@ def crear_perfil_entrenador(request):
         resultado_pass = nombre_concatenado.lower() + rut_extracto
         hashed_password = make_password(resultado_pass)
 
-        # Llamar a la función para guardar el entrenador
-        salida = guardar_entrenador(rut, nombre, apellido, imagen, tipo_entrenador, email, hashed_password)
 
-        # Manejar el resultado según el valor de salida
-        if salida == -1:
-            data['mensaje_error'] = ["El RUT ya está registrado."]
-        elif salida == -2:
-            data['mensaje_error'] = ["El email ya está registrado."]
-        elif salida == 1:
+        # Llamar a la función para guardar el entrenador
+        salida = guardar_entrenador(
+            rut, 
+            nombre, 
+            apellido, 
+            imagen, 
+            tipo_entrenador, 
+            email, 
+            hashed_password,  
+            disciplinas_seleccionadas 
+        )
+
+        # Manejar el resultado de salida
+        if salida == 1:
             data['mensaje_exito'] = ["Entrenador registrado correctamente."]
+        
+        elif salida == -1:
+            data['mensaje_error'] = ["Rut ya registrado. No es posible registrar al Entrenador."]
+
+        elif salida == -2:
+            data['mensaje_error'] = ["Email ya registrado. No es posible registrar al Entrenador."]
+
         else:
-            data['mensaje_error'] = ["No se ha podido guardar. ERROR."]
+            data['mensaje_error'] = ["No se ha podido Registrar al entrenador. ERROR."]
 
     return render(request, 'intranet/administrador/crear_perfil_entrenador.html', data)
 
@@ -284,11 +337,11 @@ def asistencia_admin(request):
 def gestion_galeria(request):
     return render (request, 'intranet/administrador/gestion_galeria.html')
 
+
 #####################################################
 
 
 ##################  LOGIN  ##########################
-
 class CustomLoginView(LoginView):
     form_class = CustomLoginForm
     template_name = 'registration/login.html'
@@ -298,9 +351,7 @@ class CustomLoginView(LoginView):
         return super().form_invalid(form)
 
 
-
-
-@login_required  # Asegúrate de que solo usuarios autenticados accedan a esta vista
+@login_required  
 def profile_redirect(request):
     user = request.user
     if user.user_type == 'coach01': 
@@ -310,11 +361,11 @@ def profile_redirect(request):
     else:
         return redirect('index')  
 
+
 #####################################################
 
 
 ###########  Procedimientos Almacenados  ###########
-
 def listado_entrenadores():
     django_cursor = connection.cursor()
     cursor = django_cursor.connection.cursor()
@@ -333,6 +384,7 @@ def listado_entrenadores():
 
     return lista
 
+
 def guardar_contacto(nombre,email,descripcion):
     django_cursor = connection.cursor()
     cursor = django_cursor.connection.cursor()
@@ -342,7 +394,7 @@ def guardar_contacto(nombre,email,descripcion):
     cursor.callproc('SP_CREATE_CONTACT',[nombre,email,descripcion, salida])
     
     return salida.getvalue()
-   
+
 
 def listado_disciplinas():
     django_cursor = connection.cursor()
@@ -356,6 +408,7 @@ def listado_disciplinas():
         lista.append(fila)
 
     return lista
+
 
 def listado_tipo_entrenador():
     django_cursor = connection.cursor()
@@ -371,19 +424,32 @@ def listado_tipo_entrenador():
     return lista
 
 
-def guardar_entrenador(rut,nombre,apellido,imagen,tipo_entrenador,email,password):
+def guardar_entrenador(rut, nombre, apellido, imagen, tipo_entrenador, email, password, disciplinas_lista):
     django_cursor = connection.cursor()
     cursor = django_cursor.connection.cursor()
 
     salida = cursor.var(oracledb.NUMBER)
 
-
- #  disciplinas_var = cursor.arrayvar(oracledb.NUMBER, disciplinas_lista)
-
-    cursor.callproc('SP_CREATE_COACH_USER',[rut, nombre, apellido, imagen, tipo_entrenador, email, password, salida
-    ])
+    disciplinas_json = json.dumps(disciplinas_lista)
     
+    try:
+        cursor.callproc('SP_CREATE_COACH_USER', [
+            rut, 
+            nombre, 
+            apellido, 
+            imagen, 
+            tipo_entrenador, 
+            email, 
+            password, 
+            disciplinas_json,  # Pasar el JSON de disciplinas
+            salida
+        ])
+    except Exception as e:
+        print(f'Error al ejecutar el procedimiento almacenado: {str(e)}')
+        return 0
+
     return salida.getvalue()
+
 
 def guardar_jugador(rut, nombre, apellido, headquarters, career, imagen, discipline_id):
     django_cursor = connection.cursor()
@@ -396,6 +462,7 @@ def guardar_jugador(rut, nombre, apellido, headquarters, career, imagen, discipl
     ])
 
     return salida.getvalue()
+
 
 def guardar_galeria(imagen, portada, galery_description, discipline_id):
     django_cursor = connection.cursor()
@@ -414,6 +481,7 @@ def guardar_galeria(imagen, portada, galery_description, discipline_id):
 
     return salida.getvalue()
 
+
 def listado_galeria_portada():
     django_cursor = connection.cursor()
     cursor = django_cursor.connection.cursor()
@@ -430,6 +498,34 @@ def listado_galeria_portada():
         }
 
         lista.append(data)
+
+    return lista
+
+
+def listado_disciplinas_por_entrenador(id_entrenador):
+    django_cursor = connection.cursor()
+    cursor = django_cursor.connection.cursor()
+    out_cur = django_cursor.connection.cursor()
+
+    cursor.callproc("SP_LIST_DISCIPLINE_FOR_COACH", [out_cur, id_entrenador])
+
+    lista = []
+    for fila in out_cur: 
+        lista.append(fila)
+
+    return lista
+
+
+def listado_jugador_por_disciplinas(id_disciplina):
+    django_cursor = connection.cursor()
+    cursor = django_cursor.connection.cursor()
+    out_cur = django_cursor.connection.cursor()
+
+    cursor.callproc("SP_LIST_PLAYERS_FOR_DISCIPLINE", [out_cur, id_disciplina])
+
+    lista = []
+    for fila in out_cur: 
+        lista.append(fila)
 
     return lista
 

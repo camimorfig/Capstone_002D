@@ -182,7 +182,8 @@ CREATE TABLE Contact (
 CREATE TABLE Galery (
     galery_id INTEGER GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1) NOT NULL ,
     galery_img blob NOT NULL,
-    galery_status VARCHAR(50) NOT NULL,
+    galery_status NUMBER NOT NULL,
+    galery_front_page NUMBER NOT NULL,     
     galery_description VARCHAR(100),
     
     ---- ADMIN FOREAN KEY ----
@@ -440,6 +441,13 @@ CREATE TABLE Elite_Athlete (
 
     INSERT INTO Discipline (discipline_name, discipline_description) 
     VALUES ('Futbolito Damas','El Futbolito es un deporte colectivo muy parecido al fútbol, presentando diferencias con respecto al terreno de juego, medidas de la cancha, medidas de la portería, peso y tamaño del balón y algunas reglas de juego. El Futbolito se juega entre dos equipos de 7 jugadores cada uno.');
+
+    INSERT INTO Discipline (discipline_name, discipline_description) 
+    VALUES ('Futsal Varones','El Futbolito es un deporte colectivo muy parecido al fútbol, presentando diferencias con respecto al terreno de juego, medidas de la cancha, medidas de la portería, peso y tamaño del balón y algunas reglas de juego. El Futbolito se juega entre dos equipos de 7 jugadores cada uno.');
+
+    INSERT INTO Discipline (discipline_name, discipline_description) 
+    VALUES ('Futsal Damas','El Futbolito es un deporte colectivo muy parecido al fútbol, presentando diferencias con respecto al terreno de juego, medidas de la cancha, medidas de la portería, peso y tamaño del balón y algunas reglas de juego. El Futbolito se juega entre dos equipos de 7 jugadores cada uno.');
+
 
     INSERT INTO Discipline (discipline_name, discipline_description) 
     VALUES ('Vóleibol Varones','El voleibol, simplemente voley, es un deporte donde dos equipos se enfrentan sobre un terreno de juego liso separados por una red central, tratando de pasar el balón por encima de la red hacia el suelo del campo contrario');

@@ -24,21 +24,50 @@
 <section class="team-section">
   <h1>Nosotros</h1>
   <div class="team-container">
-    {% for e in entrenadores %}  
+
+    {% if not entrenadores %}
+
       <div class="team-card">
-        <img src="data:imagen/png;base64, {{ e.imagen }}" alt="{{ e.data.1 }}">
-        <h2>{{ e.data.1 }}</h2>
-        <p>{{ e.data.2 }}</p>
+        <img src="{% static 'core/media/avatar.png'%}" alt="Logo Duoc UC">
+
+        <h2>Nombre Entrenador</h2>
+        <p>Disciplinas</p>
         <div class="email">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-envelope"
-            viewBox="0 0 16 16">
-            <path
-              d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1zm13 2.383-4.708 2.825L15 11.105zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741M1 11.105l4.708-2.897L1 5.383z" />
-          </svg>
-          <p>{{ e.data.3 }}</p>
-        </div>
+          <p>Correo</p>
       </div>
-    {% endfor %}
+
+    {% else %}
+
+      {% for e in entrenadores %} 
+        <div class="team-card">
+          
+          {% if not e.imagen %}
+          
+          <img src="{% static 'core/media/avatar.png'%}" alt="Logo Duoc UC">
+
+          <h2>{{ e.data.1 }}</h2>
+          <p>{{ e.data.2 }}</p>
+          <div class="email">
+            <p>{{ e.data.3 }}</p>
+          </div>
+
+          {% else %}
+
+          <img src="data:imagen/png;base64, {{ e.imagen }}" alt="{{ e.data.1 }}">
+
+
+            <h2>{{ e.data.1 }}</h2>
+          <p>{{ e.data.2 }}</p>
+          <div class="email">
+            <p>{{ e.data.3 }}</p>
+          </div>
+          {% endif %}
+
+        </div>
+      {% endfor %}  
+    {% endif %}
+  </div>
+
   </div>
 </section>
 

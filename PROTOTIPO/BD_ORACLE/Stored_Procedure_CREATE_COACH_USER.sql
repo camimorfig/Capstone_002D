@@ -1,4 +1,4 @@
-CREATE OR REPLACE PROCEDURE sp_create_coach_user(
+create or replace NONEDITIONABLE PROCEDURE sp_create_coach_user (
     -- coach data --
     p_rut VARCHAR2,
     p_name VARCHAR2,
@@ -8,6 +8,9 @@ CREATE OR REPLACE PROCEDURE sp_create_coach_user(
     -- user data --
     p_email VARCHAR2,
     p_password VARCHAR2,
+    -- JSON List of disciplines
+    p_discipline_json CLOB, 
+    
     v_salida OUT NUMBER
 ) IS
     v_coach_id VARCHAR2(200);
@@ -19,7 +22,6 @@ CREATE OR REPLACE PROCEDURE sp_create_coach_user(
     v_superuser NUMBER;
     v_count_rut NUMBER;
     v_count_email NUMBER;
-
 BEGIN
     -- Verificar RUT 
     SELECT COUNT(*)
@@ -41,7 +43,6 @@ BEGIN
         v_salida := -2; -- Email ya existe
         RETURN;
     ELSE
-
         v_active := 1;    -- 1 = sí
         v_staff := 0;     -- 0 = no
         v_superuser := 0; -- 0 = no
@@ -59,6 +60,18 @@ BEGIN
         INSERT INTO coach (coach_id, coach_name, coach_img, user_id, coach_type_id)
         VALUES (p_rut, v_name_complete, p_image, v_user_id, coach_type)
         RETURNING coach_id INTO v_coach_id;
+
+        -- Procesar el JSON para las disciplinas
+        DECLARE
+            v_discipline_id NUMBER;
+            v_json_list JSON_ARRAY_T := JSON_ARRAY_T(p_discipline_json);  
+        BEGIN
+            FOR i IN 0 .. v_json_list.get_size() - 1 LOOP
+                v_discipline_id := v_json_list.get_number(i);
+                INSERT INTO coach_discipline (coach_id, discipline_id)
+                VALUES (v_coach_id, v_discipline_id);
+            END LOOP;
+        END;
 
         v_salida := 1; -- Operación exitosa
         COMMIT;

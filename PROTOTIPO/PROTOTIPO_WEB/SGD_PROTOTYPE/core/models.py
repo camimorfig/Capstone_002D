@@ -107,11 +107,16 @@ class Coach(models.Model):
     coach_id = models.CharField(primary_key=True, max_length=20)
     coach_name = models.CharField(max_length=50)
     coach_img = models.BinaryField(blank=True, null=True)
-    user = models.ForeignKey('MainUser', models.DO_NOTHING)
+    user = models.ForeignKey('MainUser', models.DO_NOTHING, related_name='coach')  # Añadir related_name
+    coach_type = models.ForeignKey('CoachType', models.DO_NOTHING)
+    disciplines = models.ManyToManyField('Discipline', through='CoachDiscipline', related_name='coaches')
 
     class Meta:
         managed = False
         db_table = 'coach'
+
+
+
 
 
 class Contact(models.Model):
@@ -125,6 +130,24 @@ class Contact(models.Model):
         managed = False
         db_table = 'contact'
 
+class CoachDiscipline(models.Model):
+    coach = models.ForeignKey(Coach, models.DO_NOTHING)
+    discipline = models.ForeignKey('Discipline', models.DO_NOTHING)
+
+    class Meta:
+        managed = False
+        db_table = 'coach_discipline'
+        unique_together = (('coach', 'discipline'),)
+
+
+class CoachType(models.Model):
+    coach_type_id = models.BigIntegerField(primary_key=True)
+    coach_type_name = models.CharField(max_length=100)
+    coach_type_description = models.CharField(max_length=2000, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'coach_type'
 
 class Discipline(models.Model):
     discipline_id = models.BigAutoField(primary_key=True)

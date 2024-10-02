@@ -1,5 +1,10 @@
 /* eventos.css */
-
+.titulo-eventos {
+    font-family: 'Impact', sans-serif;
+    font-size: 50px;
+    color: #1a1a18;
+    padding: 20px;
+}
 /* Contenedor del Calendario */
 .calendar-container {
     background-color: #fff;

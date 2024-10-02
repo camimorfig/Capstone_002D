@@ -1,3 +1,4 @@
+/* Reset y base */
 * {
     margin: 0;
     padding: 0;
@@ -8,55 +9,32 @@ body {
     font-family: Arial, sans-serif;
 }
 
-
-.logo-navbar{
-
-        
-    position: relative;
-    right: -40px;
-
-}
-
-.user-sesion {
-    
-    position: relative;
-    left: -40px;
-}
-
-
 /* Header */
-
-/* General */
 header {
-    background-color: #000000;
+    background-color: #000;
     color: #fff;
     padding: 10px 0;
 }
 
-/* Contenedor principal unificado */
 .header-container {
     display: flex;
     justify-content: space-between;
-    align-items: center; /* Alinea verticalmente todos los elementos */
+    align-items: center;
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
 }
 
-/* Logo */
-.header-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center; /* Alinea verticalmente todos los elementos */
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
+.user-sesion {
+    position: relative;
+    left: -40px;
 }
 
-/* Logo */
 .logo-navbar img {
-    width: 150px; 
+    width: 150px;
     height: auto;
+    position: relative;
+    right: -40px;
 }
 
 /* Enlaces de navegación */
@@ -65,14 +43,12 @@ header {
     display: flex;
     flex-grow: 1;
     justify-content: center;
-    margin: 0;
-    padding: 0;
     align-items: center;
 }
 
 .nav-links li {
     margin-left: 20px;
-    position: relative; /* Para permitir el posicionamiento del dropdown */
+    position: relative;
 }
 
 .nav-links a {
@@ -87,39 +63,58 @@ header {
 }
 
 /* Dropdown */
-.dropdown-content {
+.dropdown-content, 
+.submenu-content {
     display: none;
     position: absolute;
     background-color: #333; 
-    min-width: 160px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    min-width: 160px; 
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2); 
+    border-radius: 4px; 
     z-index: 1;
-    list-style-type: none; 
-    padding: 0; 
-    margin: 0; 
+    list-style: none; 
+    padding: 8px 0; 
+    transition: opacity 0.2s ease, transform 0.2s ease; 
+    opacity: 0; 
+    transform: translateY(-5px); 
 }
 
-
-.dropdown-content li {
-    margin: 0;
-}
-
-.dropdown-content a {
+.dropdown-content a, 
+.submenu-content a {
     color: #fff;
-    padding: 8px 16px;
+    padding: 8px 16px; 
     text-decoration: none;
     display: block;
     text-align: left;
+    border-radius: 4px; 
 }
 
-.dropdown-content a:hover {
+.dropdown-content a:hover, 
+.submenu-content a:hover {
     background-color: #575757; 
 }
 
-.nav-links li:hover .dropdown-content {
+.nav-links li:hover > .dropdown-content, 
+.dropdown-submenu:hover > .submenu-content {
     display: block;
+    opacity: 1; 
+    transform: translateY(0); 
 }
 
+.nav-links li:hover .dropdown-content {
+    display: block; 
+    opacity: 1; 
+    transform: translateY(0); 
+}
+
+.dropdown-submenu {
+    position: relative;
+}
+
+.submenu-content {
+    left: 100%; 
+    top: -8px;
+}
 
 /* Main */
 main {
@@ -131,13 +126,15 @@ main {
     padding: 20px;
     width: 100%;
 }
+
 /* Noticias */
 .container {
     max-width: 1200px;
     margin: 0 auto;
 }
 
-h1.display-5 {
+h1.display-5, 
+.bg-light h2 {
     color: #333;
 }
 
@@ -149,15 +146,10 @@ p.fs-4 {
     color: #fff;
 }
 
-.bg-light h2 {
-    color: #333;
-}
-
 /* Selecciones */
 .section-team {
     display: grid;
-    grid-template-columns: repeat(4, 1fr); /* 4 columnas */
-    grid-template-rows: repeat(2, 200px); /* 2 filas */
+    grid-template-columns: repeat(4, 1fr); 
     gap: 10px;
     width: 80%;
 }
@@ -231,7 +223,8 @@ p.fs-4 {
     background-color: white;
     color: #333;
 }
-/* footer */
+
+/* Footer */
 .footer {
     background-color: #000;
     padding: 10px 20px;
@@ -246,9 +239,18 @@ p.fs-4 {
     margin: 0 auto;
 }
 
+.footer-logo-left img,
+.footer-logo-right img {
+    height: auto;
+}
+
 .footer-logo-left img {
     width: 200px; 
-    height: auto;
+}
+
+.footer-logo-right img {
+    width: 300px; 
+    margin-left: 15px;
 }
 
 .footer-redes {
@@ -258,15 +260,7 @@ p.fs-4 {
 
 .footer-redes svg {
     width: 15px; 
-    height: auto;
 }
-
-.footer-logo-right img {
-    width: 300px; 
-    height: auto;
-    margin-left: 15px;
-}
-
 
 /* Media Query para dispositivos móviles */
 @media (max-width: 768px) {
@@ -279,30 +273,23 @@ p.fs-4 {
         left: 0;
         background-color: #000; 
         text-align: center;
-             
     }
     .nav-menu {
-        display: flex; /* Mostrar icono de menú en móvil */
+        display: flex;
     }
     .nav-menu svg {
         fill: #fff;
         cursor: pointer;
     }
-   
-    /* Selecciones en modo móvil (1 columna) */
     .section-team {
         grid-template-columns: 1fr; 
-        grid-template-rows: auto; 
     }
-
     .flex-content-team {
-        
         height: auto; 
         margin-bottom: 20px; 
     }
 }
 
-/* Clase para activar el menú */
 .nav-active {
     display: flex;
 }

@@ -53,6 +53,12 @@ body {
     transform: scale(1.1);
 }
 
+.gallery-section h1 {
+    font-family: 'Impact', sans-serif;
+    font-size: 50px;
+    color:  #1a1a18;
+}  
+
 @media (max-width: 768px) {
     .gallery {
         grid-template-columns: repeat(2, 1fr);
