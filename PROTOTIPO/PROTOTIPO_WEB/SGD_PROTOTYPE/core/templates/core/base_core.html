@@ -10,6 +10,7 @@
 
         <!-- Enlace css -->
         <link rel="stylesheet" href="{% static 'core/css/style.css' %}">
+
         {% block css %}
         {% endblock css %}
         <!-- Enlace JS -->
@@ -49,60 +50,47 @@
                     <ul class="dropdown-content">
       
                         <li class="dropdown-submenu">
-                            <a href="futbol.html">Fútbol</a>
+                            <a>Fútbol</a>
                             <ul class="submenu-content">
-                                <li><a href="futbol-femenino.html">Fútbol Femenino</a></li>
-                                <li><a href="futbol.html">Fútbol Masculino</a></li>
+                                <li><a href="{% url 'disciplina_view' 'Futbolito damas' 'acerca' %}">Futbolito Femenino</a></li>
+                                <li><a href="{% url 'disciplina_view' 'Fútbol varones' 'acerca' %}">Fútbol Masculino</a></li>
                             </ul>
                         </li>
                         <li class="dropdown-submenu">
-                            <a href="futsal.html">Futsal</a>
+                            <a>Futsal</a>
                             <ul class="submenu-content">
-                                <li><a href="futsal-femenino.html">Futsal Femenino</a></li>
-                                <li><a href="futsal.html">Futsal Masculino</a></li>
+                                <li><a href="{% url 'disciplina_view' 'Futsal damas' 'acerca' %}">Futsal Femenino</a></li>
+                                <li><a href="{% url 'disciplina_view' 'Futsal varones' 'acerca' %}">Futsal Masculino</a></li>
                             </ul>
                         </li>
                         <li class="dropdown-submenu">
-                            <a href="rugby.html">Rugby</a>
+                            <li><a href="{% url 'disciplina_view' 'Rugby varones' 'acerca' %}">Rugby</a></li>
+
+                        </li>
+                        <li class="dropdown-submenu">
+                            <a>Voleibol</a>
                             <ul class="submenu-content">
-                                <li><a href="rugby-femenino.html">Rugby Femenino</a></li>
-                                <li><a href="rugby.html">Rugby Masculino</a></li>
+                                <li><a href="{% url 'disciplina_view' 'Vóleibol damas' 'acerca' %}">Voleibol Femenino</a></li>
+                                <li><a href="{% url 'disciplina_view' 'Vóleibol varones' 'acerca' %}">Voleibol Masculino</a></li>
                             </ul>
                         </li>
                         <li class="dropdown-submenu">
-                            <a href="futbolito.html">Futbolito</a>
+                            <a>Básquetbol</a>
                             <ul class="submenu-content">
-                                <li><a href="futbolito-femenino.html">Futbolito Femenino</a></li>
-                                <li><a href="futbolito.html">Futbolito Masculino</a></li>
+                                <li><a href="{% url 'disciplina_view' 'Básquetbol damas' 'acerca' %}">Básquetbol Femenino</a></li>
+                                <li><a href="{% url 'disciplina_view' 'Básquetbol varones' 'acerca' %}">Básquetbol Masculino</a></li>
                             </ul>
                         </li>
                         <li class="dropdown-submenu">
-                            <a href="voleibol.html">Voleibol</a>
+                            <a>Tenis de Mesa</a>
                             <ul class="submenu-content">
-                                <li><a href="voleibol-femenino.html">Voleibol Femenino</a></li>
-                                <li><a href="voleibol.html">Voleibol Masculino</a></li>
+                                <li><a href="{% url 'disciplina_view' 'Tenis de mesa damas' 'acerca' %}">Tenis de Mesa Femenino</a></li>
+                                <li><a href="{% url 'disciplina_view' 'Tenis de mesa varones' 'acerca' %}">Tenis de Mesa Masculino</a></li>
                             </ul>
                         </li>
                         <li class="dropdown-submenu">
-                            <a href="basquetbol.html">Básquetbol</a>
-                            <ul class="submenu-content">
-                                <li><a href="basquetbol-femenino.html">Básquetbol Femenino</a></li>
-                                <li><a href="basquetbol.html">Básquetbol Masculino</a></li>
-                            </ul>
-                        </li>
-                        <li class="dropdown-submenu">
-                            <a href="tenisdemesa.html">Tenis de Mesa</a>
-                            <ul class="submenu-content">
-                                <li><a href="tenisdemesa-femenino.html">Tenis de Mesa Femenino</a></li>
-                                <li><a href="tenisdemesa.html">Tenis de Mesa Masculino</a></li>
-                            </ul>
-                        </li>
-                        <li class="dropdown-submenu">
-                            <a href="ajedrez.html">Ajedrez</a>
-                            <ul class="submenu-content">
-                                <li><a href="ajedrez-femenino.html">Ajedrez Femenino</a></li>
-                                <li><a href="ajedrez.html">Ajedrez Masculino</a></li>
-                            </ul>
+                            <li><a href="{% url 'disciplina_view' 'Ajedrez' 'acerca' %}">Ajedrez</a></li>
+
                         </li>
                     </ul>
 

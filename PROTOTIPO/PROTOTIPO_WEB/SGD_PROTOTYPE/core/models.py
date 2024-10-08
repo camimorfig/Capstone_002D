@@ -153,7 +153,6 @@ class Discipline(models.Model):
     discipline_id = models.BigAutoField(primary_key=True)
     discipline_name = models.CharField(max_length=50)
     discipline_description = models.CharField(max_length=500)
-    coach = models.ForeignKey(Coach, models.DO_NOTHING)
 
     class Meta:
         managed = False
@@ -299,7 +298,7 @@ class Player(models.Model):
     player_last_name = models.CharField(max_length=50)
     player_headquarters = models.CharField(max_length=50, blank=True, null=True)
     player_career = models.CharField(max_length=30)
-    player_img = models.BinaryField(blank=True, null=True)
+    player_img = models.ImageField(upload_to='player_images/', null=True, blank=True)    
     player_status = models.CharField(max_length=30)
     discipline = models.ForeignKey(Discipline, models.DO_NOTHING)
     game_position = models.ForeignKey(GamePosition, models.DO_NOTHING)

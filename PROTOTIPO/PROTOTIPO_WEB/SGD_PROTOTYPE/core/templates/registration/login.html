@@ -7,7 +7,8 @@
         {% load static %}
 
         <link rel="stylesheet" href="{% static 'core/css/login-style.css' %}">
-        
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
         <!-- HEATER Y FOOTER -->
 
     </head>
@@ -40,17 +41,20 @@
         <script src="{% static 'core/js/script-login.js' %}"></script>
 
     <!-- MENSAJES -->
+
+
     {% if messages %}
         {% for message in messages %}
             <script>
                 Swal.fire({
-                    title: "{% if message.tags == 'error' %}Error{% else %}Felicidades{% endif %}",
-                    text: "{{ message }}",
-                    icon: "{% if message.tags == 'error' %}error{% else %}success{% endif %}",
-                });
+                    "title": "Error!",
+                    "text": "{{ message }}",
+                    "icon": "error",
+                })
             </script>
         {% endfor %}
     {% endif %}
+
 
     </body>
 </html>

@@ -12,11 +12,13 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages 
 from django.views.generic import TemplateView
-from .models import Coach, Admin
+from .models import Coach, Admin, Discipline, Player, Galery
 import oracledb
 import cx_Oracle
 import base64
 import json
+from django.shortcuts import get_object_or_404
+
 
 
 ###########  views de Templates  ###########
@@ -66,6 +68,54 @@ def noticias(request):
     return render (request, 'core/noticias.html')
 
 
+def disciplina_view(request, disciplina, seccion):
+    disciplina_obj = get_object_or_404(Discipline, discipline_name__iexact=disciplina)
+    
+    if seccion == "acerca":
+        # En este caso, mostramos la información básica de la disciplina
+        context = {
+            'disciplina': disciplina_obj,
+            'seccion': seccion,
+        }
+        
+    elif seccion == "plantel":
+      # Recuperar jugadores relacionados con esta disciplina
+        jugadores = Player.objects.filter(discipline=disciplina_obj)
+        
+        # Lista para almacenar jugadores con sus imágenes en base64
+        jugadores_con_imagenes = []
+        for jugador in jugadores:
+            if jugador.player_img:  # Verifica que haya una imagen
+                # Codifica la imagen en base64 sin usar .read()
+                imagen_base64 = base64.b64encode(jugador.player_img.read()).decode('utf-8')
+                jugadores_con_imagenes.append({
+                    'jugador': jugador,
+                    'imagen_base64': imagen_base64
+                })
+        
+        context = {
+            'disciplina': disciplina_obj,
+            'seccion': seccion,
+            'jugadores_con_imagenes': jugadores_con_imagenes,
+        }
+
+    elif seccion == "galeria":
+        # Recuperar las imágenes de la galería relacionadas con esta disciplina
+        imagenes = Galery.objects.filter(galery_description__icontains=disciplina_obj.discipline_name)
+        context = {
+            'disciplina': disciplina_obj,
+            'seccion': seccion,
+            'imagenes': imagenes,
+        }
+
+    else:
+        # Si la sección no es válida, podemos redirigir o mostrar un error
+        return render(request, 'core/error.html', {'mensaje': 'Sección no encontrada'})
+
+    # Renderizar la plantilla dinámica
+    return render(request, 'core/disciplinas/disciplina_template.html', context)
+
+
 ###################### COACH ######################
 class CoachDashboardView(LoginRequiredMixin, TemplateView):
     template_name = 'intranet/entrenador/entrenador.html'
@@ -103,17 +153,32 @@ def perfil_jugadores(request):
     data = {
         'disciplinas': disciplinas
     }
-    
-    print(listado_jugador_por_disciplinas(4))
 
     return render(request, 'intranet/entrenador/perfil_jugadores.html', data)
 
-
+@login_required
 def crear_perfil_Jugador(request):
 
+    # Verificar si el usuario tiene entrenadores asociados
+    if not hasattr(request.user, 'coach'):
+        return HttpResponseForbidden("El usuario no está asociado a ningún entrenador.")
+
+    # Obtener el ID del entrenador autenticado, asegurando que hay uno asociado
+    entrenador = request.user.coach.first()  # Si hay múltiples entrenadores, obtén el primero
+
+    if not entrenador:
+        return HttpResponseForbidden("No hay entrenadores asociados a este usuario.")
+
+    # Obtener el ID del entrenador
+    entrenador_id = entrenador.coach_id
+
+    # Llamar al procedimiento almacenado para listar las disciplinas del entrenador
+    disciplinas = listado_disciplinas_por_entrenador(entrenador_id)
+
     data = {
-        'disciplinas': listado_disciplinas() 
-        }
+        'disciplinas': disciplinas
+    }
+
 
     if request.method == 'POST':
         # Obtener los datos del formulario
@@ -147,7 +212,7 @@ def crear_perfil_Jugador(request):
             data['mensaje_error'] = ["Debes ingresar una Carrera para registrar un jugador."]
             return render (request, 'intranet/entrenador/crear_perfil_Jugador.html', data)
 
-        discipline_id = request.POST.get('discipline_id')
+        discipline_id = request.POST.get('disciplina')
         if not discipline_id:
             data['mensaje_error'] = ["Debes ingresar una Disciplina para registrar un jugador."]
             return render (request, 'intranet/entrenador/crear_perfil_Jugador.html', data)
@@ -190,6 +255,11 @@ def jugadores_por_disciplina(request):
     }
 
     return render (request, 'intranet/entrenador/obtener_datos_entrenador.html', data)
+
+
+def grafico(request):
+    return render (request, 'intranet/entrenador/grafico.html')
+
 
 #####################################################
 
@@ -338,6 +408,11 @@ def gestion_galeria(request):
     return render (request, 'intranet/administrador/gestion_galeria.html')
 
 
+def solicitud_jugador(request):
+    return render (request, 'intranet/administrador/solicitud_jugador.html')
+
+
+
 #####################################################
 
 
@@ -361,6 +436,7 @@ def profile_redirect(request):
     else:
         return redirect('index')  
 
+ 
 
 #####################################################
 

@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deportes Duoc UC</title>
+
+    <!-- Cargar Statics -->
+    {% load static %}
+
+    <!-- Enlace css -->
+    <link rel="stylesheet" href="{% static 'core/css/style.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .notification-dropdown {
+            width: 300px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .notification-item {
+            border-bottom: 1px solid #e9ecef;
+            padding: 10px;
+        }
+
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+
+        .notification-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+
+        .notification-time {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+    </style>
+    {% block css %}
+    {% endblock css %}
+    <!-- Enlace JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    {% block js %}
+    {% endblock js %}
+
+
+</head>
+
+<body>
+    <!-- Header -->
+    <header>
+        <!-- Barra de navegación -->
+        <nav class="navbar">
+            <div class="logo-navbar">
+                <a href="{% url 'index' %}">
+                    <img src="{% static 'core/media/logo-duoc.png'%}" alt="Logo Duoc UC">
+                </a>
+            </div>
+            <ul class="nav-links">
+
+                {% if user.user_type == 'coach01' %}
+
+                <li><a href="{% url 'entrenador_dashboard' %}">Perfil</a></li>
+
+                {% elif user.user_type == 'admin01' %}
+
+                <li><a href="{% url 'admin_dashboard' %}">Perfil</a></li>
+
+                {% endif %}
+
+                <li><a href="{% url 'noticias' %}">Noticias</a></li>
+                <li><a href="{% url 'galeria' %}">Galería</a></li>
+                <li><a href="{% url 'eventos' %}">Eventos</a></li>
+                <li class="dropdown">
+                    <a href="">Selecciones</a>
+                    <ul class="dropdown-content">
+
+                        <li class="dropdown-submenu">
+                            <a href="futbol.html">Fútbol</a>
+                            <ul class="submenu-content">
+                                <li><a href="futbol-femenino.html">Fútbol Femenino</a></li>
+                                <li><a href="futbol.html">Fútbol Masculino</a></li>
+                            </ul>
+                        </li>
+                        <li class="dropdown-submenu">
+                            <a href="futsal.html">Futsal</a>
+                            <ul class="submenu-content">
+                                <li><a href="futsal-femenino.html">Futsal Femenino</a></li>
+                                <li><a href="futsal.html">Futsal Masculino</a></li>
+                            </ul>
+                        </li>
+                        <li class="dropdown-submenu">
+                            <a href="rugby.html">Rugby</a>
+                            <ul class="submenu-content">
+                                <li><a href="rugby-femenino.html">Rugby Femenino</a></li>
+                                <li><a href="rugby.html">Rugby Masculino</a></li>
+                            </ul>
+                        </li>
+                        <li class="dropdown-submenu">
+                            <a href="futbolito.html">Futbolito</a>
+                            <ul class="submenu-content">
+                                <li><a href="futbolito-femenino.html">Futbolito Femenino</a></li>
+                                <li><a href="futbolito.html">Futbolito Masculino</a></li>
+                            </ul>
+                        </li>
+                        <li class="dropdown-submenu">
+                            <a href="voleibol.html">Voleibol</a>
+                            <ul class="submenu-content">
+                                <li><a href="voleibol-femenino.html">Voleibol Femenino</a></li>
+                                <li><a href="voleibol.html">Voleibol Masculino</a></li>
+                            </ul>
+                        </li>
+                        <li class="dropdown-submenu">
+                            <a href="basquetbol.html">Básquetbol</a>
+                            <ul class="submenu-content">
+                                <li><a href="basquetbol-femenino.html">Básquetbol Femenino</a></li>
+                                <li><a href="basquetbol.html">Básquetbol Masculino</a></li>
+                            </ul>
+                        </li>
+                        <li class="dropdown-submenu">
+                            <a href="tenisdemesa.html">Tenis de Mesa</a>
+                            <ul class="submenu-content">
+                                <li><a href="tenisdemesa-femenino.html">Tenis de Mesa Femenino</a></li>
+                                <li><a href="tenisdemesa.html">Tenis de Mesa Masculino</a></li>
+                            </ul>
+                        </li>
+                        <li class="dropdown-submenu">
+                            <a href="ajedrez.html">Ajedrez</a>
+                            <ul class="submenu-content">
+                                <li><a href="ajedrez-femenino.html">Ajedrez Femenino</a></li>
+                                <li><a href="ajedrez.html">Ajedrez Masculino</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                </li>
+                <li><a href="{% url 'nosotros' %}">Nosotros</a></li>
+
+                {% if user.is_authenticated %}
+
+                {% else %}
+                <li><a href="{% url 'contacto' %}">Contacto</a></li>
+                {% endif %}
+            </ul>
+            {% if user.is_authenticated %}
+            
+            {% endif %}
+            <div class="nav-item dropdown mx-2">
+                <a class="nav-link dropdown-toggle" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-bell"></i>
+                </a>
+                <div class="dropdown-menu dropdown-menu-end notification-dropdown" aria-labelledby="notificationDropdown">
+                    <div class="d-flex justify-content-between align-items-center px-3 py-2">
+                        <h6 class="mb-0">Notifications</h6>
+                        <a href="#" class="text-muted small">Mark all as read</a>
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <div class="notification-item">
+                        <div class="d-flex">
+                            <img src="https://via.placeholder.com/40" alt="Jessie Samson" class="notification-avatar me-3">
+                            <div>
+                                <strong>Jessie Samson</strong>
+                                <p class="mb-0">Mentioned you in a comment.</p>
+                                <span class="notification-time">10:41 AM August 7,2021</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="notification-item">
+                        <div class="d-flex">
+                            <img src="https://via.placeholder.com/40" alt="Jane Foster" class="notification-avatar me-3">
+                            <div>
+                                <strong>Jane Foster</strong>
+                                <p class="mb-0">Created an event.</p>
+                                <span class="notification-time">10:20 AM August 7,2021</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="notification-item">
+                        <div class="d-flex">
+                            <img src="https://via.placeholder.com/40" alt="Jessie Samson" class="notification-avatar me-3">
+                            <div>
+                                <strong>Jessie Samson</strong>
+                                <p class="mb-0">Liked your comment.</p>
+                                <span class="notification-time">9:30 AM August 7,2021</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="notification-item">
+                        <div class="d-flex">
+                            <img src="https://via.placeholder.com/40" alt="Kiera Anderson" class="notification-avatar me-3">
+                            <div>
+                                <strong>Kiera Anderson</strong>
+                                <p class="mb-0">Mentioned you in a comment.</p>
+                                <span class="notification-time">9:11 AM August 7,2021</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" class="dropdown-item text-center">Notification history</a>
+                </div>
+            </div>
+            {% if user.is_authenticated %}
+
+
+            <form id="logout-form" method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-outline-warning">Cerrar Sesión</button>
+            </form>
+            {% else %}
+            <div class="user-sesion">
+                <a href="{% url 'login' %}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" style="left:200px;" fill="#ffffff"
+                        class="bi bi-person-circle" viewBox="0 0 16 16">
+                        <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0" />
+                        <path fill-rule="evenodd"
+                            d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1" />
+                    </svg>
+                </a>
+            </div>
+            {% endif %}
+
+        </nav>
+    </header>
+
+    <!-- Contenido -->
+    {% block contenido %}
+    {% endblock %}
+
+
+    <!-- footer -->
+    <footer class="footer mt-5">
+        <div class="footer-content">
+            <div class="footer-logo-left">
+                <img src="{% static 'core/media/logo-duoc.png'%}" alt="Duoc UC Logo">
+            </div>
+            <div class="footer-redes">
+                <div class="Facebook">
+                    <a href="https://www.facebook.com/DuocUC/?locale=es_LA" target="_blank">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#ffffff"
+                            class="bi bi-facebook" viewBox="0 0 16 16">
+                            <path
+                                d="M16 8.049c0-4.446-3.582-8.05-8-8.05C3.58 0-.002 3.603-.002 8.05c0 4.017 2.926 7.347 6.75 7.951v-5.625h-2.03V8.05H6.75V6.275c0-2.017 1.195-3.131 3.022-3.131.876 0 1.791.157 1.791.157v1.98h-1.009c-.993 0-1.303.621-1.303 1.258v1.51h2.218l-.354 2.326H9.25V16c3.824-.604 6.75-3.934 6.75-7.951" />
+                        </svg>
+                    </a>
+                </div>
+                <div class="Instagram">
+                    <a href="https://www.instagram.com/duocuc_cl/?hl=es" target="_blank">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#ffffff"
+                            class="bi bi-instagram" viewBox="0 0 16 16">
+                            <path
+                                d="M8 0C5.829 0 5.556.01 4.703.048 3.85.088 3.269.222 2.76.42a3.9 3.9 0 0 0-1.417.923A3.9 3.9 0 0 0 .42 2.76C.222 3.268.087 3.85.048 4.7.01 5.555 0 5.827 0 8.001c0 2.172.01 2.444.048 3.297.04.852.174 1.433.372 1.942.205.526.478.972.923 1.417.444.445.89.719 1.416.923.51.198 1.09.333 1.942.372C5.555 15.99 5.827 16 8 16s2.444-.01 3.298-.048c.851-.04 1.434-.174 1.943-.372a3.9 3.9 0 0 0 1.416-.923c.445-.445.718-.891.923-1.417.197-.509.332-1.09.372-1.942C15.99 10.445 16 10.173 16 8s-.01-2.445-.048-3.299c-.04-.851-.175-1.433-.372-1.941a3.9 3.9 0 0 0-.923-1.417A3.9 3.9 0 0 0 13.24.42c-.51-.198-1.092-.333-1.943-.372C10.443.01 10.172 0 7.998 0zm-.717 1.442h.718c2.136 0 2.389.007 3.232.046.78.035 1.204.166 1.486.275.373.145.64.319.92.599s.453.546.598.92c.11.281.24.705.275 1.485.039.843.047 1.096.047 3.231s-.008 2.389-.047 3.232c-.035.78-.166 1.203-.275 1.485a2.5 2.5 0 0 1-.599.919c-.28.28-.546.453-.92.598-.28.11-.704.24-1.485.276-.843.038-1.096.047-3.232.047s-2.39-.009-3.233-.047c-.78-.036-1.203-.166-1.485-.276a2.5 2.5 0 0 1-.92-.598 2.5 2.5 0 0 1-.6-.92c-.109-.281-.24-.705-.275-1.485-.038-.843-.046-1.096-.046-3.233s.008-2.388.046-3.231c.036-.78.166-1.204.276-1.486.145-.373.319-.64.599-.92s.546-.453.92-.598c.282-.11.705-.24 1.485-.276.738-.034 1.024-.044 2.515-.045zm4.988 1.328a.96.96 0 1 0 0 1.92.96.96 0 0 0 0-1.92m-4.27 1.122a4.109 4.109 0 1 0 0 8.217 4.109 4.109 0 0 0 0-8.217m0 1.441a2.667 2.667 0 1 1 0 5.334 2.667 2.667 0 0 1 0-5.334" />
+                        </svg>
+                    </a>
+                </div>
+                <div class="x">
+                    <a href="https://x.com/DuocUC?ref_src=twsrc%5Egoogle%7Ctwcamp%5Eserp%7Ctwgr%5Eauthor"
+                        target="_blank">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#ffffff"
+                            class="bi bi-twitter-x" viewBox="0 0 16 16">
+                            <path
+                                d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865z" />
+                        </svg>
+                    </a>
+                </div>
+            </div>
+            <div class="footer-logo-right">
+                <img src="{% static 'core/media/acreditacion.png'%}" alt="Acreditación 1">
+            </div>
+        </div>
+    </footer>
+</body>
+
+</html>

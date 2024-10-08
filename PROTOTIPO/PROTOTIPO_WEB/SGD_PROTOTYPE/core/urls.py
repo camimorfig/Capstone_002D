@@ -1,4 +1,6 @@
 from django.urls import path
+from django.contrib.auth import views as auth_views
+
 from.views import *
 
 
@@ -10,6 +12,7 @@ urlpatterns = [
     path('nosotros/', nosotros, name="nosotros"),
     path('noticias/', noticias, name="noticias"),
     path('login/', CustomLoginView.as_view(), name="login"),
+    path('accounts/logout/', auth_views.LogoutView.as_view(), name='logout'),
 
     path('entrenador/', CoachDashboardView.as_view() , name="entrenador_dashboard"),
     path('administrador/', AdminDashboardView.as_view() , name="admin_dashboard"),
@@ -27,6 +30,11 @@ urlpatterns = [
     path('gestion_galeria/', gestion_galeria, name='gestion_galeria'),   
     path('jugadores/', jugadores_por_disciplina, name='jugadores_por_disciplina'),   
 
+    path('grafico/', grafico, name='grafico'),   
+    path('solicitud_jugador/', solicitud_jugador, name='solicitud_jugador'),  
 
-    
+
+    path('<str:disciplina>/<str:seccion>/', disciplina_view, name='disciplina_view'),
+
+
 ]

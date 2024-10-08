@@ -431,7 +431,7 @@ CREATE TABLE Elite_Athlete (
     VALUES ('Ajedrez','El ajedrez es un juego de tablero entre dos contrincantes en el que cada uno dispone al inicio de dieciséis piezas móviles, desiguales en importancia y valor, que se desplazan sobre un tablero capturando piezas del jugador contrario. El objetivo final del juego consiste en “derrocar al rey” del oponente.');
      
     INSERT INTO Discipline (discipline_name, discipline_description) 
-    VALUES ('Tenis de Mesa Varoenes','Consiste en un deporte de oposición, que se realiza en una mesa de juego, separando los dos campos por una red, con dos jugadores/as con sus raquetas respectivas y una bola que hay que pasar al campo contrario después de golpear la mesa. Se pierde el tanto cuando no se pasa la bola al campo contrario.');
+    VALUES ('Tenis de Mesa Varones','Consiste en un deporte de oposición, que se realiza en una mesa de juego, separando los dos campos por una red, con dos jugadores/as con sus raquetas respectivas y una bola que hay que pasar al campo contrario después de golpear la mesa. Se pierde el tanto cuando no se pasa la bola al campo contrario.');
 
     INSERT INTO Discipline (discipline_name, discipline_description) 
     VALUES ('Tenis de Mesa Damas','Consiste en un deporte de oposición, que se realiza en una mesa de juego, separando los dos campos por una red, con dos jugadores/as con sus raquetas respectivas y una bola que hay que pasar al campo contrario después de golpear la mesa. Se pierde el tanto cuando no se pasa la bola al campo contrario.');
