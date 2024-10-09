@@ -1,4 +1,5 @@
-from .models import Admin, Coach
+from .models import Admin, Coach, Discipline
+
 
 def coach_name_processor(request):
     if request.user.is_authenticated and request.user.user_type == 'coach01':
@@ -17,3 +18,11 @@ def admin_name_processor(request):
         except Admin.DoesNotExist:
             return {'nombre_admin': "Admin desconocido"}
     return {}
+
+
+
+
+def disciplinas_navbar(request):
+    disciplinas = Discipline.objects.all()  
+
+    return {'disciplinas_navbar': disciplinas}

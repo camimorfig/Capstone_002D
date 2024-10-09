@@ -34,22 +34,22 @@
       <div class="carousel-item active" data-bs-interval="10000">
         <img src="{% static 'core/media/news1.png'%}" class="d-block w-100" alt="...">
         <div class="carousel-caption d-none d-md-block">
-          <h5>First slide label</h5>
-          <p>Some representative placeholder content for the first slide.</p>
+          <h5></h5>
+          <p></p>
         </div>
       </div>
       <div class="carousel-item" data-bs-interval="2000">
         <img src="{% static 'core/media/news2.png'%}" class="d-block w-100" alt="...">
         <div class="carousel-caption d-none d-md-block">
-          <h5>Second slide label</h5>
-          <p>Some representative placeholder content for the second slide.</p>
+          <h5></h5>
+          <p></p>
         </div>
       </div>
       <div class="carousel-item">
         <img src="{% static 'core/media/new3.png'%}" class="d-block w-100" alt="...">
         <div class="carousel-caption d-none d-md-block">
-          <h5>Third slide label</h5>
-          <p>Some representative placeholder content for the third slide.</p>
+          <h5></h5>
+          <p></p>
         </div>
       </div>
     </div>
@@ -64,66 +64,28 @@
   </div>
 </section>
 <main>
+
+  
   <!-- Noticias  -->
   <div class="card-group">
-    <div class="card">
-      <img src="{% static 'core/media/img.png'%}" class="card-img-top" alt="Fútbol">
-      <div class="card-body">
-        <h5 class="card-title">Gran Participación en el Torneo Interuniversitario de Fútbol</h5>
-        <p class="card-text">La selección de fútbol de Duoc UC destacó en el reciente Torneo Interuniversitario,
-          mostrando un desempeño excepcional durante todo el campeonato.</p>
+
+    {% for n in noticias %} 
+
+
+      <div class="card">
+        <img src="data:imagen/png;base64, {{ n.imagen }}" class="card-img-top" alt="">
+        <div class="card-body">
+          <h5 class="card-title">{{ n.data.1 }}</h5>
+          <p class="card-text">{{ n.data.3 }}</p>
+        </div>
+        <div class="card-footer">
+          <small class="text-body-secondary">{{ n.data.4 }}</small>
+        </div>
       </div>
-      <div class="card-footer">
-        <small class="text-body-secondary">Última actualización hace 10 minutos</small>
-      </div>
-    </div>
-    <div class="card">
-      <img src="{% static 'core/media/img.png'%}" class="card-img-top" alt="Vóleibol">
-      <div class="card-body">
-        <h5 class="card-title">Éxito Rotundo en el Campeonato de Vóleibol Femenino</h5>
-        <p class="card-text">El equipo femenino de vóleibol de Duoc UC se coronó campeón del Campeonato Regional de
-          Vóleibol Universitario. </p>
-      </div>
-      <div class="card-footer">
-        <small class="text-body-secondary">Última actualización hace 15 minutos</small>
-      </div>
-    </div>
-    <div class="card">
-      <img src="{% static 'core/media/img.png'%}" class="card-img-top" alt="Seminario">
-      <div class="card-body">
-        <h5 class="card-title">Seminario de Preparación Física: Hacia el Alto Rendimiento</h5>
-        <p class="card-text">El Departamento de Deportes de Duoc UC organizó un seminario enfocado en la preparación
-          física para el alto rendimiento..</p>
-      </div>
-      <div class="card-footer">
-        <small class="text-body-secondary">Última actualización hace 20 minutos</small>
-      </div>
-    </div>
-  </div>
-  <div class="card-group mt-4">
-    <div class="card">
-      <img src="{% static 'core/media/img.png'%}" class="card-img-top" alt="Talleres Deportivos">
-      <div class="card-body">
-        <h5 class="card-title">Duoc UC Anuncia Nueva Temporada de Talleres Deportivos</h5>
-        <p class="card-text">Con el objetivo de fomentar el deporte y la vida saludable entre sus estudiantes, Duoc UC
-          ha anunciado el inicio de una nueva temporada de talleres deportivos. .</p>
-      </div>
-      <div class="card-footer">
-        <small class="text-body-secondary">Última actualización hace 25 minutos</small>
-      </div>
-    </div>
-    <div class="card">
-      <img src="{% static 'core/media/img.png'%}" class="card-img-top" alt="Atletismo">
-      <div class="card-body">
-        <h5 class="card-title">Destacada Participación en el Campeonato Nacional de Atletismo</h5>
-        <p class="card-text">Los atletas de Duoc UC brillaron en el Campeonato Nacional de Atletismo Universitario,
-          obteniendo varias medallas en diferentes categorías. .</p>
-      </div>
-      <div class="card-footer">
-        <small class="text-body-secondary">Última actualización hace 30 minutos</small>
-      </div>
-    </div>
-  </div>
+
+    {% endfor %}
+
+
 </main>
 
 {% endblock %}

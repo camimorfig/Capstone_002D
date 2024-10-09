@@ -66,6 +66,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'core.context_processors.admin_name_processor',
                 'core.context_processors.coach_name_processor',
+                'core.context_processors.disciplinas_navbar',
                 
             ],
         },

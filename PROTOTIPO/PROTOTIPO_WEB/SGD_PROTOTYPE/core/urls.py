@@ -33,8 +33,11 @@ urlpatterns = [
     path('grafico/', grafico, name='grafico'),   
     path('solicitud_jugador/', solicitud_jugador, name='solicitud_jugador'),  
 
+    path('selecciones/', selecciones, name='selecciones'),  
 
     path('<str:disciplina>/<str:seccion>/', disciplina_view, name='disciplina_view'),
+
+
 
 
 ]

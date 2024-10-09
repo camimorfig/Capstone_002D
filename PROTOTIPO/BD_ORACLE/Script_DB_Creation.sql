@@ -67,6 +67,8 @@ CREATE  TABLE Discipline (
    discipline_id INTEGER GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1) NOT NULL,
    discipline_name VARCHAR(50) NOT NULL,
    discipline_description VARCHAR(500) NOT NULL,
+   galery_img blob,
+
  
    
    CONSTRAINT pk_Discipline PRIMARY KEY (discipline_id)
@@ -443,10 +445,10 @@ CREATE TABLE Elite_Athlete (
     VALUES ('Futbolito Damas','El Futbolito es un deporte colectivo muy parecido al fútbol, presentando diferencias con respecto al terreno de juego, medidas de la cancha, medidas de la portería, peso y tamaño del balón y algunas reglas de juego. El Futbolito se juega entre dos equipos de 7 jugadores cada uno.');
 
     INSERT INTO Discipline (discipline_name, discipline_description) 
-    VALUES ('Futsal Varones','El Futbolito es un deporte colectivo muy parecido al fútbol, presentando diferencias con respecto al terreno de juego, medidas de la cancha, medidas de la portería, peso y tamaño del balón y algunas reglas de juego. El Futbolito se juega entre dos equipos de 7 jugadores cada uno.');
+    VALUES ('Futsal Varones','El Futsal es un deporte colectivo muy parecido al fútbol, presentando diferencias con respecto al terreno de juego, medidas de la cancha, medidas de la portería, peso y tamaño del balón y algunas reglas de juego. El Futbolito se juega entre dos equipos de 7 jugadores cada uno.');
 
     INSERT INTO Discipline (discipline_name, discipline_description) 
-    VALUES ('Futsal Damas','El Futbolito es un deporte colectivo muy parecido al fútbol, presentando diferencias con respecto al terreno de juego, medidas de la cancha, medidas de la portería, peso y tamaño del balón y algunas reglas de juego. El Futbolito se juega entre dos equipos de 7 jugadores cada uno.');
+    VALUES ('Futsal Damas','El Futsal es un deporte colectivo muy parecido al fútbol, presentando diferencias con respecto al terreno de juego, medidas de la cancha, medidas de la portería, peso y tamaño del balón y algunas reglas de juego. El Futbolito se juega entre dos equipos de 7 jugadores cada uno.');
 
 
     INSERT INTO Discipline (discipline_name, discipline_description) 

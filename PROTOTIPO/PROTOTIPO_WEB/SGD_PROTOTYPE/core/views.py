@@ -23,7 +23,10 @@ from django.shortcuts import get_object_or_404
 
 ###########  views de Templates  ###########
 def index(request):
+
     data = {
+        
+        'disciplinas': listado_disciplinas(), 
         'galeria_pf':listado_galeria_portada()
         }
     return render (request, 'core/index.html', data)
@@ -64,8 +67,15 @@ def nosotros(request):
     return render (request, 'core/nosotros.html', data)
 
 
+
 def noticias(request):
-    return render (request, 'core/noticias.html')
+
+    data = {
+    
+    'noticias': listado_noticias()
+    }
+
+    return render (request, 'core/noticias.html', data)
 
 
 def disciplina_view(request, disciplina, seccion):
@@ -114,6 +124,10 @@ def disciplina_view(request, disciplina, seccion):
 
     # Renderizar la plantilla dinámica
     return render(request, 'core/disciplinas/disciplina_template.html', context)
+
+def selecciones(request):
+
+    return render (request, 'core/disciplinas/selecciones.html')
 
 
 ###################### COACH ######################
@@ -231,7 +245,7 @@ def crear_perfil_Jugador(request):
 
     return render (request, 'intranet/entrenador/crear_perfil_Jugador.html', data)
 
-
+@login_required
 def asistencia_entrenador(request):
     data = {
 
@@ -240,11 +254,11 @@ def asistencia_entrenador(request):
 
     return render (request, 'intranet/entrenador/asistencia_entrenador.html', data)
 
-
+@login_required
 def tomar_asistencia(request):
     return render (request, 'intranet/entrenador/tomar_asistencia.html')
 
-
+@login_required
 def jugadores_por_disciplina(request):
     
     disciplina = request.GET.get('disciplina') 
@@ -256,7 +270,7 @@ def jugadores_por_disciplina(request):
 
     return render (request, 'intranet/entrenador/obtener_datos_entrenador.html', data)
 
-
+@login_required
 def grafico(request):
     return render (request, 'intranet/entrenador/grafico.html')
 
@@ -279,7 +293,7 @@ class AdminDashboardView(LoginRequiredMixin, TemplateView):
 
         return super().dispatch(request, *args, **kwargs)
 
-
+@login_required
 def crear_perfil_entrenador(request):
     data = {
         'disciplinas': listado_disciplinas(),
@@ -354,11 +368,51 @@ def crear_perfil_entrenador(request):
 
     return render(request, 'intranet/administrador/crear_perfil_entrenador.html', data)
 
-
+@login_required
 def crear_noticias(request):
-    return render (request, 'intranet/administrador/crear_noticias.html')
+
+    data = {
 
 
+    }
+
+    if request.method == 'POST':
+        img_noticia = request.FILES.get('img').read()
+        if not img_noticia:
+            data['mensaje_error'] = ["Debes subir una imagen para la noticia."]
+            return render(request, 'intranet/crear_galeria.html', data)
+ 
+        nombre_noticia = request.POST.get('nombre')
+        if not nombre_noticia:
+            data['mensaje_error'] = ["Debes ingresar un nombre para la noticia."]
+            return render(request, 'intranet/crear_galeria.html', data)
+
+        descripcion_noticia = request.POST.get('descripcion')
+        if not descripcion_noticia:
+            data['mensaje_error'] = ["Debes ingresar una descripción para la noticia."]
+            return render(request, 'intranet/crear_galeria.html', data)
+
+
+        portada = request.POST.get('portada')
+        if portada == "on":
+            portada = 1 
+        elif portada == None:
+            portada = 0
+
+
+        # Guardar la galería en la base de datos
+        salida = guardar_noticias(nombre_noticia, descripcion_noticia, img_noticia, portada)
+
+        if salida == 1:
+            data['mensaje_exito'] = ["Imagen registrada correctamente."]
+        else:
+            data['mensaje_error'] = ["No se ha podido registrar la galería. ERROR."]
+
+
+    
+    return render (request, 'intranet/administrador/crear_noticias.html', data)
+
+@login_required
 def subir_imagen(request):
 
     data = {
@@ -399,15 +453,15 @@ def subir_imagen(request):
     
     return render (request, 'intranet/administrador/subir_imagen.html', data)
 
-
+@login_required
 def asistencia_admin(request):
     return render (request, 'intranet/administrador/asistencia_admin.html')
 
-
+@login_required
 def gestion_galeria(request):
     return render (request, 'intranet/administrador/gestion_galeria.html')
 
-
+@login_required
 def solicitud_jugador(request):
     return render (request, 'intranet/administrador/solicitud_jugador.html')
 
@@ -604,5 +658,43 @@ def listado_jugador_por_disciplinas(id_disciplina):
         lista.append(fila)
 
     return lista
+
+
+def guardar_noticias(nombre_noticia, descripcion_noticia, img_noticia, portada):
+    django_cursor = connection.cursor()
+    cursor = django_cursor.connection.cursor()
+
+    salida = cursor.var(oracledb.NUMBER)
+
+    cursor.callproc('SP_CREATE_NEWS', [
+        nombre_noticia,
+        descripcion_noticia,
+        img_noticia,
+        portada,
+        salida
+    ])
+
+    return salida.getvalue()
+
+
+def listado_noticias():
+    django_cursor = connection.cursor()
+    cursor = django_cursor.connection.cursor()
+    out_cur = django_cursor.connection.cursor()
+
+    cursor.callproc("sp_list_news", [out_cur])
+
+    lista = []
+    for fila in out_cur:
+        data={
+            'data':fila,
+            'imagen':str(base64.b64encode(fila[5].read()), 'utf-8'),        
+        }
+
+        lista.append(data)
+
+    return lista
+
+
 
 ####################################################

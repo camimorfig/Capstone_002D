@@ -46,53 +46,7 @@
                     <li><a href="{% url 'galeria' %}">Galería</a></li>
                     <li><a href="{% url 'eventos' %}">Eventos</a></li>
                     <li class="dropdown">
-                    <a href="">Selecciones</a>
-                    <ul class="dropdown-content">
-      
-                        <li class="dropdown-submenu">
-                            <a>Fútbol</a>
-                            <ul class="submenu-content">
-                                <li><a href="{% url 'disciplina_view' 'Futbolito damas' 'acerca' %}">Futbolito Femenino</a></li>
-                                <li><a href="{% url 'disciplina_view' 'Fútbol varones' 'acerca' %}">Fútbol Masculino</a></li>
-                            </ul>
-                        </li>
-                        <li class="dropdown-submenu">
-                            <a>Futsal</a>
-                            <ul class="submenu-content">
-                                <li><a href="{% url 'disciplina_view' 'Futsal damas' 'acerca' %}">Futsal Femenino</a></li>
-                                <li><a href="{% url 'disciplina_view' 'Futsal varones' 'acerca' %}">Futsal Masculino</a></li>
-                            </ul>
-                        </li>
-                        <li class="dropdown-submenu">
-                            <li><a href="{% url 'disciplina_view' 'Rugby varones' 'acerca' %}">Rugby</a></li>
-
-                        </li>
-                        <li class="dropdown-submenu">
-                            <a>Voleibol</a>
-                            <ul class="submenu-content">
-                                <li><a href="{% url 'disciplina_view' 'Vóleibol damas' 'acerca' %}">Voleibol Femenino</a></li>
-                                <li><a href="{% url 'disciplina_view' 'Vóleibol varones' 'acerca' %}">Voleibol Masculino</a></li>
-                            </ul>
-                        </li>
-                        <li class="dropdown-submenu">
-                            <a>Básquetbol</a>
-                            <ul class="submenu-content">
-                                <li><a href="{% url 'disciplina_view' 'Básquetbol damas' 'acerca' %}">Básquetbol Femenino</a></li>
-                                <li><a href="{% url 'disciplina_view' 'Básquetbol varones' 'acerca' %}">Básquetbol Masculino</a></li>
-                            </ul>
-                        </li>
-                        <li class="dropdown-submenu">
-                            <a>Tenis de Mesa</a>
-                            <ul class="submenu-content">
-                                <li><a href="{% url 'disciplina_view' 'Tenis de mesa damas' 'acerca' %}">Tenis de Mesa Femenino</a></li>
-                                <li><a href="{% url 'disciplina_view' 'Tenis de mesa varones' 'acerca' %}">Tenis de Mesa Masculino</a></li>
-                            </ul>
-                        </li>
-                        <li class="dropdown-submenu">
-                            <li><a href="{% url 'disciplina_view' 'Ajedrez' 'acerca' %}">Ajedrez</a></li>
-
-                        </li>
-                    </ul>
+                    <a href="{% url 'selecciones' %}">Selecciones</a>
 
                     </li>    
                     <li><a href="{% url 'nosotros' %}">Nosotros</a></li>
