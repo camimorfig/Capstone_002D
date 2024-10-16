@@ -3,7 +3,6 @@ from django.contrib.auth import views as auth_views
 
 from.views import *
 
-
 urlpatterns = [
     path('', index, name="index"),
     path('contacto/', contacto, name="contacto"),
@@ -26,6 +25,9 @@ urlpatterns = [
     path('asistencia_entrenador/', asistencia_entrenador, name='asistencia_entrenador'),   
     path('asistencia_entrenador/tomar_asistencia/', tomar_asistencia, name='tomar_asistencia'),   
     
+    path('gestion_disciplina/', gestion_disciplina, name='gestion_disciplina'),
+    path('update_discipline/', update_discipline, name='update_discipline'),
+    
     path('gestion_galeria/subir_imagen/', subir_imagen, name='subir_imagen'),   
     path('gestion_galeria/', gestion_galeria, name='gestion_galeria'),   
     path('jugadores/', jugadores_por_disciplina, name='jugadores_por_disciplina'),   
@@ -36,6 +38,11 @@ urlpatterns = [
     path('selecciones/', selecciones, name='selecciones'),  
 
     path('<str:disciplina>/<str:seccion>/', disciplina_view, name='disciplina_view'),
+
+
+    path('administrador/aceptar-solicitud/<int:id>/', aceptar_solicitud, name='aceptar_solicitud'),
+
+
 
 
 

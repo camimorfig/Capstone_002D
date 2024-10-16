@@ -18,17 +18,19 @@ import cx_Oracle
 import base64
 import json
 from django.shortcuts import get_object_or_404
-
+from django.core.paginator import Paginator
+from django.http import Http404
 
 
 ###########  views de Templates  ###########
 def index(request):
-
+    
     data = {
         
         'disciplinas': listado_disciplinas(), 
         'galeria_pf':listado_galeria_portada()
         }
+        
     return render (request, 'core/index.html', data)
 
 
@@ -57,7 +59,23 @@ def eventos(request):
 
 
 def galeria(request):
-    return render (request, 'core/galeria.html')
+    galeria = listado_galeria()
+    page = request.GET.get('page',1)
+
+    try:
+        paginator = Paginator(galeria, 9)
+        galeria = paginator.page(page)
+    except:
+        raise Http404            
+
+
+    data = {
+    'entity':galeria,
+    'paginator': paginator
+    }   
+
+
+    return render (request, 'core/galeria.html', data)
 
 
 def nosotros(request):
@@ -69,12 +87,9 @@ def nosotros(request):
 
 
 def noticias(request):
-
     data = {
-    
     'noticias': listado_noticias()
     }
-
     return render (request, 'core/noticias.html', data)
 
 
@@ -127,7 +142,11 @@ def disciplina_view(request, disciplina, seccion):
 
 def selecciones(request):
 
-    return render (request, 'core/disciplinas/selecciones.html')
+    data = {
+        'disciplinas':listado_disciplinas()
+        }  
+
+    return render (request, 'core/selecciones.html', data)
 
 
 ###################### COACH ######################
@@ -173,12 +192,10 @@ def perfil_jugadores(request):
 @login_required
 def crear_perfil_Jugador(request):
 
-    # Verificar si el usuario tiene entrenadores asociados
     if not hasattr(request.user, 'coach'):
         return HttpResponseForbidden("El usuario no está asociado a ningún entrenador.")
 
-    # Obtener el ID del entrenador autenticado, asegurando que hay uno asociado
-    entrenador = request.user.coach.first()  # Si hay múltiples entrenadores, obtén el primero
+    entrenador = request.user.coach.first()  
 
     if not entrenador:
         return HttpResponseForbidden("No hay entrenadores asociados a este usuario.")
@@ -235,7 +252,7 @@ def crear_perfil_Jugador(request):
      #  position_id = request.POST.get('position_id')
 
         # Guardar el jugador en la base de datos
-        salida = guardar_jugador(rut, nombre, apellido, headquarters, career, imagen, discipline_id)
+        salida = guardar_jugador(rut, nombre, apellido, headquarters, career, imagen, discipline_id, entrenador_id)
 
         if salida == 1:
             data['mensaje_exito'] = ["Jugador registrado correctamente."]
@@ -298,6 +315,8 @@ def crear_perfil_entrenador(request):
     data = {
         'disciplinas': listado_disciplinas(),
         'tipo_entrenador': listado_tipo_entrenador(),
+        'entrenadores':listado_entrenadores()
+
     }
 
     if request.method == 'POST':
@@ -307,7 +326,14 @@ def crear_perfil_entrenador(request):
         apellido = request.POST.get('apellido')
         tipo_entrenador = int(request.POST.get('tipo_entrenador')) 
         email = request.POST.get('email')
-        imagen = request.FILES.get('imagen').read() if request.FILES.get('imagen') else None
+
+        if 'img' in request.FILES:
+            imagen_file = request.FILES['img']
+            imagen = imagen_file.read()
+        else:
+            data['mensaje_error'] = ["Debes subir una imagen para registrar al entrenador."]
+            return render(request, 'intranet/administrador/crear_perfil_entrenador.html', data)
+
         disciplinas_seleccionadas = request.POST.getlist('lista_de_disciplina')
 
 
@@ -372,13 +398,16 @@ def crear_perfil_entrenador(request):
 def crear_noticias(request):
 
     data = {
-
+        'noticias': listado_noticias()
 
     }
 
     if request.method == 'POST':
-        img_noticia = request.FILES.get('img').read()
-        if not img_noticia:
+        if 'img' in request.FILES:
+            imagen_file = request.FILES['img']
+            img_noticia = imagen_file.read()
+        else:
+
             data['mensaje_error'] = ["Debes subir una imagen para la noticia."]
             return render(request, 'intranet/crear_galeria.html', data)
  
@@ -392,16 +421,14 @@ def crear_noticias(request):
             data['mensaje_error'] = ["Debes ingresar una descripción para la noticia."]
             return render(request, 'intranet/crear_galeria.html', data)
 
-
-        portada = request.POST.get('portada')
-        if portada == "on":
-            portada = 1 
-        elif portada == None:
-            portada = 0
+        etiqueta = request.POST.get('etiqueta')
+        if not etiqueta:
+            data['mensaje_error'] = ["Debes ingresar una etiqueta para la noticia."]
+            return render(request, 'intranet/crear_galeria.html', data)
 
 
         # Guardar la galería en la base de datos
-        salida = guardar_noticias(nombre_noticia, descripcion_noticia, img_noticia, portada)
+        salida = guardar_noticias(nombre_noticia, descripcion_noticia, img_noticia, etiqueta)
 
         if salida == 1:
             data['mensaje_exito'] = ["Imagen registrada correctamente."]
@@ -416,24 +443,27 @@ def crear_noticias(request):
 def subir_imagen(request):
 
     data = {
-        'disciplinas': listado_disciplinas()  # Asumiendo que existe una función para listar disciplinas
+        'disciplinas': listado_disciplinas()  
     }
 
     if request.method == 'POST':
-        imagen = request.FILES.get('imagen').read()
-        if not imagen:
+            
+        if 'imagen' in request.FILES:
+            imagen_file = request.FILES['imagen']
+            imagen = imagen_file.read()
+        else:
             data['mensaje_error'] = ["Debes subir una imagen para registrar una galería."]
-            return render(request, 'intranet/crear_galeria.html', data)
- 
+            return render(request, 'intranet/administrador/subir_imagen.html', data)
+
         discipline_id = request.POST.get('discipline_id')
         if not discipline_id:
             data['mensaje_error'] = ["Debes ingresar una disciplina para la galería."]
-            return render(request, 'intranet/crear_galeria.html', data)
+            return render(request, 'intranet/administrador/subir_imagen.html', data)
 
         galery_description = request.POST.get('galery_description')
         if not galery_description:
             data['mensaje_error'] = ["Debes ingresar una descripción para la galería."]
-            return render(request, 'intranet/crear_galeria.html', data)
+            return render(request, 'intranet/administrador/subir_imagen.html', data)
 
         portada = request.POST.get('portada')
         if portada == "on":
@@ -459,12 +489,114 @@ def asistencia_admin(request):
 
 @login_required
 def gestion_galeria(request):
-    return render (request, 'intranet/administrador/gestion_galeria.html')
+
+    data = {
+        'disciplinas': listado_disciplinas()  
+    }
+
+    if request.method == 'POST':
+            
+        if 'imagen' in request.FILES:
+            imagen_file = request.FILES['imagen']
+            imagen = imagen_file.read()
+        
+        discipline_id = request.POST.get('discipline_id')
+        if not discipline_id:
+            data['mensaje_error'] = ["Debes ingresar una disciplina para la galería."]
+            return render(request, 'intranet/administrador/subir_imagen.html', data)
+
+        galery_description = request.POST.get('galery_description')
+        if not galery_description:
+            data['mensaje_error'] = ["Debes ingresar una descripción para la galería."]
+            return render(request, 'intranet/administrador/subir_imagen.html', data)
+
+        portada = request.POST.get('portada')
+        if portada == "on":
+            portada = 1
+        elif portada == None:
+            portada = 0
+
+
+        # Guardar la galería en la base de datos
+        salida = guardar_galeria(imagen, portada, galery_description, discipline_id)
+
+        if salida == 1:
+            data['mensaje_exito'] = ["Imagen registrada correctamente."]
+        else:
+            data['mensaje_error'] = ["No se ha podido registrar la galería. ERROR."]
+
+    
+
+    return render (request, 'intranet/administrador/gestion_galeria.html', data)
 
 @login_required
 def solicitud_jugador(request):
-    return render (request, 'intranet/administrador/solicitud_jugador.html')
 
+    data = {
+        'solicitud': listado_solicitud()  
+    }
+
+    return render (request, 'intranet/administrador/solicitud_jugador.html', data)
+
+from django.shortcuts import redirect
+from django.contrib import messages
+from django.db import connection
+
+def aceptar_solicitud(request, id):
+    with connection.cursor() as cursor:
+        try:
+            cursor.callproc('sp_aceptar_solicitud', [id])
+            messages.success(request, 'Solicitud aceptada con éxito.')
+        except Exception as e:
+            messages.error(request, f'Error al aceptar la solicitud: {str(e)}')
+    
+    return redirect('solicitud_jugador')
+
+
+
+def gestion_disciplina(request):
+    disciplinas = listado_disciplinas()
+    disciplina_seleccionada = None
+    jugadores = []
+
+    if request.method == 'POST':
+        discipline_id = request.POST.get('disciplina')
+        if discipline_id:
+            disciplina_seleccionada = Discipline.objects.get(discipline_id=discipline_id)
+            # Recuperar los jugadores asociados a esta disciplina
+            jugadores = Player.objects.filter(discipline=disciplina_seleccionada)  # Ajusta según tu modelo
+
+    context = {
+        'disciplinas': disciplinas,
+        'disciplina_seleccionada': disciplina_seleccionada,
+        'jugadores': jugadores,
+    }
+    return render(request, 'intranet/administrador/gestion_disciplina.html', context)
+
+
+def update_discipline(request):
+    discipline_id = request.POST.get('discipline_id')
+    discipline = get_object_or_404(Discipline, discipline_id=discipline_id)
+
+    try:
+        if 'title' in request.POST:
+            discipline.discipline_name = request.POST['title']
+        if 'description' in request.POST:
+            discipline.discipline_description = request.POST['description']
+        if 'image' in request.FILES:
+            discipline.discipline_image = request.FILES['image']
+
+        discipline.save()
+
+        return JsonResponse({
+            'success': True,
+            'image_url': discipline.discipline_image.url if discipline.discipline_image else None
+        })
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=400)
 
 
 #####################################################
@@ -534,8 +666,13 @@ def listado_disciplinas():
     cursor.callproc("SP_LIST_DISCIPLINE", [out_cur])
 
     lista = []
-    for fila in out_cur: 
-        lista.append(fila)
+    for fila in out_cur:
+        data={
+            'data':fila,
+            'imagen':str(base64.b64encode(fila[3].read()), 'utf-8')
+        }
+        
+        lista.append(data)
 
     return lista
 
@@ -581,15 +718,13 @@ def guardar_entrenador(rut, nombre, apellido, imagen, tipo_entrenador, email, pa
     return salida.getvalue()
 
 
-def guardar_jugador(rut, nombre, apellido, headquarters, career, imagen, discipline_id):
+def guardar_jugador(rut, nombre, apellido, headquarters, career, imagen, discipline_id, entrenador_id):
     django_cursor = connection.cursor()
     cursor = django_cursor.connection.cursor()
 
     salida = cursor.var(oracledb.NUMBER)
 
-    cursor.callproc('SP_CREATE_PLAYER', [
-        rut, nombre, apellido, headquarters, career, imagen, discipline_id, salida
-    ])
+    cursor.callproc('SP_CREATE_PLAYER', [   rut, nombre, apellido, headquarters, career, imagen, discipline_id, entrenador_id, salida])
 
     return salida.getvalue()
 
@@ -660,7 +795,7 @@ def listado_jugador_por_disciplinas(id_disciplina):
     return lista
 
 
-def guardar_noticias(nombre_noticia, descripcion_noticia, img_noticia, portada):
+def guardar_noticias(nombre_noticia, descripcion_noticia, img_noticia, etiqueta):
     django_cursor = connection.cursor()
     cursor = django_cursor.connection.cursor()
 
@@ -670,7 +805,7 @@ def guardar_noticias(nombre_noticia, descripcion_noticia, img_noticia, portada):
         nombre_noticia,
         descripcion_noticia,
         img_noticia,
-        portada,
+        etiqueta,
         salida
     ])
 
@@ -695,6 +830,43 @@ def listado_noticias():
 
     return lista
 
+
+def listado_galeria():
+    django_cursor = connection.cursor()
+    cursor = django_cursor.connection.cursor()
+    out_cur = django_cursor.connection.cursor()
+
+    cursor.callproc("sp_list_images", [out_cur])
+
+    lista = []
+    for fila in out_cur:
+        data={
+            'data':fila,
+            'imagen':str(base64.b64encode(fila[1].read()), 'utf-8'),    
+            
+        }
+
+        lista.append(data)
+
+    return lista
+
+def listado_solicitud():
+    django_cursor = connection.cursor()
+    cursor = django_cursor.connection.cursor()
+    out_cur = django_cursor.connection.cursor()
+
+    cursor.callproc("sp_list_request", [out_cur])
+
+    lista = []
+    for fila in out_cur:
+        data={
+            'data':fila,
+            
+        }
+
+        lista.append(data)
+
+    return lista
 
 
 ####################################################

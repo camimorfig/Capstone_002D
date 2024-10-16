@@ -1,0 +1,361 @@
+{% extends 'intranet/administrador/base_admin.html' %}
+
+<!-- Cargar Statics -->
+{% load static %}
+
+<!-- Enlace css -->
+{% block css %}
+<link rel="stylesheet" href="{% static 'core/css/style-admin.css' %}">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+
+
+<!-- <link rel="stylesheet" href="{% static 'core/css/style.css' %}">
+<link rel="stylesheet" href="{% static 'core/css/jazz.css' %}">
+
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+<link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+    crossorigin="anonymous"> -->
+
+{% endblock css %}
+
+<!-- Enlace JS -->
+{% block js %}
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function cargarDatosDisciplina() {
+
+        var disciplinaId = document.getElementById('disciplina').value;
+        fetch(`/gestion_disciplina/?discipline_id=${disciplinaId}`, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('titleDisplay').textContent = data.titulo;
+                document.getElementById('descriptionDisplay').textContent = data.descripcion;
+                document.getElementById('imageDisplay').textContent = data.imagen;
+            })
+            .catch(error => console.error('Error:', error));
+    }
+    function cambiarJugadores() {
+        let disciplinaId = document.getElementById("disciplina").value;
+        let url = '/jugadores/?disciplina=' + disciplinaId;
+
+        fetch(url)
+            .then(function (result) {
+                return result.text();  // Cambié de txt() a text()
+            })
+            .then(function (result) {
+                // Reemplaza el contenido del tbody con el ID 'datos_jugadores'
+                document.getElementById('datos_jugadores').innerHTML = result;
+            });
+            }
+    function saveChanges(type) {
+            let newValue;
+            let formData = new FormData();
+            
+            // Añadir el discipline_id a formData
+            const disciplineId = document.getElementById('disciplineId').value;
+            formData.append('discipline_id', disciplineId);
+
+            switch (type) {
+                case 'title':
+                    newValue = document.getElementById('titleInput').value;
+                    formData.append('title', newValue);
+                    break;
+                case 'description':
+                    newValue = document.getElementById('descriptionInput').value;
+                    formData.append('description', newValue);
+                    break;
+                case 'image':
+                    newValue = document.getElementById('imageInput').files[0];
+                    if (newValue) {
+                        formData.append('image', newValue);
+                    }
+                    break;
+            }
+
+            // Send data to server
+            fetch('/update_discipline/', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // Update the display
+                    if (type === 'title') {
+                        document.getElementById('titleDisplay').textContent = newValue;
+                    } else if (type === 'description') {
+                        document.getElementById('descriptionDisplay').textContent = newValue;
+                    } else if (type === 'image' && data.image_url) {
+                        document.getElementById('imageDisplay').src = data.image_url;
+                    }
+                    // Close the modal
+                    bootstrap.Modal.getInstance(document.getElementById(type + 'Modal')).hide();
+                } else {
+                    alert('Error al guardar los cambios: ' + (data.error || 'Error desconocido'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al guardar los cambios: ' + error.message);
+            });
+        }
+
+        // Function to get CSRF token
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }          
+</script>
+<!-- <script>
+    function saveChanges(type) {
+        let newValue;
+        switch (type) {
+            case 'title':
+                newValue = document.getElementById('titleInput').value;
+                break;
+            case 'description':
+                newValue = document.getElementById('descriptionInput').value;
+                break;
+            case 'image':
+                newValue = document.getElementById('imageInput').files[0] ? document.getElementById('imageInput').files[0].name : '';
+                break;
+        }
+
+        // Cerrar el modal y actualizar la vista principal
+        setTimeout(function () {
+            var modal = bootstrap.Modal.getInstance(document.getElementById(type + 'Modal'));
+            modal.hide();
+            updateMainView(type, newValue);
+        }, 100);
+    }
+
+    function updateMainView(type, value) {
+        document.getElementById(type + 'Display').textContent = value;
+    }
+
+    // Agregar event listeners a todos los modales
+    ['title', 'description', 'image'].forEach(function (type) {
+        var modal = document.getElementById(type + 'Modal');
+        modal.addEventListener('hidden.bs.modal', function () {
+            console.log(type + ' Modal cerrado');
+        });
+    });
+</script> -->
+{% endblock js %}
+
+<!-- Contenido de la pagina Eventos -->
+{% block sub_contenido %}
+
+        <div class="col-md-9">
+            <!-- <h2>Editar Pagina Disciplinas</h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">Administración</li>
+                    <li class="breadcrumb-item active">Editar Pagina Disciplinas</li>
+                </ol>
+            </nav> -->
+            <div class="card">
+                <div class="card-body">
+                    <h4><i class="bi bi-journal-text text-primary"></i> Editar Pagina Disciplinas</h4>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="disciplina" class="form-label">Disciplina:</label>
+                                <select class="form-select" id="disciplina" name="disciplina"
+                                    onchange="this.form.submit()">
+                                    <option value=""  disabled selected>Seleccione una opción</option>
+                                    {% for d in disciplinas %}
+                                    <option value="{{ d.data.0 }}" 
+                                    {% if disciplina_seleccionada and disciplina_seleccionada.discipline_id == d.data.0 %}selected{% endif %}>
+                                    {{ d.data.1 }}
+                                        
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+
+                    {% if disciplina_seleccionada %}
+
+                    <div class="card mb-3">
+                        <div class="card-header">Resumen Portada</div>
+                        <div class="card-body">
+                            <div class="mb-3 row">
+                                <label class="col-sm-2 col-form-label">TITULO:</label>
+                                <div class="col-sm-8">
+                                    <span id="titleDisplay">{{ disciplina_seleccionada.discipline_name }}</span>
+                                </div>
+                                <div class="col-sm-2">
+                                    <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
+                                        data-bs-target="#titleModal">EDITAR</button>
+                                </div>
+                            </div>
+                            <div class="mb-3 row">
+                                <label class="col-sm-2 col-form-label">DESCRIPCION:</label>
+                                <div class="col-sm-8">
+                                    <span id="descriptionDisplay">
+                                        {{ disciplina_seleccionada.discipline_description}}</span>
+                                </div>
+                                <div class="col-sm-2">
+                                    <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
+                                        data-bs-target="#descriptionModal">EDITAR</button>
+                                </div>
+                            </div>
+                            <div class="mb-3 row">
+                                <label class="col-sm-2 col-form-label">IMAGEN:</label>
+                                <div class="col-sm-8">
+                                    <span id="imageDisplay">
+                                        {{ disciplina_seleccionada.discipline_image}}</span>
+                                    <!-- Ajusta esto según cómo manejes las imágenes -->
+                                </div>
+                                <div class="col-sm-2">
+                                    <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
+                                        data-bs-target="#imageModal">EDITAR</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+ 
+                    <div class="card mb-4">
+                        <div class="card-header">Resumen PLANTEL</div>
+                        <div class="card-body">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>RUT</th>
+                                        <th>Nombre</th>
+                                        <th>Apellido</th>
+                                        <th>Disciplina</th>
+                                        <th>Sede</th>
+                                        <th>Carrera</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="datos_jugadores">
+                                    <tr>
+                                        <td colspan="9" class="text-center">Seleccione una disciplina para ver los
+                                            jugadores</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div> 
+
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination">
+                            <li class="page-item disabled"><a class="page-link" href="#">Anterior</a></li>
+                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                            <li class="page-item"><a class="page-link" href="#">3</a></li>
+                            <li class="page-item"><a class="page-link" href="#">4</a></li>
+                            <li class="page-item"><a class="page-link" href="#">Siguiente</a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</main>
+<!-- Add this at the end of your body tag -->
+<!-- Modal for Title -->
+<div class="modal fade" id="titleModal" tabindex="-1" aria-labelledby="titleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="titleModalLabel">Editar Título</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="text" class="form-control" id="titleInput"
+                    value="{{ disciplina_seleccionada.discipline_name }}">
+                <input type="hidden" id="disciplineId" value="{{ disciplina_seleccionada.id }}">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="saveChanges('title')">Guardar cambios</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Description -->
+<div class="modal fade" id="descriptionModal" tabindex="-1" aria-labelledby="descriptionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="descriptionModalLabel">Editar Descripción</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <textarea class="form-control" id="descriptionInput"
+                    rows="3">{{ disciplina_seleccionada.discipline_description }}</textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="saveChanges('description')">Guardar cambios</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Image -->
+<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="imageModalLabel">Editar Imagen</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="file" class="form-control" id="imageInput">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="saveChanges('image')">Guardar cambios</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

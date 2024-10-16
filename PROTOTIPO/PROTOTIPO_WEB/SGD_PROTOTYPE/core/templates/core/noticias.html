@@ -15,77 +15,59 @@
 <!-- Enlace JS -->
 {% block js %}
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{% static 'core/javascript/script-news.js' %}"></script>
 {% endblock js %}
 
 <!-- Contenido de la pagina Noticias -->
 {% block contenido %}
 
-<!-- Sección Principal del Portal de Noticias -->
-<section class="new-carrusel">
-  <!-- carrusel noticias -->
-  <div id="carouselExampleDark" class="carousel carousel-dark slide">
-    <div class="carousel-indicators">
-      <button type="button" data-bs-target="#carouselExampleDark" data-bs-slide-to="0" class="active"
-        aria-current="true" aria-label="Slide 1"></button>
-      <button type="button" data-bs-target="#carouselExampleDark" data-bs-slide-to="1" aria-label="Slide 2"></button>
-      <button type="button" data-bs-target="#carouselExampleDark" data-bs-slide-to="2" aria-label="Slide 3"></button>
-    </div>
-    <div class="carousel-inner">
-      <div class="carousel-item active" data-bs-interval="10000">
-        <img src="{% static 'core/media/news1.png'%}" class="d-block w-100" alt="...">
-        <div class="carousel-caption d-none d-md-block">
-          <h5></h5>
-          <p></p>
-        </div>
+  <!-- Sección Principal del Portal de Noticias -->
+  <!-- banner -->
+  <section class="first-banner">
+  <img src="{% static 'core/media/media_seleccines/banner_noticias.png'%}" alt="selecciones" class="first-banner-img">
+  <div class="first-banner-content">
+      <div class="first-banner-text">
+      <h1>NUESTRAS NOTICIAS</h1>
+      <p>Entérate e infórmate de cada paso en nuestra comunidad deportiva: Torneos, eventos, talleres y las hazañas de
+          nuestros seleccionados.
+      </p>
       </div>
-      <div class="carousel-item" data-bs-interval="2000">
-        <img src="{% static 'core/media/news2.png'%}" class="d-block w-100" alt="...">
-        <div class="carousel-caption d-none d-md-block">
-          <h5></h5>
-          <p></p>
-        </div>
-      </div>
-      <div class="carousel-item">
-        <img src="{% static 'core/media/new3.png'%}" class="d-block w-100" alt="...">
-        <div class="carousel-caption d-none d-md-block">
-          <h5></h5>
-          <p></p>
-        </div>
-      </div>
-    </div>
-    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleDark" data-bs-slide="prev">
-      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-      <span class="visually-hidden">Previous</span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleDark" data-bs-slide="next">
-      <span class="carousel-control-next-icon" aria-hidden="true"></span>
-      <span class="visually-hidden">Next</span>
-    </button>
   </div>
-</section>
-<main>
+  </div>
+  </section>
 
-  
-  <!-- Noticias  -->
-  <div class="card-group">
+  <main role="main">
+    <div class="card-group">
+        {% for n in noticias %} 
+            <article class="card" news-id="{{ n.data.0 }}">
+            <span class="card-category">{{ n.data.6 }}</span>
+            <div class="card-img-container">
+                <img src="data:imagen/png;base64, {{ n.imagen }}" class="card-img-top" alt="">
 
-    {% for n in noticias %} 
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">{{ n.data.1 }}</h5>
+                <p class="card-text">{{ n.data.3 }}</p>
+                <button class="read-more">Leer más</button>
+            </div>
+            <div class="card-footer">
+                {{ n.data.4 }}
+            </div>
+            <div class="full-news-content" style="display: none;">
+                <h2>{{ n.data.1 }}</h2>
+                <p>{{ n.data.3 }}</p>
+            </div>
+            </article>
+        {% endfor %}
+    </div>
+  </main>
 
+  <div id="newsModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <div id="modalContent"></div>
+    </div>
+  </div>
 
-      <div class="card">
-        <img src="data:imagen/png;base64, {{ n.imagen }}" class="card-img-top" alt="">
-        <div class="card-body">
-          <h5 class="card-title">{{ n.data.1 }}</h5>
-          <p class="card-text">{{ n.data.3 }}</p>
-        </div>
-        <div class="card-footer">
-          <small class="text-body-secondary">{{ n.data.4 }}</small>
-        </div>
-      </div>
-
-    {% endfor %}
-
-
-</main>
 
 {% endblock %}

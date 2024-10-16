@@ -1,7 +1,10 @@
 ---- MAIN_USER ----
 DROP TABLE Main_User CASCADE CONSTRAINTS;
-DROP TABLE Admin CASCADE CONSTRAINTS;
 --------------------
+
+---- ADMIN ----
+DROP TABLE Admin CASCADE CONSTRAINTS;
+--------------------------
 
 ---- COACH ----
 DROP TABLE Discipline CASCADE CONSTRAINTS;
@@ -18,15 +21,15 @@ DROP TABLE News CASCADE CONSTRAINTS;
 --------------------------
 
 ---- PLAYER DATA ----
-DROP TABLE Game_Position CASCADE CONSTRAINTS;
 DROP TABLE Player CASCADE CONSTRAINTS;
 DROP TABLE Attendance CASCADE CONSTRAINTS;
 DROP TABLE Statistic CASCADE CONSTRAINTS;
 DROP TABLE Team_Roster CASCADE CONSTRAINTS;
+DROP TABLE Elite_Athlete CASCADE CONSTRAINTS;
 --------------------
 
----- ELITE THLETE DATA ----
-DROP TABLE Elite_Athlete CASCADE CONSTRAINTS;
+---- OTHER DATA ----
+DROP TABLE Requests CASCADE CONSTRAINTS;
 --------------------
 
                 -------------------------------------------------------------
@@ -59,7 +62,6 @@ CREATE TABLE Main_User (
             -------------------------------------------------------------------             
                 -------------------------------------------------------------
 
-
 --------------------------------------------------------
 --  DDL for DISCIPLINE
 --------------------------------------------------------
@@ -74,10 +76,6 @@ CREATE  TABLE Discipline (
    CONSTRAINT pk_Discipline PRIMARY KEY (discipline_id)
 );
 
-
-
-
-
 --------------------------------------------------------
 --  DDL for COACH_TYPE
 --------------------------------------------------------
@@ -90,13 +88,12 @@ CREATE  TABLE Coach_Type (
    CONSTRAINT pk_Coach_Type PRIMARY KEY (coach_type_id)
 );
  
-    
 ----------------------------------------------------------
 --  DDL for COACH
 ----------------------------------------------------------   
 CREATE TABLE Coach (
     coach_id VARCHAR(20) NOT NULL ,
-    coach_name VARCHAR(50) NOT NULL,
+    coach_name VARCHAR(100) NOT NULL,
     coach_img blob,
 ---- USER AND DISCIPLINE FOREAN KEY----
     user_id INT NOT NULL,
@@ -148,6 +145,7 @@ CREATE TABLE Admin (
    CONSTRAINT pk_Admin PRIMARY KEY (admin_id)
 );
 
+
      ------------------------------
     --------- ALTER ADMIN ----------
      ------------------------------
@@ -187,7 +185,7 @@ CREATE TABLE Galery (
     galery_status NUMBER NOT NULL,
     galery_front_page NUMBER NOT NULL,     
     galery_description VARCHAR(100),
-    
+    galery_date DATE,
     ---- ADMIN FOREAN KEY ----
     discipline_id INT,
     ----
@@ -221,6 +219,7 @@ CREATE TABLE News (
     news_description VARCHAR(500),    
     news_date DATE NOT NULL,
     news_img blob,
+    news_tag VARCHAR(50) NOT NULL,
 
    CONSTRAINT pk_News PRIMARY KEY (news_id)
 );
@@ -246,16 +245,6 @@ ALTER TABLE Galery
           ----------------------------- PLAYER DATA -----------------------------
             -------------------------------------------------------------------             
                 -------------------------------------------------------------
-                
---------------------------------------------------------
---  DDL for GAME_POSITION
---------------------------------------------------------
-CREATE  TABLE Game_Position (
-   game_position_id INTEGER GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1) NOT NULL,
-   game_position_name VARCHAR(50) NOT NULL,
-
-   CONSTRAINT pk_Game_Position PRIMARY KEY (game_position_id)
-);
 
 --------------------------------------------------------
 --  DDL for PLAYER
@@ -355,12 +344,6 @@ ALTER TABLE Team_Roster
 	 ADD CONSTRAINT Team_Roster_Player_fk FOREIGN KEY (player_id)
 	  REFERENCES Player (player_id);
 
-                -------------------------------------------------------------
-            -------------------------------------------------------------------
-          -------------------------- ELITE THLETE DATA --------------------------
-            -------------------------------------------------------------------             
-                -------------------------------------------------------------
-                
 --------------------------------------------------------
 --  DDL for PLAYER
 --------------------------------------------------------
@@ -376,7 +359,39 @@ CREATE TABLE Elite_Athlete (
     
     CONSTRAINT pk_Elite_Athlete PRIMARY KEY (elite_athlete_id)
 );            
-    
+
+                -------------------------------------------------------------
+            -------------------------------------------------------------------
+          -------------------------- OTHER DATA --------------------------
+            -------------------------------------------------------------------             
+                -------------------------------------------------------------
+
+
+--------------------------------------------------------
+--  DDL for REQUESTS
+--------------------------------------------------------               
+
+CREATE TABLE Requests (
+    request_id INTEGER GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1) NOT NULL,
+    request_description VARCHAR(2000) NOT NULL,      
+
+---- USER AND DISCIPLINE FOREAN KEY----
+    coach_id VARCHAR(20) NOT NULL ,
+    player_id INTEGER NOT NULL,
+----
+ 
+   CONSTRAINT pk_Requests PRIMARY KEY (request_id)
+);
+
+ALTER TABLE Requests
+	 ADD CONSTRAINT Requests_Player_fk FOREIGN KEY (player_id)
+	  REFERENCES Player (player_id);
+      
+ALTER TABLE Requests
+	 ADD CONSTRAINT Requests_Coach_fk FOREIGN KEY (coach_id)
+	  REFERENCES Coach (coach_id);      
+
+
                 ----------------------------
              ------------------------------------
             --              INSERT              --     
@@ -449,7 +464,6 @@ CREATE TABLE Elite_Athlete (
 
     INSERT INTO Discipline (discipline_name, discipline_description) 
     VALUES ('Futsal Damas','El Futsal es un deporte colectivo muy parecido al fútbol, presentando diferencias con respecto al terreno de juego, medidas de la cancha, medidas de la portería, peso y tamaño del balón y algunas reglas de juego. El Futbolito se juega entre dos equipos de 7 jugadores cada uno.');
-
 
     INSERT INTO Discipline (discipline_name, discipline_description) 
     VALUES ('Vóleibol Varones','El voleibol, simplemente voley, es un deporte donde dos equipos se enfrentan sobre un terreno de juego liso separados por una red central, tratando de pasar el balón por encima de la red hacia el suelo del campo contrario');

@@ -6,12 +6,17 @@ BEGIN
   WHERE ci.coach_id = c.coach_id) AS coach_img,
 c.coach_name,
 LISTAGG(d.discipline_name, ', ') WITHIN GROUP (ORDER BY d.discipline_name),
-u.email
- 
+u.email,
+c.coach_id,
+ct.coach_type_name
+
+
 FROM  coach c JOIN main_user u          ON (c.user_id = u.user_id)
               JOIN coach_discipline cd  ON (c.coach_id = cd.coach_id)
               JOIN discipline d         ON (cd.discipline_id = d.discipline_id)
-    
-GROUP BY c.coach_name, u.email, c.coach_id;
+              JOIN coach_type ct        ON (c.coach_type_id = ct.coach_type_id)
+
+GROUP BY c.coach_name, u.email, c.coach_id ,ct.coach_type_name
+;
 
 end;

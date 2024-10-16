@@ -153,7 +153,8 @@ class Discipline(models.Model):
     discipline_id = models.BigAutoField(primary_key=True)
     discipline_name = models.CharField(max_length=50)
     discipline_description = models.CharField(max_length=500)
-
+    galery_img = models.BinaryField(blank=True, null=True)
+    
     class Meta:
         managed = False
         db_table = 'discipline'

@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.gallery-item img').forEach(image => {
+    document.querySelectorAll('.container galeria mt-5').forEach(image => {
         image.addEventListener('click', function() {
             const modal = document.createElement('div');
             modal.classList.add('modal');

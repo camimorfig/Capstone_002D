@@ -18,8 +18,8 @@ JOIN
     discipline d ON p.discipline_id = d.discipline_id
 LEFT JOIN 
     attendance a ON p.player_id = a.player_id
-    
-WHERE d.discipline_id = v_discipline_id
+
+WHERE d.discipline_id = v_discipline_id and p.player_status = 1
 GROUP BY 
     p.player_id, 
     p.player_rut,

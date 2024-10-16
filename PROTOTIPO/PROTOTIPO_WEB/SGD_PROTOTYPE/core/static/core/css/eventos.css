@@ -17,6 +17,62 @@
     padding: 20px;
 }
 
+/* banner principal */
+.first-banner {
+    position: relative;
+    height: 50vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 5 5%;
+    overflow: hidden;
+}
+
+.first-banner-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1;
+    filter: brightness(0.4);
+    /* Ajusta la oscuridad de la imagen si lo deseas */
+}
+
+.first-banner-content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    color: white;
+}
+
+.first-banner-text {
+    background-color: rgba(7, 0, 0, 0.736);
+    padding: 30px;
+    border-radius: 7px;
+    max-width: 800px;
+    color: white;
+}
+
+.first-banner-content h1 {
+    font-size: 3.5rem;
+    margin-bottom: 1rem;
+    font-family: 'Impact', sans-serif;
+}
+
+.first-banner-content h2 {
+    color: #ff4d4d;
+    font-size: 2rem;
+}
+
+.first-banner-content p {
+    font-size: 1.2rem;
+    max-width: 600px;
+}
+
+
 /* Encabezado del Calendario */
 .calendar-header {
     display: flex;
