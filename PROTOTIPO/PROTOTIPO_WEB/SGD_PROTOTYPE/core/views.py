@@ -255,7 +255,7 @@ def crear_perfil_Jugador(request):
         salida = guardar_jugador(rut, nombre, apellido, headquarters, career, imagen, discipline_id, entrenador_id)
 
         if salida == 1:
-            data['mensaje_exito'] = ["Jugador registrado correctamente."]
+            data['mensaje_exito'] = ["Solicitud de Creación de Jugador enviada correctamente."]
         else:
             data['mensaje_error'] = ["No se ha podido registrar. ERROR."]
 
@@ -533,7 +533,9 @@ def gestion_galeria(request):
 def solicitud_jugador(request):
 
     data = {
-        'solicitud': listado_solicitud()  
+        'solicitud': listado_solicitud(),
+        'contacto': listado_contacto()
+
     }
 
     return render (request, 'intranet/administrador/solicitud_jugador.html', data)
@@ -867,6 +869,25 @@ def listado_solicitud():
         lista.append(data)
 
     return lista
+
+def listado_contacto():
+    django_cursor = connection.cursor()
+    cursor = django_cursor.connection.cursor()
+    out_cur = django_cursor.connection.cursor()
+
+    cursor.callproc("SP_LIST_CONTACT", [out_cur])
+
+    lista = []
+    for fila in out_cur:
+        data={
+            'data':fila,
+            
+        }
+
+        lista.append(data)
+
+    return lista
+
 
 
 ####################################################

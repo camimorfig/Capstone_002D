@@ -89,7 +89,7 @@
                                                                     <li><a class="dropdown-item" href="#"><i
                                                                                 class="bi bi-trash text-danger"></i> Borrar
                                                                         </a></li>   
-                                                                        <li><a class="dropdown-item" href="{% url 'aceptar_solicitud' id=solicitud.id %}">
+                                                                        <li><a class="dropdown-item" href="{% url 'aceptar_solicitud' id=s.data.0 %}">
                                                                             <i class="bi bi-pencil text-primary"></i> Aceptar
                                                                         </a></li>
                                                                         
@@ -174,6 +174,8 @@
             <div class="modal-header">
                 <h5 class="modal-title" id="viewModalLabel">Mensaje Contactanos</h5>
             </div>
+            
+            
             <div class="modal-body">
                 <h6>Joaquin Jorquera</h6>
                 <p>jo.jorquera@duocuc.cl</p>
