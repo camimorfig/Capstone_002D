@@ -12,7 +12,33 @@
 <link rel="stylesheet" href="{% static 'core/css/style-selecciones-simple.css' %}">
 <link rel="stylesheet" href="{% static 'core/css/style-team-galery.css' %}">
 <link rel="stylesheet" href="{% static 'core/css/nosotros.css' %}">
-
+<style>
+    .gallery-item {
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+    
+    .gallery-item:hover {
+      transform: scale(1.05);
+    }
+  
+    .modal-dialog {
+      max-width: 90%;
+      margin: 1.75rem auto;
+    }
+  
+    .modal-dialog img {
+      max-width: 100%;
+      height: auto;
+    }
+  
+    .gallery-img {
+      width: 100%;
+      height: 250px;
+      object-fit: cover;
+      margin-bottom: 20px;
+    }
+  </style>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
@@ -23,6 +49,23 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <link rel="stylesheet" href="{% static 'core/javascript/script-team-gallery.js' %}">
 <link rel="stylesheet" href="{% static 'core/javascript/script.js' %}">
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Seleccionar todas las imágenes de la galería
+      const galleryImages = document.querySelectorAll('.gallery-item');
+      const modalImg = document.querySelector('#imgModal');
+      const modal = new bootstrap.Modal(document.querySelector('#galleryModal'));
+  
+      // Agregar evento click a cada imagen
+      galleryImages.forEach(img => {
+        img.addEventListener('click', function() {
+          modalImg.src = this.src;
+          modal.show();
+        });
+      });
+    });
+  </script>
 {% endblock js %}
 
 
@@ -133,14 +176,25 @@
         </section>
 
         <section class="container galeria">
-            {% if image %}
-                {% for imagen in imagenes %}
-                    <div class="row">
-                        <div class="col-lg-4">                
-                            <img src="data:image/jpeg;base64,{{ imagen.galery_img|safe }}" alt="Imagen de {{ disciplina.discipline_name }}" class="rounded img">
-                        </div>
-                    </div>
+            {% if imagenes %}
+                {% for i in imagenes %}
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <img src="data:imagen/png;base64, {{ i.imagen }}" 
+                         alt="Imagen galería" 
+                         class="gallery-item gallery-img rounded shadow"
+                         loading="lazy">
+                  </div>
                 {% endfor %}
+
+                <!-- Modal para ver imagen -->
+                <div class="modal fade" id="galleryModal" tabindex="-1" aria-labelledby="galleryModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content bg-transparent border-0">
+                        <button type="button" class="btn-close bg-white position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <img src="" id="imgModal" class="rounded" alt="Imagen ampliada">
+                    </div>
+                    </div>
+                </div>
                 
             {% else %}             
      

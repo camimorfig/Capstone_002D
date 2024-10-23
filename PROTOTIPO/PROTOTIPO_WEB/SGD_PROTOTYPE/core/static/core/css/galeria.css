@@ -70,6 +70,32 @@
     height: 260px;
 }
 
+.gallery-item {
+    cursor: pointer;
+    transition: transform 0.3s ease;
+  }
+  
+  .gallery-item:hover {
+    transform: scale(1.05);
+  }
+
+  .modal-dialog {
+    max-width: 90%;
+    margin: 1.75rem auto;
+  }
+
+  .modal-dialog img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .gallery-img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    margin-bottom: 20px;
+  }
+
 .galeria img:hover{
    border: 2px solid white;
 }

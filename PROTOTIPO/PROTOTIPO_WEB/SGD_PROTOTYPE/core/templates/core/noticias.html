@@ -37,29 +37,37 @@
   </section>
 
   <main role="main">
-    <div class="card-group">
-        {% for n in noticias %} 
-            <article class="card" news-id="{{ n.data.0 }}">
-            <span class="card-category">{{ n.data.6 }}</span>
-            <div class="card-img-container">
-                <img src="data:imagen/png;base64, {{ n.imagen }}" class="card-img-top" alt="">
+    
+    {% if noticias %}
+        <div class="card-group">
+            {% for n in noticias %} 
+                <article class="card" news-id="{{ n.data.0 }}">
+                <span class="card-category">{{ n.data.6 }}</span>
+                <div class="card-img-container">
+                    <img src="data:imagen/png;base64, {{ n.imagen }}" class="card-img-top" alt="">
 
-            </div>
-            <div class="card-body">
-                <h5 class="card-title">{{ n.data.1 }}</h5>
-                <p class="card-text">{{ n.data.3 }}</p>
-                <button class="read-more">Leer más</button>
-            </div>
-            <div class="card-footer">
-                {{ n.data.4 }}
-            </div>
-            <div class="full-news-content" style="display: none;">
-                <h2>{{ n.data.1 }}</h2>
-                <p>{{ n.data.3 }}</p>
-            </div>
-            </article>
-        {% endfor %}
-    </div>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ n.data.1 }}</h5>
+                    <p class="card-text">{{ n.data.3 }}</p>
+                    <button class="read-more">Leer más</button>
+                </div>
+                <div class="card-footer">
+                    {{ n.data.4 }}
+                </div>
+                <div class="full-news-content" style="display: none;">
+                    <h2>{{ n.data.1 }}</h2>
+                    <p>{{ n.data.3 }}</p>
+                </div>
+                </article>
+            {% endfor %}
+        </div>
+    {% else %}
+
+        <div class="first-banner"> <h1><strong> No hay Noticias registradas </strong></h1> </div>  
+    
+    {% endif %}  
+
   </main>
 
   <div id="newsModal" class="modal">

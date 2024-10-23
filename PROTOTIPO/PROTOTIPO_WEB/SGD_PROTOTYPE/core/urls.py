@@ -28,7 +28,6 @@ urlpatterns = [
     path('gestion_disciplina/', gestion_disciplina, name='gestion_disciplina'),
     path('update_discipline/', update_discipline, name='update_discipline'),
     
-    path('gestion_galeria/subir_imagen/', subir_imagen, name='subir_imagen'),   
     path('gestion_galeria/', gestion_galeria, name='gestion_galeria'),   
     path('jugadores/', jugadores_por_disciplina, name='jugadores_por_disciplina'),   
 

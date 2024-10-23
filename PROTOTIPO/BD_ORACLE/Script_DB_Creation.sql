@@ -15,9 +15,15 @@ DROP TABLE Coach_Discipline CASCADE CONSTRAINTS;
 
 ---- OTHER FUNCTIONS ----
 DROP TABLE Contact CASCADE CONSTRAINTS;
-DROP TABLE Galery CASCADE CONSTRAINTS;
 DROP TABLE Events CASCADE CONSTRAINTS;
 DROP TABLE News CASCADE CONSTRAINTS;
+--------------------------
+
+---- GALERYS ----
+DROP TABLE Galery_General CASCADE CONSTRAINTS;
+DROP TABLE Galery_Discipline CASCADE CONSTRAINTS;
+DROP TABLE Galery_Front CASCADE CONSTRAINTS;
+
 --------------------------
 
 ---- PLAYER DATA ----
@@ -29,6 +35,7 @@ DROP TABLE Elite_Athlete CASCADE CONSTRAINTS;
 --------------------
 
 ---- OTHER DATA ----
+DROP TABLE Status_Type CASCADE CONSTRAINTS;
 DROP TABLE Requests CASCADE CONSTRAINTS;
 --------------------
 
@@ -177,25 +184,6 @@ CREATE TABLE Contact (
 );
 
 ----------------------------------------------------------
---  DDL for GALERY
-----------------------------------------------------------   
-CREATE TABLE Galery (
-    galery_id INTEGER GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1) NOT NULL ,
-    galery_img blob NOT NULL,
-    galery_status NUMBER NOT NULL,
-    galery_front_page NUMBER NOT NULL,     
-    galery_description VARCHAR(100),
-    galery_date DATE,
-    ---- ADMIN FOREAN KEY ----
-    discipline_id INT,
-    ----
-    
-    
-
-   CONSTRAINT pk_Galery PRIMARY KEY (galery_id)
-);
-
-----------------------------------------------------------
 --  DDL for EVENTS
 ----------------------------------------------------------   
 CREATE TABLE Events (
@@ -232,14 +220,72 @@ ALTER TABLE Contact
 	 ADD CONSTRAINT Contact_Admin_fk FOREIGN KEY (admin_id)
 	  REFERENCES Admin (admin_id); 
       
+   
+   
+      
+                -------------------------------------------------------------
+            -------------------------------------------------------------------
+          ----------------------------- GALERYS -----------------------------
+            -------------------------------------------------------------------             
+                -------------------------------------------------------------      
+     
+  
+   
+      
+----------------------------------------------------------
+--  DDL for GALERY_GENERAL
+----------------------------------------------------------   
+CREATE TABLE Galery_General(
+    galery_gen_id INTEGER GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1) NOT NULL ,
+    galery_gen_img blob NOT NULL,
+    galery_gen_tag VARCHAR(50),
+    galery_gen_status NUMBER NOT NULL,
+    galery_gen_date DATE,
+    
+   CONSTRAINT pk_Galery_General PRIMARY KEY (galery_gen_id)
+);
+      
+      
+----------------------------------------------------------
+--  DDL for GALERY_DISCIPLINE
+----------------------------------------------------------   
+CREATE TABLE Galery_Discipline (
+    galery_dis_id INTEGER GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1) NOT NULL ,
+    galery_dis_img blob NOT NULL,
+    galery_dis_status NUMBER NOT NULL,
+    galery_dis_tag VARCHAR(50),
+    galery_dis_date DATE,
+    ---- ADMIN FOREAN KEY ----
+    discipline_id INT,
+    ----
+   CONSTRAINT pk_Galery_Discipline PRIMARY KEY (galery_dis_id)
+);      
+      
      ------------------------------
-    --------- ALTER GALERY ----------
+    --------- ALTER GALERY_DISCIPLINE ----------
      ------------------------------
      
-ALTER TABLE Galery
-	 ADD CONSTRAINT Galery_Discipline_fk FOREIGN KEY (discipline_id)
+ALTER TABLE Galery_Discipline
+	 ADD CONSTRAINT Galery_Discipline_Discipline_fk FOREIGN KEY (discipline_id)
 	  REFERENCES Discipline (discipline_id);         
+ 
+      
+----------------------------------------------------------
+--  DDL for GALERY_FRONT
+----------------------------------------------------------   
+CREATE TABLE Galery_Front (
+    galery_front_id INTEGER GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1) NOT NULL ,
+    galery_front_img blob NOT NULL,
+    galery_front_status NUMBER NOT NULL,
+    galery_front_title VARCHAR(100),
+    galery_front_description VARCHAR(200),
+    galery_front_place VARCHAR(200),
+    galery_front_date DATE,
 
+   CONSTRAINT pk_Galery_Front PRIMARY KEY (galery_front_id)
+);      
+      
+      
                 -------------------------------------------------------------
             -------------------------------------------------------------------
           ----------------------------- PLAYER DATA -----------------------------
@@ -373,23 +419,38 @@ CREATE TABLE Elite_Athlete (
 
 CREATE TABLE Requests (
     request_id INTEGER GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1) NOT NULL,
-    request_description VARCHAR(2000) NOT NULL,      
-
+    coach_name VARCHAR(100) NOT NULL,
+    player_rut VARCHAR(13)NOT NULL,
+    player_name VARCHAR(50) NOT NULL,
+    player_last_name VARCHAR(50) NOT NULL,
+    discipline_name VARCHAR(50) NOT NULL,
+    player_headquarters VARCHAR(50),
+    player_career VARCHAR(30) NOT NULL,
+    request_status VARCHAR(30) NOT NULL,
+    request_date DATE NOT NULL,
+    
 ---- USER AND DISCIPLINE FOREAN KEY----
-    coach_id VARCHAR(20) NOT NULL ,
-    player_id INTEGER NOT NULL,
+    coach_id VARCHAR(20) NOT NULL,
 ----
  
    CONSTRAINT pk_Requests PRIMARY KEY (request_id)
 );
 
-ALTER TABLE Requests
-	 ADD CONSTRAINT Requests_Player_fk FOREIGN KEY (player_id)
-	  REFERENCES Player (player_id);
-      
-ALTER TABLE Requests
-	 ADD CONSTRAINT Requests_Coach_fk FOREIGN KEY (coach_id)
-	  REFERENCES Coach (coach_id);      
+    ALTER TABLE Requests
+    ADD CONSTRAINT Requests_Coach_fk FOREIGN KEY (coach_id)
+    REFERENCES Coach (coach_id);      
+
+--------------------------------------------------------
+--  DDL for STATUS_TYPE
+--------------------------------------------------------
+CREATE  TABLE Status_Type (
+   status_id INT NOT NULL,
+   status_type_name VARCHAR(100) NOT NULL,
+    
+   CONSTRAINT pk_status_type PRIMARY KEY (status_id)
+);
+ 
+
 
 
                 ----------------------------
@@ -437,51 +498,51 @@ ALTER TABLE Requests
 -----------------------------------------------
 ----------------DISCIPLINE-----------------------
 -----------------------------------------------  
+    INSERT INTO Discipline (discipline_name, discipline_description, galery_img)
+    VALUES ('Básquetbol Varones','El básquetbol es uno de los deportes más populares del mundo y uno de los más vistos. Es un deporte de equipo en el que dos equipos de cinco jugadores activos cada uno intentan anotar puntos entre sí lanzando una pelota a través de un aro de 300 cm de altura (la "canasta") bajo reglas establecidas.', empty_blob());
 
-    INSERT INTO Discipline (discipline_name, discipline_description)
-    VALUES ('Básquetbol Varones','El básquetbol es uno de los deportes más populares del mundo y uno de los más vistos. Es un deporte de equipo en el que dos equipos de cinco jugadores activos cada uno intentan anotar puntos entre sí lanzando una pelota a través de un aro de 300 cm de altura (la "canasta") bajo reglas establecidas.');
+    INSERT INTO Discipline (discipline_name, discipline_description, galery_img)
+    VALUES ('Básquetbol Damas','El básquetbol es uno de los deportes más populares del mundo y uno de los más vistos. Es un deporte de equipo en el que dos equipos de cinco jugadores activos cada uno intentan anotar puntos entre sí lanzando una pelota a través de un aro de 300 cm de altura (la "canasta") bajo reglas establecidas.', empty_blob());
 
-    INSERT INTO Discipline (discipline_name, discipline_description)
-    VALUES ('Básquetbol Damas','El básquetbol es uno de los deportes más populares del mundo y uno de los más vistos. Es un deporte de equipo en el que dos equipos de cinco jugadores activos cada uno intentan anotar puntos entre sí lanzando una pelota a través de un aro de 300 cm de altura (la "canasta") bajo reglas establecidas.');
-    
-    INSERT INTO Discipline (discipline_name, discipline_description)
-    VALUES ('Ajedrez','El ajedrez es un juego de tablero entre dos contrincantes en el que cada uno dispone al inicio de dieciséis piezas móviles, desiguales en importancia y valor, que se desplazan sobre un tablero capturando piezas del jugador contrario. El objetivo final del juego consiste en “derrocar al rey” del oponente.');
-     
-    INSERT INTO Discipline (discipline_name, discipline_description) 
-    VALUES ('Tenis de Mesa Varones','Consiste en un deporte de oposición, que se realiza en una mesa de juego, separando los dos campos por una red, con dos jugadores/as con sus raquetas respectivas y una bola que hay que pasar al campo contrario después de golpear la mesa. Se pierde el tanto cuando no se pasa la bola al campo contrario.');
+    INSERT INTO Discipline (discipline_name, discipline_description, galery_img)
+    VALUES ('Ajedrez','El ajedrez es un juego de tablero entre dos contrincantes en el que cada uno dispone al inicio de dieciséis piezas móviles, desiguales en importancia y valor, que se desplazan sobre un tablero capturando piezas del jugador contrario. El objetivo final del juego consiste en "derrocar al rey" del oponente.', empty_blob());
 
-    INSERT INTO Discipline (discipline_name, discipline_description) 
-    VALUES ('Tenis de Mesa Damas','Consiste en un deporte de oposición, que se realiza en una mesa de juego, separando los dos campos por una red, con dos jugadores/as con sus raquetas respectivas y una bola que hay que pasar al campo contrario después de golpear la mesa. Se pierde el tanto cuando no se pasa la bola al campo contrario.');
+    INSERT INTO Discipline (discipline_name, discipline_description, galery_img)
+    VALUES ('Tenis de Mesa Varones','Consiste en un deporte de oposición, que se realiza en una mesa de juego, separando los dos campos por una red, con dos jugadores/as con sus raquetas respectivas y una bola que hay que pasar al campo contrario después de golpear la mesa. Se pierde el tanto cuando no se pasa la bola al campo contrario.', empty_blob());
 
-    INSERT INTO Discipline (discipline_name, discipline_description) 
-    VALUES ('Fútbol Varones','Se juega mediante una pelota que se debe desplazar a través del campo con cualquier parte del cuerpo que no sean los brazos o las manos, y mayoritariamente con los pies (de ahí su nombre). El objetivo es introducirla dentro de la portería o arco contrario, acción que se denomina marcar un gol');
+    INSERT INTO Discipline (discipline_name, discipline_description, galery_img)
+    VALUES ('Tenis de Mesa Damas','Consiste en un deporte de oposición, que se realiza en una mesa de juego, separando los dos campos por una red, con dos jugadores/as con sus raquetas respectivas y una bola que hay que pasar al campo contrario después de golpear la mesa. Se pierde el tanto cuando no se pasa la bola al campo contrario.', empty_blob());
 
-    INSERT INTO Discipline (discipline_name, discipline_description) 
-    VALUES ('Futbolito Damas','El Futbolito es un deporte colectivo muy parecido al fútbol, presentando diferencias con respecto al terreno de juego, medidas de la cancha, medidas de la portería, peso y tamaño del balón y algunas reglas de juego. El Futbolito se juega entre dos equipos de 7 jugadores cada uno.');
+    INSERT INTO Discipline (discipline_name, discipline_description, galery_img)
+    VALUES ('Fútbol Varones','Se juega mediante una pelota que se debe desplazar a través del campo con cualquier parte del cuerpo que no sean los brazos o las manos, y mayoritariamente con los pies (de ahí su nombre). El objetivo es introducirla dentro de la portería o arco contrario, acción que se denomina marcar un gol', empty_blob());
 
-    INSERT INTO Discipline (discipline_name, discipline_description) 
-    VALUES ('Futsal Varones','El Futsal es un deporte colectivo muy parecido al fútbol, presentando diferencias con respecto al terreno de juego, medidas de la cancha, medidas de la portería, peso y tamaño del balón y algunas reglas de juego. El Futbolito se juega entre dos equipos de 7 jugadores cada uno.');
+    INSERT INTO Discipline (discipline_name, discipline_description, galery_img)
+    VALUES ('Futbolito Damas','El Futbolito es un deporte colectivo muy parecido al fútbol, presentando diferencias con respecto al terreno de juego, medidas de la cancha, medidas de la portería, peso y tamaño del balón y algunas reglas de juego. El Futbolito se juega entre dos equipos de 7 jugadores cada uno.', empty_blob());
 
-    INSERT INTO Discipline (discipline_name, discipline_description) 
-    VALUES ('Futsal Damas','El Futsal es un deporte colectivo muy parecido al fútbol, presentando diferencias con respecto al terreno de juego, medidas de la cancha, medidas de la portería, peso y tamaño del balón y algunas reglas de juego. El Futbolito se juega entre dos equipos de 7 jugadores cada uno.');
+    INSERT INTO Discipline (discipline_name, discipline_description, galery_img)
+    VALUES ('Futsal Varones','El Futsal es un deporte colectivo muy parecido al fútbol, presentando diferencias con respecto al terreno de juego, medidas de la cancha, medidas de la portería, peso y tamaño del balón y algunas reglas de juego. El Futbolito se juega entre dos equipos de 7 jugadores cada uno.', empty_blob());
 
-    INSERT INTO Discipline (discipline_name, discipline_description) 
-    VALUES ('Vóleibol Varones','El voleibol, simplemente voley, es un deporte donde dos equipos se enfrentan sobre un terreno de juego liso separados por una red central, tratando de pasar el balón por encima de la red hacia el suelo del campo contrario');
+    INSERT INTO Discipline (discipline_name, discipline_description, galery_img)
+    VALUES ('Futsal Damas','El Futsal es un deporte colectivo muy parecido al fútbol, presentando diferencias con respecto al terreno de juego, medidas de la cancha, medidas de la portería, peso y tamaño del balón y algunas reglas de juego. El Futbolito se juega entre dos equipos de 7 jugadores cada uno.', empty_blob());
 
-    INSERT INTO Discipline (discipline_name, discipline_description) 
-    VALUES ('Vóleibol Damas','El voleibol, simplemente voley, es un deporte donde dos equipos se enfrentan sobre un terreno de juego liso separados por una red central, tratando de pasar el balón por encima de la red hacia el suelo del campo contrario');
+    INSERT INTO Discipline (discipline_name, discipline_description, galery_img)
+    VALUES ('Vóleibol Varones','El voleibol, simplemente voley, es un deporte donde dos equipos se enfrentan sobre un terreno de juego liso separados por una red central, tratando de pasar el balón por encima de la red hacia el suelo del campo contrario', empty_blob());
 
-    INSERT INTO Discipline (discipline_name, discipline_description) 
-    VALUES ('Rugby Varones','Es un deporte de equipo en el que cada jugador puede darlo todo. El rugby es un deporte de equipo en el que se juegan quince jugadores por equipo. El objetivo del juego es apoyar la pelota detrás de la línea de try del oponente, en lo que se denomina el área de in-goal. El rugby se juega tanto con la pelota en la mano como con patadas .');
+    INSERT INTO Discipline (discipline_name, discipline_description, galery_img)
+    VALUES ('Vóleibol Damas','El voleibol, simplemente voley, es un deporte donde dos equipos se enfrentan sobre un terreno de juego liso separados por una red central, tratando de pasar el balón por encima de la red hacia el suelo del campo contrario', empty_blob());
 
-
+    INSERT INTO Discipline (discipline_name, discipline_description, galery_img)
+    VALUES ('Rugby Varones','Es un deporte de equipo en el que cada jugador puede darlo todo. El rugby es un deporte de equipo en el que se juegan quince jugadores por equipo. El objetivo del juego es apoyar la pelota detrás de la línea de try del oponente, en lo que se denomina el área de in-goal. El rugby se juega tanto con la pelota en la mano como con patadas .', empty_blob());
 ---------------------------------------
 
-     ------------------------------
-    ---------- ALTER MAIN_USER ----------
-     ------------------------------
+-----------------------------------------------
+----------------DISCIPLINE-----------------------
+-----------------------------------------------
+    INSERT INTO Status_Type (status_id, Status_Type_name)
+    VALUES (0,'Inactivo');
 
-
-
+    INSERT INTO Status_Type (status_id, Status_Type_name)
+    VALUES (1,'Activo');
+    
 commit;
       

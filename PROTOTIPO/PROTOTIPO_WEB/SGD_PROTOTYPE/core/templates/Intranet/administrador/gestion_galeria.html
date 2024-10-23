@@ -9,6 +9,34 @@
 
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+
+<style>
+    .gallery-item {
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+    
+    .gallery-item:hover {
+      transform: scale(1.05);
+    }
+  
+    .modal-dialog {
+      max-width: 90%;
+      margin: 1.75rem auto;
+    }
+  
+    .modal-dialog img {
+      max-width: 100%;
+      height: auto;
+    }
+  
+    .gallery-img {
+      width: 100%;
+      height: 250px;
+      object-fit: cover;
+      margin-bottom: 20px;
+    }
+  </style>
 {% endblock css %}
 
 <!-- Enlace JS -->
@@ -104,7 +132,7 @@
                             
                                                                     <div class="form-group mt-2">
                                                                         <label for="descripcion"><strong>Etiqueta</strong></label>
-                                                                        <input type="text" class="form-control" id="etiqueta" name="galery_description" placeholder="Etiqueta Foto" required>
+                                                                        <input type="text" class="form-control" id="etiqueta" name="etiqueta" placeholder="Etiqueta Foto" required>
                                                                     </div>
                                                                 
                                                                     <hr>
@@ -123,47 +151,70 @@
                                 <div class="tab-pane fade show " id="gg" role="tabpanel" aria-labelledby="gg-tab">
                                     <hr>
                                     <div class="card py-2 px-2">
-                                        <table class="table table-striped table-hover">
-                                            <thead>
-                                                <tr>
-                                                    <th>Id</th>
-                                                    <th>Etiqueta</th>
-                                                    <th>Fecha de creación</th>
-                                                    <th>Imagen</th>
-                                                    <th>Opciones</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td>1</td>
-                                                    <td>Duoc Futbol</td>
-                                                    <td>17/08/2022 13:55 </td>
-                                                    <td><button class="btn btn-danger btn-sm" data-bs-toggle="modal"
-                                                        data-bs-target="#viewPhotoModal">Ver</button></td>
-                                                    <td>
-                                                        <div class="dropdown">
-                                                            <button class="btn btn-primary btn-sm dropdown-toggle"
-                                                                type="button" id="dropdownMenuButton1"
-                                                                data-bs-toggle="dropdown" aria-expanded="false">
-                                                                Ver Opciones
-                                                            </button>
-                                                            <ul class="dropdown-menu"
-                                                                aria-labelledby="dropdownMenuButton1" data-bs-toggle="modal"
-                                                                data-bs-target="#deleteModal">
-                                                                <li><a class="dropdown-item" href="#"><i
-                                                                            class="bi bi-trash text-danger"></i> Borrar
-                                                                    </a></li>
-                                                                <li><a class="dropdown-item" data-bs-toggle="modal"
-                                                                    data-bs-target="#EditModal"><i
-                                                                            class="bi bi-pencil text-primary"></i>
-                                                                        Editar </a></li>
-                                                            </ul>
+
+                                        {% if not galeria %}
+                                            <div> <h4><strong> No hay Imagenes registradas en la galeria general </strong></h4> </div>  
+
+                                        {% else %}
+                                            <table class="table table-striped table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Id</th>
+                                                        <th>Etiqueta</th>
+                                                        <th>Fecha de creación</th>
+                                                        <th>Imagen</th>
+                                                        <th>Opciones</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for g in galeria %}
+                                                        <tr>
+                                                            <td>{{g.data.0}}</td>
+                                                            <td>{{g.data.2}}</td>
+                                                            <td>{{g.data.4}}</td>
+                                                            <td><button class="btn btn-danger btn-sm" data-bs-toggle="modal"
+                                                                data-bs-target="#viewNewModal{{g.data.0}}">Ver</button></td>
+                                                            <td>
+                                                                <div class="dropdown">
+                                                                    <button class="btn btn-primary btn-sm dropdown-toggle"
+                                                                        type="button" id="dropdownMenuButton1"
+                                                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                                                        Ver Opciones
+                                                                    </button>
+                                                                    <ul class="dropdown-menu"
+                                                                        aria-labelledby="dropdownMenuButton1" data-bs-toggle="modal"
+                                                                        data-bs-target="#deleteModal">
+                                                                        <li><a class="dropdown-item" href="#"><i
+                                                                                    class="bi bi-trash text-danger"></i> Borrar
+                                                                            </a></li>
+                                                                        <li><a class="dropdown-item" data-bs-toggle="modal"
+                                                                            data-bs-target="#EditModal"><i
+                                                                                    class="bi bi-pencil text-primary"></i>
+                                                                                Editar </a></li>
+                                                                    </ul>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                        <!-- Modal for Ver -->
+                                                        <div class="modal fade" id="viewNewModal{{g.data.0}}" tabindex="-1" aria-labelledby="viewPhotoModalLabel" aria-hidden="true">
+                                                            <div class="modal-dialog">
+                                                                <div class="modal-content">
+                                                                    <div class="modal-header">
+                                                                        <h5 class="modal-title" id="viewPhotoModalLabel">{{g.data.2}}</h5>
+                                                                    </div>
+                                                                    <div class="modal-body">
+                                                                        <img src="data:imagen/png;base64, {{ g.imagen }}" alt="" srcset="">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
                                                         </div>
-                                                    </td>
-                                                </tr>
-                                                
-                                            </tbody>
-                                        </table>
+
+                                                    {% endfor %}
+
+                                                </tbody>
+                                            </table>
+                                        {% endif %}
+
                                     </div>
                                     <!-- Modal for Aceptar -->
                                     <div class="modal fade" id="EditModal" tabindex="-1" aria-labelledby="EditModalLabel" aria-hidden="true">
@@ -187,19 +238,6 @@
                                                 </div>
                                                 <div class="modal-body">
                                                     <p>Se ha eliminado la imagen</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- Modal for Ver -->
-                                    <div class="modal fade" id="viewPhotoModal" tabindex="-1" aria-labelledby="viewPhotoModalLabel" aria-hidden="true">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title" id="viewPhotoModalLabel">Photo</h5>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <img src="" alt="" srcset="">
                                                 </div>
                                             </div>
                                         </div>

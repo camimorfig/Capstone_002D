@@ -59,7 +59,7 @@ def eventos(request):
 
 
 def galeria(request):
-    galeria = listado_galeria()
+    galeria = listado_galeria_general()
     page = request.GET.get('page',1)
 
     try:
@@ -85,7 +85,6 @@ def nosotros(request):
     return render (request, 'core/nosotros.html', data)
 
 
-
 def noticias(request):
     data = {
     'noticias': listado_noticias()
@@ -98,14 +97,14 @@ def disciplina_view(request, disciplina, seccion):
     
     if seccion == "acerca":
         # En este caso, mostramos la información básica de la disciplina
-        context = {
+        data = {
             'disciplina': disciplina_obj,
             'seccion': seccion,
         }
         
     elif seccion == "plantel":
       # Recuperar jugadores relacionados con esta disciplina
-        jugadores = Player.objects.filter(discipline=disciplina_obj)
+        jugadores = Player.objects.filter(discipline=disciplina_obj, player_status = 1)
         
         # Lista para almacenar jugadores con sus imágenes en base64
         jugadores_con_imagenes = []
@@ -118,7 +117,7 @@ def disciplina_view(request, disciplina, seccion):
                     'imagen_base64': imagen_base64
                 })
         
-        context = {
+        data = {
             'disciplina': disciplina_obj,
             'seccion': seccion,
             'jugadores_con_imagenes': jugadores_con_imagenes,
@@ -126,8 +125,8 @@ def disciplina_view(request, disciplina, seccion):
 
     elif seccion == "galeria":
         # Recuperar las imágenes de la galería relacionadas con esta disciplina
-        imagenes = Galery.objects.filter(galery_description__icontains=disciplina_obj.discipline_name)
-        context = {
+        imagenes = listado_galeria_discipline(disciplina_obj.discipline_id)
+        data = {
             'disciplina': disciplina_obj,
             'seccion': seccion,
             'imagenes': imagenes,
@@ -138,7 +137,7 @@ def disciplina_view(request, disciplina, seccion):
         return render(request, 'core/error.html', {'mensaje': 'Sección no encontrada'})
 
     # Renderizar la plantilla dinámica
-    return render(request, 'core/disciplinas/disciplina_template.html', context)
+    return render(request, 'core/disciplinas/disciplina_template.html', data)
 
 def selecciones(request):
 
@@ -279,7 +278,6 @@ def tomar_asistencia(request):
 def jugadores_por_disciplina(request):
     
     disciplina = request.GET.get('disciplina') 
-    print(disciplina)
     data = { 
         'jugadores':listado_jugador_por_disciplinas(disciplina)
 
@@ -358,7 +356,7 @@ def crear_perfil_entrenador(request):
             return render(request, 'intranet/administrador/crear_perfil_entrenador.html', data)
 
         disciplinas_seleccionadas = [int(disciplina) for disciplina in disciplinas_seleccionadas]
-
+        
 
         # Generar contraseña
         nombre_concatenado = apellido[:2]
@@ -382,6 +380,8 @@ def crear_perfil_entrenador(request):
         # Manejar el resultado de salida
         if salida == 1:
             data['mensaje_exito'] = ["Entrenador registrado correctamente."]
+            data['entrenadores'] = listado_entrenadores()
+
         
         elif salida == -1:
             data['mensaje_error'] = ["Rut ya registrado. No es posible registrar al Entrenador."]
@@ -439,49 +439,6 @@ def crear_noticias(request):
     
     return render (request, 'intranet/administrador/crear_noticias.html', data)
 
-@login_required
-def subir_imagen(request):
-
-    data = {
-        'disciplinas': listado_disciplinas()  
-    }
-
-    if request.method == 'POST':
-            
-        if 'imagen' in request.FILES:
-            imagen_file = request.FILES['imagen']
-            imagen = imagen_file.read()
-        else:
-            data['mensaje_error'] = ["Debes subir una imagen para registrar una galería."]
-            return render(request, 'intranet/administrador/subir_imagen.html', data)
-
-        discipline_id = request.POST.get('discipline_id')
-        if not discipline_id:
-            data['mensaje_error'] = ["Debes ingresar una disciplina para la galería."]
-            return render(request, 'intranet/administrador/subir_imagen.html', data)
-
-        galery_description = request.POST.get('galery_description')
-        if not galery_description:
-            data['mensaje_error'] = ["Debes ingresar una descripción para la galería."]
-            return render(request, 'intranet/administrador/subir_imagen.html', data)
-
-        portada = request.POST.get('portada')
-        if portada == "on":
-            portada = 1
-        elif portada == None:
-            portada = 0
-
-
-        # Guardar la galería en la base de datos
-        salida = guardar_galeria(imagen, portada, galery_description, discipline_id)
-
-        if salida == 1:
-            data['mensaje_exito'] = ["Imagen registrada correctamente."]
-        else:
-            data['mensaje_error'] = ["No se ha podido registrar la galería. ERROR."]
-
-    
-    return render (request, 'intranet/administrador/subir_imagen.html', data)
 
 @login_required
 def asistencia_admin(request):
@@ -491,41 +448,66 @@ def asistencia_admin(request):
 def gestion_galeria(request):
 
     data = {
-        'disciplinas': listado_disciplinas()  
+        'disciplinas': listado_disciplinas(),
+        'galeria': listado_galeria_general(),
     }
 
     if request.method == 'POST':
+
+        publicar_en = request.POST.get('publicar_en')
+        if publicar_en == 'galeria-general':
+
+            if 'imagen' in request.FILES:
+                imagen_file = request.FILES['imagen']
+                imagen = imagen_file.read()
+            else:
+                data['mensaje_error'] = ["Debes subir una imagen para publicar en la galería general."]
+                return render (request, 'intranet/administrador/gestion_galeria.html', data)
             
-        if 'imagen' in request.FILES:
-            imagen_file = request.FILES['imagen']
-            imagen = imagen_file.read()
+            etiqueta = request.POST.get('etiqueta')
+            if not etiqueta:
+                data['mensaje_error'] = ["Debes ingresar una etiqueta para publicar en la galería general."]
+                return render (request, 'intranet/administrador/gestion_galeria.html', data)
+
+            # Guardar la imagen en la galeria general de la base de datos
+            salida = guardar_galeria_general(imagen, etiqueta)
+
+            if salida == 1:
+                data['mensaje_exito'] = ["Imagen registrada correctamente en galeria general."]
+            else:
+                data['mensaje_error'] = ["No se ha podido registrar la imagen. ERROR."]
+
+        elif publicar_en == 'galeria-disciplina':
+            
+            if 'imagen' in request.FILES:
+                imagen_file = request.FILES['imagen']
+                imagen = imagen_file.read()
+            else:
+                data['mensaje_error'] = ["Debes subir una imagen para publicar en la galeria de disciplina."]
+                return render (request, 'intranet/administrador/gestion_galeria.html', data)
+            
+            discipline_id = request.POST.get('discipline_id')
+            if not discipline_id:
+                data['mensaje_error'] = ["Debes ingresar una Disciplina para registrar una imagen en la galeria de disciplina."]
+                return render (request, 'intranet/administrador/gestion_galeria.html', data)
+
+            etiqueta = request.POST.get('etiqueta')
+            if not etiqueta:
+                data['mensaje_error'] = ["Debes ingresar una etiqueta para publicar en la galeria de disciplina."]
+                return render (request, 'intranet/administrador/gestion_galeria.html', data)
+
+            salida = guardar_galeria_disciplina(imagen, discipline_id, etiqueta)
+
+            if salida == 1:
+                data['mensaje_exito'] = ["Imagen registrada correctamente en galeria de disciplina."]
+            else:
+                data['mensaje_error'] = ["No se ha podido registrar la imagen. ERROR."]
+
         
-        discipline_id = request.POST.get('discipline_id')
-        if not discipline_id:
-            data['mensaje_error'] = ["Debes ingresar una disciplina para la galería."]
-            return render(request, 'intranet/administrador/subir_imagen.html', data)
-
-        galery_description = request.POST.get('galery_description')
-        if not galery_description:
-            data['mensaje_error'] = ["Debes ingresar una descripción para la galería."]
-            return render(request, 'intranet/administrador/subir_imagen.html', data)
-
-        portada = request.POST.get('portada')
-        if portada == "on":
-            portada = 1
-        elif portada == None:
-            portada = 0
-
-
-        # Guardar la galería en la base de datos
-        salida = guardar_galeria(imagen, portada, galery_description, discipline_id)
-
-        if salida == 1:
-            data['mensaje_exito'] = ["Imagen registrada correctamente."]
         else:
-            data['mensaje_error'] = ["No se ha podido registrar la galería. ERROR."]
+            data['mensaje_error'] = ["Debes seleccionar donde se subira la imagen."]
+            return render (request, 'intranet/administrador/gestion_galeria.html', data)
 
-    
 
     return render (request, 'intranet/administrador/gestion_galeria.html', data)
 
@@ -731,22 +713,36 @@ def guardar_jugador(rut, nombre, apellido, headquarters, career, imagen, discipl
     return salida.getvalue()
 
 
-def guardar_galeria(imagen, portada, galery_description, discipline_id):
+def guardar_galeria_general(imagen, etiqueta):
     django_cursor = connection.cursor()
     cursor = django_cursor.connection.cursor()
 
     salida = cursor.var(oracledb.NUMBER)
 
-    cursor.callproc('SP_CREATE_GALERY', [
+    cursor.callproc('SP_CREATE_GALERY_GENERAL', [
         imagen, 
-        portada, 
-        galery_description, 
-        discipline_id,
-
+        etiqueta,
         salida
     ])
 
     return salida.getvalue()
+
+
+def guardar_galeria_disciplina(imagen, discipline_id, etiqueta):
+    django_cursor = connection.cursor()
+    cursor = django_cursor.connection.cursor()
+
+    salida = cursor.var(oracledb.NUMBER)
+
+    cursor.callproc('SP_CREATE_GALERY_DISCIPLINE', [
+        imagen,
+        etiqueta,
+        discipline_id, 
+
+        salida
+    ])
+
+    return salida.getvalue()    
 
 
 def listado_galeria_portada():
@@ -754,7 +750,7 @@ def listado_galeria_portada():
     cursor = django_cursor.connection.cursor()
     out_cur = django_cursor.connection.cursor()
 
-    cursor.callproc("sp_list_images_front_page", [out_cur])
+    cursor.callproc("sp_list_images_front", [out_cur])
 
     lista = []
     for fila in out_cur:
@@ -833,12 +829,32 @@ def listado_noticias():
     return lista
 
 
-def listado_galeria():
+def listado_galeria_general():
     django_cursor = connection.cursor()
     cursor = django_cursor.connection.cursor()
     out_cur = django_cursor.connection.cursor()
 
-    cursor.callproc("sp_list_images", [out_cur])
+    cursor.callproc("sp_list_images_general", [out_cur])
+
+    lista = []
+    for fila in out_cur:
+        data={
+            'data':fila,
+            'imagen':str(base64.b64encode(fila[1].read()), 'utf-8'),    
+            
+        }
+
+        lista.append(data)
+
+    return lista
+
+
+def listado_galeria_discipline(disciplina_id):
+    django_cursor = connection.cursor()
+    cursor = django_cursor.connection.cursor()
+    out_cur = django_cursor.connection.cursor()
+
+    cursor.callproc("sp_list_images_discipline", [out_cur, disciplina_id])
 
     lista = []
     for fila in out_cur:
