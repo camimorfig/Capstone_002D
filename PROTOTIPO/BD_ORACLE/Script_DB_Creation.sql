@@ -304,6 +304,8 @@ CREATE TABLE Player (
     player_career VARCHAR(30) NOT NULL,
     player_img blob,
     player_status VARCHAR(30) NOT NULL,
+--    player_birthday DATE NOT NULL,
+--    player_horary VARCHAR(30) NOT NULL,
 ---- IDs ----
     discipline_id INT NOT NULL,
     game_position_id INT,    

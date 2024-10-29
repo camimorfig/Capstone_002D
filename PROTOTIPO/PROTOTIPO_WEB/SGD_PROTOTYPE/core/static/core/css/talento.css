@@ -61,14 +61,10 @@
 .team-section {
     text-align: center;
     padding: 50px 0;
-    background-color: #ffffff;
+    background-color: #f7f7f7;
 }
 
-.team-section h1 {
-    font-size: 36px;
-    margin-bottom: 50px;
-}
-
+/* Contenedor de las tarjetas */
 .team-container {
     display: flex;
     justify-content: center;
@@ -76,55 +72,72 @@
     gap: 20px;
 }
 
+/* Tarjeta de equipo */
 .team-card {
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    overflow: hidden;
+    position: relative;
     width: 300px;
-    padding: 20px;
-    text-align: center;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    height: 400px; /* Ajusté la altura */
+    overflow: hidden;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
+/* Efecto de hover en la tarjeta */
+.team-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* Imagen del perfil cubre toda la tarjeta */
 .team-card img {
     width: 100%;
-    height: auto;
-    border-radius: 50%;
+    height: 100%;
+    object-fit: cover; /* Asegura que la imagen cubra la tarjeta sin distorsión */
+    transition: opacity 0.3s ease;
 }
 
-.team-card h2 {
-    font-size: 24px;
-    margin: 15px 0 5px;
+/* Oculta la imagen cuando se hace hover */
+.team-card:hover img {
+    opacity: 0.3;
 }
 
-.team-card p {
-    font-size: 16px;
-    color: #666;
-    margin-bottom: 20px;
-}
-
-.email {
+/* Información del equipo (oculta inicialmente) */
+.team-info {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7); /* Fondo semitransparente */
+    color: white;
     display: flex;
-    align-items: center;
+    flex-direction: column;
     justify-content: center;
-    gap: 10px;
-    margin-top: 10px;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    padding: 20px;
 }
 
-.email i {
-    font-size: 20px;
-    color: #333;
+/* Muestra la información al hacer hover */
+.team-card:hover .team-info {
+    opacity: 1;
 }
 
-.email input {
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    padding: 5px 10px;
-    width: 70%;
-    font-size: 14px;
+/* Estilos del texto dentro de la tarjeta */
+.team-info h2 {
+    font-size: 24px;
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
 }
 
+.team-info p {
+    font-size: 16px;
+    font-family: 'Roboto', sans-serif;
+    margin: 5px 0;
+}
+/* Footer */
 footer {
     background-color: #1a2e4a;
     color: #fff;

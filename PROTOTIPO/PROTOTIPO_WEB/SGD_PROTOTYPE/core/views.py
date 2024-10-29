@@ -22,6 +22,7 @@ from django.core.paginator import Paginator
 from django.http import Http404
 
 
+
 ###########  views de Templates  ###########
 def index(request):
     
@@ -47,9 +48,9 @@ def contacto(request):
         salida = guardar_contacto(nombre,email,descripcion)
 
         if salida == 1:
-            data['mensaje'] = 'guardado correctamente'
+            data['mensaje_exito'] = ['Guardado correctamente']
         else:
-            data['mensaje'] = 'no se ha podido guardar. ERROR.'            
+            data['mensaje_error'] = ['No se ha podido guardar. ERROR.']            
 
     return render (request, 'core/contacto.html',data)
 
@@ -106,21 +107,24 @@ def disciplina_view(request, disciplina, seccion):
       # Recuperar jugadores relacionados con esta disciplina
         jugadores = Player.objects.filter(discipline=disciplina_obj, player_status = 1)
         
-        # Lista para almacenar jugadores con sus imágenes en base64
-        jugadores_con_imagenes = []
-        for jugador in jugadores:
-            if jugador.player_img:  # Verifica que haya una imagen
-                # Codifica la imagen en base64 sin usar .read()
-                imagen_base64 = base64.b64encode(jugador.player_img.read()).decode('utf-8')
-                jugadores_con_imagenes.append({
-                    'jugador': jugador,
-                    'imagen_base64': imagen_base64
-                })
+        # # Lista para almacenar jugadores con sus imágenes en base64
+        # jugadores_con_imagenes = []
+        # for jugador in jugadores:
+        #     if jugador.player_img:  # Verifica que haya una imagen
+        #         # Codifica la imagen en base64 sin usar .read()
+        #         imagen_base64 = base64.b64encode(jugador.player_img.read()).decode('utf-8')
+        #         jugadores_con_imagenes.append({
+        #             'jugador': jugador,
+        #             'imagen_base64': imagen_base64
+        #         })
         
         data = {
             'disciplina': disciplina_obj,
             'seccion': seccion,
-            'jugadores_con_imagenes': jugadores_con_imagenes,
+            # 'jugadores_con_imagenes': jugadores_con_imagenes,
+
+            'jugadores_con_imagenes': jugadores,
+
         }
 
     elif seccion == "galeria":
@@ -139,6 +143,7 @@ def disciplina_view(request, disciplina, seccion):
     # Renderizar la plantilla dinámica
     return render(request, 'core/disciplinas/disciplina_template.html', data)
 
+
 def selecciones(request):
 
     data = {
@@ -146,6 +151,12 @@ def selecciones(request):
         }  
 
     return render (request, 'core/selecciones.html', data)
+
+
+def talento(request):
+    data = {
+        }
+    return render (request, 'core/talento.html', data)
 
 
 ###################### COACH ######################
@@ -255,6 +266,8 @@ def crear_perfil_Jugador(request):
 
         if salida == 1:
             data['mensaje_exito'] = ["Solicitud de Creación de Jugador enviada correctamente."]
+        elif salida == -1:
+            data['mensaje_error'] = ["Rut ya registrado. Cambie el rut o contacto con el administrador  ."] 
         else:
             data['mensaje_error'] = ["No se ha podido registrar. ERROR."]
 
@@ -279,7 +292,8 @@ def jugadores_por_disciplina(request):
     
     disciplina = request.GET.get('disciplina') 
     data = { 
-        'jugadores':listado_jugador_por_disciplinas(disciplina)
+        'jugadores':listado_jugador_por_disciplinas(disciplina),
+
 
     }
 
@@ -288,9 +302,6 @@ def jugadores_por_disciplina(request):
 @login_required
 def grafico(request):
     return render (request, 'intranet/entrenador/grafico.html')
-
-
-#####################################################
 
 
 ###################### ADMIN ######################
@@ -432,6 +443,7 @@ def crear_noticias(request):
 
         if salida == 1:
             data['mensaje_exito'] = ["Imagen registrada correctamente."]
+            data['noticias'] = listado_noticias()
         else:
             data['mensaje_error'] = ["No se ha podido registrar la galería. ERROR."]
 
@@ -500,6 +512,8 @@ def gestion_galeria(request):
 
             if salida == 1:
                 data['mensaje_exito'] = ["Imagen registrada correctamente en galeria de disciplina."]
+                data['galeria'] = listado_galeria_general()
+
             else:
                 data['mensaje_error'] = ["No se ha podido registrar la imagen. ERROR."]
 
@@ -519,23 +533,35 @@ def solicitud_jugador(request):
         'contacto': listado_contacto()
 
     }
-
     return render (request, 'intranet/administrador/solicitud_jugador.html', data)
 
-from django.shortcuts import redirect
-from django.contrib import messages
-from django.db import connection
+
 
 def aceptar_solicitud(request, id):
-    with connection.cursor() as cursor:
-        try:
-            cursor.callproc('sp_aceptar_solicitud', [id])
-            messages.success(request, 'Solicitud aceptada con éxito.')
-        except Exception as e:
-            messages.error(request, f'Error al aceptar la solicitud: {str(e)}')
     
-    return redirect('solicitud_jugador')
+    data = {
 
+    }
+    
+    django_cursor = connection.cursor()
+    cursor = django_cursor.connection.cursor()
+    out_cur = django_cursor.connection.cursor()
+    salida = cursor.var(oracledb.NUMBER)
+     
+    cursor.callproc('sp_acept_request', [id, salida])
+    
+    salida_final = salida.getvalue()
+    if salida_final == 1:
+        data = {    'mensaje_exito': "Solicitud aceptada exitosamente.",
+                    'solicitud': listado_solicitud(), } 
+        return render(request, 'intranet/administrador/solicitud_jugador.html', data)
+
+    elif salida_final == 0:
+        data['mensaje_error'] = ["Error en la BD."]
+        return render(request, 'intranet/administrador/solicitud_jugador.html', data)       
+    else:
+        data['mensaje_error'] = ["No se pudo procesar la solicitud."]
+        return render(request, 'intranet/administrador/solicitud_jugador.html', data)
 
 
 def gestion_disciplina(request):
@@ -583,9 +609,6 @@ def update_discipline(request):
         }, status=400)
 
 
-#####################################################
-
-
 ##################  LOGIN  ##########################
 class CustomLoginView(LoginView):
     form_class = CustomLoginForm
@@ -605,10 +628,6 @@ def profile_redirect(request):
         return redirect('admin_dashboard')  # Redirigir a la página del administrador
     else:
         return redirect('index')  
-
- 
-
-#####################################################
 
 
 ###########  Procedimientos Almacenados  ###########
@@ -868,6 +887,7 @@ def listado_galeria_discipline(disciplina_id):
 
     return lista
 
+
 def listado_solicitud():
     django_cursor = connection.cursor()
     cursor = django_cursor.connection.cursor()
@@ -885,6 +905,7 @@ def listado_solicitud():
         lista.append(data)
 
     return lista
+
 
 def listado_contacto():
     django_cursor = connection.cursor()
@@ -904,6 +925,3 @@ def listado_contacto():
 
     return lista
 
-
-
-####################################################

@@ -56,8 +56,8 @@
                                                     <th>Disciplina</th>
                                                     <th>Sede</th>
                                                     <th>Carrera</th>
-                                                    <th>Estado</th>
                                                     <th>Fecha De Solicitud</th>
+                                                    <th>Estado</th>
                                                     <th>Opciones</th>
                                                 </tr>
                                             </thead>
@@ -98,7 +98,7 @@
                                                         </td>
                                                     </tr>
                                                 {% endfor %}
-                                                
+
                                             </tbody>
                                         </table>
                                     {% endif %}
@@ -161,35 +161,41 @@
             </div>
         </div>
     </div>
+
+    <!-- Tabla de solicitudes -->
+    <div class="table-responsive">
+        <table class="table">
+            <!-- Tu tabla actual -->
+        </table>
+    </div>
+
+    <!-- Mensajes de Sweet Alert -->
+    {% if mensaje_error %}
+        {% for m_error in mensaje_error %}
+            <script>
+                Swal.fire({
+                    "title": "Error!",
+                    "text": "{{m_error}}",
+                    "icon": "error",
+                })
+            </script>
+        {% endfor %}
+    {% endif %}
+
+    {% if mensaje_exito %}
+        {% for m_exito in mensaje_exito %}
+            <script>
+                Swal.fire({
+                    "title": "Felicidades!",
+                    "text": "{{m_exito}}",
+                    "icon": "success",
+                })
+            </script>
+        {% endfor %}
+    {% endif %}
+    
+
 </main>
 
-
-
-<!-- Modal for Aceptar -->
-<div class="modal fade" id="acceptModal" tabindex="-1" aria-labelledby="acceptModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="acceptModalLabel">Solicitud aceptada</h5>
-            </div>
-            <div class="modal-body">
-                <p>La solicitud ha sido aceptada, ya podra visualizar al jugador en su respectiva diciplina</p>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- Modal for Borrar -->
-<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="deleteModalLabel">Solicitud rechazada</h5>
-            </div>
-            <div class="modal-body">
-                <p>La solicitud ha sido rechazada, NO podra visualizar al jugador en su respectiva diciplina</p>
-            </div>
-        </div>
-    </div>
-</div>
 
 {% endblock %}

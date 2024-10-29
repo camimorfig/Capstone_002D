@@ -16,7 +16,7 @@
 <!-- Enlace JS -->
 {% block js %}
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
     function cambiarJugadores() {
@@ -139,13 +139,16 @@
                                                             <th>Sede</th>
                                                             <th>Carrera</th>
                                                             <th>Asistencia</th>
+                                                            <th>Estado</th>                                                            
                                                             <th>Acciones</th>
                                                         </tr>
                                                     </thead>
+                                                    
+
                                                     <tbody id="datos_jugadores">
                                                         <!-- Aquí se cargarán las filas dinámicamente -->
                                                         <tr>
-                                                            <td colspan="9" class="text-center">Seleccione una disciplina para ver los jugadores</td>
+                                                            <td colspan="10" class="text-center">Seleccione una disciplina para ver los jugadores</td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
@@ -160,6 +163,11 @@
                 </div>
             </div>
         </div>
+
+
+
+
+
     </main>
     
 {% endblock %}

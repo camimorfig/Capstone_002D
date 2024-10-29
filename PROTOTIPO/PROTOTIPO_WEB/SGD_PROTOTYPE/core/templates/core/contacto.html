@@ -39,5 +39,33 @@
       </form>
     </div>
   </div>
+
+  <!-- MENSAJES -->
+  {% if mensaje_error %}
+  {% for m_eror in mensaje_error %}
+      <script>
+          Swal.fire({
+              "title": "Error!",
+              "text": "{{m_eror}}",
+              "icon": "error",
+          })
+      </script>
+  {% endfor %}
+  {% endif %}
+
+  {% if mensaje_exito %}
+  {% for m_exito in mensaje_exito %}
+      <script>
+          Swal.fire({
+              "title": "Felicidades!",
+              "text": "{{ m_exito }}",
+              "icon": "success",
+          })
+      </script>
+  {% endfor %}
+  {% endif %}
+
+
+
    
 {% endblock %}
