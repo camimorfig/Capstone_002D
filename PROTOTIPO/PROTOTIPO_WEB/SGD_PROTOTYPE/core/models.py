@@ -302,7 +302,6 @@ class Player(models.Model):
     player_img = models.ImageField(upload_to='player_images/', null=True, blank=True)    
     player_status = models.CharField(max_length=30)
     discipline = models.ForeignKey(Discipline, models.DO_NOTHING)
-    game_position = models.ForeignKey(GamePosition, models.DO_NOTHING)
 
     class Meta:
         managed = False

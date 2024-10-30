@@ -7,19 +7,14 @@
         {% load static %}
 
         <link rel="stylesheet" href="{% static 'core/css/login-style.css' %}">
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-        <!-- HEATER Y FOOTER -->
-
     </head>
     <body>
-
 
         <div class="login-box">
             <img src="{% static 'core/media/logo-duoc.png'%}" alt="Login" class="login-logo" height="100">
             <form id="login-form" method="post">
                 {% csrf_token %}
-
+    
                 <div class="form-group">
                     {{ form.username }}
                     {{ form.username.label_tag }}
@@ -35,26 +30,24 @@
                     <span></span>
                     Iniciar sesión
                 </button>
-            </form> 
+                <div class="back-index">
+                    <a href="{% url 'index' %}  ">Volver a la página principal</a>
+                </div>
+            </form>
         </div>
 
+        {% if messages %}
+            {% for message in messages %}
+                <script>
+                    Swal.fire({
+                        "title": "Error!",
+                        "text": "{{ message }}",
+                        "icon": "error",
+                    })
+                </script>
+            {% endfor %}
+        {% endif %}
+
         <script src="{% static 'core/js/script-login.js' %}"></script>
-
-    <!-- MENSAJES -->
-
-
-    {% if messages %}
-        {% for message in messages %}
-            <script>
-                Swal.fire({
-                    "title": "Error!",
-                    "text": "{{ message }}",
-                    "icon": "error",
-                })
-            </script>
-        {% endfor %}
-    {% endif %}
-
-
     </body>
 </html>

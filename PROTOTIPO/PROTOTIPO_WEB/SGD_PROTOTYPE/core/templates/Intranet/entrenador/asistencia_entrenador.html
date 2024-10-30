@@ -49,22 +49,7 @@
             <!-- Start MAIN -->
             <div class="container-fluid ">
 
-                <!-- start page title -->
-                <!-- <div class="row mt-3">
-                    <div class="col-12">
-                        <div class="page-title-box d-flex align-items-center justify-content-between">
-                            <h4>Asistencia</h4>
-                            <div class="page-title-right">
-                                <ol class="breadcrumb m-0">
-                                    <li class="breadcrumb-item">Administración</li>
-                                    <li class="breadcrumb-item active">Realizar Asistencia</li>
-                                </ol>
-                            </div>
-                        </div>
-                    </div>
-                </div> -->
-                <!-- end page title -->
-                <!-- CONTENIDO CREAR JUGADOR -->
+                <!-- CONTENIDO DICIPLINA ENTRENAODOR -->
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="card">
@@ -84,23 +69,24 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
+                                                {% for disciplina in disciplinas %}
                                                 <tr>
-                                                    <td>Futsal Damas</td>
-                                                    <td>17/03/2023 16:24:05</td>
+                                                    <td>{{ disciplina.1 }}</td>
+                                                    <td>{{ disciplina.2|date:"d/m/Y H:i:s" }}</td>
                                                     <td>
-                                                        <button class="btn btn-outline-dark" href="#"><a href="{% url 'tomar_asistencia' %}" style="color: black; text-decoration: none;"><i class="bi bi-pencil text-primary"></i> Registrar
-                                                        </a></button>
+                                                        <button class="btn btn-outline-dark">
+                                                            <a href="{% url 'tomar_asistencia' %}?disciplina_id={{ disciplina.0 }}" style="color: black; text-decoration: none;">
+                                                                <i class="bi bi-pencil text-primary"></i> Registrar
+                                                            </a>
+                                                        </button>
                                                     </td>
                                                 </tr>
+                                                {% empty %}
                                                 <tr>
-                                                    <td>Futsal Varones</td>
-                                                    <td>17/03/2023 16:24:05</td>
-                                                    <td>
-                                                        <button class="btn btn-outline-dark" href="#"><a href="{% url 'tomar_asistencia' %}" style="color: black; text-decoration: none;"><i class="bi bi-pencil text-primary"></i> Registrar
-                                                        </a></button>
-                                                    </td>
+                                                    <td colspan="3" class="text-center">No hay disciplinas asignadas</td>
                                                 </tr>
-                                                    <!-- Add more rows as needed -->
+                                                {% endfor %}
+                                                <!-- Add more rows as needed -->
                                             </tbody>
                                         </table>
 
@@ -110,7 +96,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div>  
             </div>
         </div>
     </main>

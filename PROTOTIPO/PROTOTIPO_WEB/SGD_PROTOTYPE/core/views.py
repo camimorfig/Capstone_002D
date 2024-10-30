@@ -20,6 +20,7 @@ import json
 from django.shortcuts import get_object_or_404
 from django.core.paginator import Paginator
 from django.http import Http404
+from datetime import date, datetime
 
 
 
@@ -107,24 +108,26 @@ def disciplina_view(request, disciplina, seccion):
       # Recuperar jugadores relacionados con esta disciplina
         jugadores = Player.objects.filter(discipline=disciplina_obj, player_status = 1)
         
-        # # Lista para almacenar jugadores con sus imágenes en base64
-        # jugadores_con_imagenes = []
-        # for jugador in jugadores:
-        #     if jugador.player_img:  # Verifica que haya una imagen
-        #         # Codifica la imagen en base64 sin usar .read()
-        #         imagen_base64 = base64.b64encode(jugador.player_img.read()).decode('utf-8')
-        #         jugadores_con_imagenes.append({
-        #             'jugador': jugador,
-        #             'imagen_base64': imagen_base64
-        #         })
+        # Lista para almacenar jugadores con sus imágenes en base64
+        jugadores_listo = []
+        for jugador in jugadores:
+            if jugador.player_img:  # Verifica que haya una imagen
+                # Codifica la imagen en base64 sin usar .read()
+                imagen_base64 = base64.b64encode(jugador.player_img.read()).decode('utf-8')
+                jugadores_listo.append({
+                    'jugador': jugador,
+                    'imagen_base64': imagen_base64
+                })
+            else:
+                jugadores_listo.append({
+                    'jugador': jugador,
+                    'imagen_base64': None
+                })
         
         data = {
             'disciplina': disciplina_obj,
             'seccion': seccion,
-            # 'jugadores_con_imagenes': jugadores_con_imagenes,
-
-            'jugadores_con_imagenes': jugadores,
-
+            'jugadores': jugadores_listo,
         }
 
     elif seccion == "galeria":
@@ -276,16 +279,99 @@ def crear_perfil_Jugador(request):
 
 @login_required
 def asistencia_entrenador(request):
+    if not hasattr(request.user, 'coach'):
+        return HttpResponseForbidden("El usuario no está asociado a ningún entrenador.")
+
+    entrenador = request.user.coach.first()  
+
+    if not entrenador:
+        return HttpResponseForbidden("No hay entrenadores asociados a este usuario.")
+
+    # Obtener el ID del entrenador
+    entrenador_id = entrenador.coach_id
+
+    # Llamar al procedimiento almacenado para listar las disciplinas del entrenador
+    disciplinas = listado_disciplinas_por_fechahoy_con_entrenador(entrenador_id)
+
     data = {
-
-
+        'disciplinas': disciplinas
     }
 
     return render (request, 'intranet/entrenador/asistencia_entrenador.html', data)
 
-@login_required
+
 def tomar_asistencia(request):
-    return render (request, 'intranet/entrenador/tomar_asistencia.html')
+    discipline_id = request.GET.get('disciplina_id')
+    print('b')
+
+    if not discipline_id:
+        messages.error(request, 'Disciplina no especificada')
+        return redirect('asistencia_entrenador')
+        print('a')
+
+
+    try:
+        discipline_id = int(discipline_id)
+        print('f')
+
+        # Obtener jugadores
+        jugadores = listado_jugadores_por_disciplina(discipline_id)
+        print(jugadores)
+        if not jugadores:
+            messages.warning(request, 'No hay jugadores registrados en esta disciplina')
+            return redirect('asistencia_entrenador')
+
+        # Procesar POST
+        if request.method == 'POST':
+            print("Procesando POST para asistencia")  # Debug
+            success_count = 0
+            error_count = 0
+            
+            for jugador in jugadores:
+                player_id = jugador['id']
+                estado = request.POST.get(f'estado_{player_id}')
+                comentario = request.POST.get(f'comentario_{player_id}', '')
+                
+                print(f"Procesando jugador {player_id}: estado={estado}")  # Debug
+                
+                if estado:  # Solo procesar si se seleccionó un estado
+                    result = registrar_asistencia(
+                        player_id=player_id,
+                        discipline_id=discipline_id,
+                        status=estado,
+                        comments=comentario
+                    )
+                    
+                    if result == 1:
+                        success_count += 1
+                        print(f"Asistencia registrada exitosamente para jugador {player_id}")
+                    else:
+                        error_count += 1
+                        print(f"Error al registrar asistencia para jugador {player_id}")
+            
+            if error_count == 0 and success_count > 0:
+                messages.success(request, f'Asistencia registrada correctamente para {success_count} jugadores')
+                return redirect('asistencia_entrenador')
+            elif error_count > 0:
+                messages.error(request, f'Hubo errores al registrar {error_count} asistencias')
+            else:
+                messages.warning(request, 'No se seleccionó ningún estado de asistencia')
+        
+        context = {
+            'jugadores': jugadores,
+            'disciplina_id': discipline_id,
+            'fecha_actual': date.today()
+        }
+                
+    except Exception as e:
+        print('c')
+        print(f"Error en tomar_asistencia: {str(e)}")
+        messages.error(request, f'Error: {str(e)}')
+        return redirect('asistencia_entrenador')
+
+    return render(request, 'intranet/entrenador/tomar_asistencia.html', context)
+
+
 
 @login_required
 def jugadores_por_disciplina(request):
@@ -925,3 +1011,108 @@ def listado_contacto():
 
     return lista
 
+
+def listado_jugadores_por_disciplina(discipline_id):
+    try:
+        django_cursor = connection.cursor()
+        out_cur = django_cursor.connection.cursor()
+        print(discipline_id)
+        # Ejecutar el procedimiento
+        django_cursor.callproc("SP_LIST_PLAYERS_FOR_DISCIPLINE", [out_cur, str(discipline_id)])
+        
+        # Procesar resultados
+        lista = []
+        for fila in out_cur:
+            jugador = {
+                'id': fila[0],
+                'rut': fila[1],
+                'nombre': fila[2],
+                'apellido': fila[3],
+                'disciplina': fila[4],
+                'sede': fila[5],
+                'carrera': fila[6],
+                'promedio_asistencia': fila[7]
+            }
+            lista.append(jugador)
+        print(lista)
+        return lista
+    except Exception as e:
+        print(f"Error al obtener jugadores: {str(e)}")
+        return []
+    finally:
+        if 'out_cur' in locals():
+            out_cur.close()
+        if 'django_cursor' in locals():
+            django_cursor.close()
+
+
+def registrar_asistencia(player_id, discipline_id, status, comments):
+    try:
+        with connection.cursor() as cursor:
+            # Primero obtenemos el status_id
+            cursor.execute(
+                "SELECT status_id FROM attendance_status WHERE status_name = :1",
+                [status]
+            )
+            status_row = cursor.fetchone()
+            if not status_row:
+                print(f"Estado no encontrado: {status}")
+                return 0
+                
+            status_id = status_row[0]
+            
+            # Luego insertamos la asistencia
+            cursor.execute("""
+                INSERT INTO attendance (
+                    player_id,
+                    discipline_id,
+                    status_id,
+                    attendance_date,
+                    attendance_comments
+                ) VALUES (
+                    :1,
+                    :2,
+                    :3,
+                    SYSDATE,
+                    :4
+                )
+            """, [player_id, discipline_id, status_id, comments])
+            
+            cursor.connection.commit()
+            return 1
+            
+    except Exception as e:
+        print(f"Error al registrar asistencia: {str(e)}")
+        if 'cursor' in locals():
+            cursor.connection.rollback()
+        return -1
+
+
+def verificar_asistencia_existente(discipline_id):
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT COUNT(*) 
+                FROM Attendance 
+                WHERE discipline_id = :1 
+                AND TRUNC(attendance_date) = TRUNC(SYSDATE)
+            """, [discipline_id])
+            
+            count = cursor.fetchone()[0]
+            return count > 0
+    except Exception as e:
+        print(f"Error al verificar asistencia: {str(e)}")
+        return False
+
+def listado_disciplinas_por_fechahoy_con_entrenador(id_entrenador):
+    django_cursor = connection.cursor()
+    cursor = django_cursor.connection.cursor()
+    out_cur = django_cursor.connection.cursor()
+
+    cursor.callproc("SP_LIST_DISCIPLINE_DATE_FOR_COACH", [out_cur, id_entrenador])
+
+    lista = []
+    for fila in out_cur: 
+        lista.append(fila)
+
+    return lista

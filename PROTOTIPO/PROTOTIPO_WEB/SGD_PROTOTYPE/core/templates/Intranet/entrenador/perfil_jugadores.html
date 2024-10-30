@@ -23,6 +23,7 @@
         let disciplinaId = document.getElementById("disciplina").value;
         let url = '/jugadores/?disciplina=' + disciplinaId;
 
+
         fetch(url)
         .then(function(result){
             return result.text();  // Cambié de txt() a text()

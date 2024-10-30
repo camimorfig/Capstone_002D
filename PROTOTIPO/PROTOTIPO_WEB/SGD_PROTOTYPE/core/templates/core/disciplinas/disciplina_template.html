@@ -116,15 +116,25 @@
         </nav>
     </section>
 
-    {% if jugadores_con_imagenes %}
+    {% if jugadores %}
+
         <main class="team-sections">
             <div class="filter-and-cards-container">
                 <section class="player-section">
                     <h2 class="section-title">PLANTEL</h2>
                     <div class="player-cards">
-                        {% for jugador in jugadores_con_imagenes %}
+                        {% for jugador in jugadores %}
                             <div class="player-card">
+                                {% if jugador.imagen_base64 %}
+
                                 <img src="data:image/png;base64,{{ jugador.imagen_base64 }}" alt="Player Image" class="player-image">
+
+                                {% else %}
+
+                                <img src="{% static 'core/media/avatar.png'%}" alt="Player Image" class="player-image">
+
+                                {% endif %}
+
                                 <div class="player-info">
                                     <div class="player-name-container">
                                         <span class="player-first-name">{{ jugador.jugador.player_name }}</span>
@@ -137,6 +147,7 @@
                 </section>
             </div>
         </main>
+            
     {% else %}
         <main>
             <div>
