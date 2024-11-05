@@ -12,7 +12,7 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages 
 from django.views.generic import TemplateView
-from .models import Coach, Admin, Discipline, Player, Galery
+from .models import *
 import oracledb
 import cx_Oracle
 import base64
@@ -302,21 +302,17 @@ def asistencia_entrenador(request):
 
 def tomar_asistencia(request):
     discipline_id = request.GET.get('disciplina_id')
-    print('b')
 
     if not discipline_id:
         messages.error(request, 'Disciplina no especificada')
         return redirect('asistencia_entrenador')
-        print('a')
 
 
     try:
         discipline_id = int(discipline_id)
-        print('f')
 
         # Obtener jugadores
         jugadores = listado_jugadores_por_disciplina(discipline_id)
-        print(jugadores)
         if not jugadores:
             messages.warning(request, 'No hay jugadores registrados en esta disciplina')
             return redirect('asistencia_entrenador')
@@ -364,7 +360,6 @@ def tomar_asistencia(request):
         }
                 
     except Exception as e:
-        print('c')
         print(f"Error en tomar_asistencia: {str(e)}")
         messages.error(request, f'Error: {str(e)}')
         return redirect('asistencia_entrenador')
@@ -500,41 +495,88 @@ def crear_noticias(request):
     }
 
     if request.method == 'POST':
-        if 'img' in request.FILES:
-            imagen_file = request.FILES['img']
-            img_noticia = imagen_file.read()
-        else:
+        if 'form_crear' in request.POST:
+            if 'img' in request.FILES:
+                imagen_file = request.FILES['img']
+                img_noticia = imagen_file.read()
+            else:
 
-            data['mensaje_error'] = ["Debes subir una imagen para la noticia."]
-            return render(request, 'intranet/crear_galeria.html', data)
- 
-        nombre_noticia = request.POST.get('nombre')
-        if not nombre_noticia:
-            data['mensaje_error'] = ["Debes ingresar un nombre para la noticia."]
-            return render(request, 'intranet/crear_galeria.html', data)
-
-        descripcion_noticia = request.POST.get('descripcion')
-        if not descripcion_noticia:
-            data['mensaje_error'] = ["Debes ingresar una descripción para la noticia."]
-            return render(request, 'intranet/crear_galeria.html', data)
-
-        etiqueta = request.POST.get('etiqueta')
-        if not etiqueta:
-            data['mensaje_error'] = ["Debes ingresar una etiqueta para la noticia."]
-            return render(request, 'intranet/crear_galeria.html', data)
-
-
-        # Guardar la galería en la base de datos
-        salida = guardar_noticias(nombre_noticia, descripcion_noticia, img_noticia, etiqueta)
-
-        if salida == 1:
-            data['mensaje_exito'] = ["Imagen registrada correctamente."]
-            data['noticias'] = listado_noticias()
-        else:
-            data['mensaje_error'] = ["No se ha podido registrar la galería. ERROR."]
-
-
+                data['mensaje_error'] = ["Debes subir una imagen para la noticia."]
+                return render(request, 'intranet/crear_galeria.html', data)
     
+            nombre_noticia = request.POST.get('nombre')
+            if not nombre_noticia:
+                data['mensaje_error'] = ["Debes ingresar un nombre para la noticia."]
+                return render(request, 'intranet/crear_galeria.html', data)
+
+            descripcion_noticia = request.POST.get('descripcion')
+            if not descripcion_noticia:
+                data['mensaje_error'] = ["Debes ingresar una descripción para la noticia."]
+                return render(request, 'intranet/crear_galeria.html', data)
+
+            etiqueta = request.POST.get('etiqueta')
+            if not etiqueta:
+                data['mensaje_error'] = ["Debes ingresar una etiqueta para la noticia."]
+                return render(request, 'intranet/crear_galeria.html', data)
+
+            # Guardar la galería en la base de datos
+            salida = guardar_noticias(nombre_noticia, descripcion_noticia, img_noticia, etiqueta)
+
+            if salida == 1:
+                data['mensaje_exito'] = ["Imagen registrada correctamente."]
+                data['noticias'] = listado_noticias()
+            else:
+                data['mensaje_error'] = ["No se ha podido registrar la galería. ERROR."]
+
+
+
+        elif 'form_editar' in request.POST:
+            id_noticias = request.POST.get('id')
+
+            if id_noticias:
+                noticia = get_object_or_404(News, news_id=id_noticias)
+
+                if 'imagen' in request.FILES:
+                    imagen_file = request.FILES['imagen']
+                    img_noticia = imagen_file.read()  # Nueva imagen
+                else:
+                    img_noticia = noticia.news_img  # Imagen actual de la BD
+
+                # Obtener otros campos del formulario
+                nombre_noticia = request.POST.get('titulo')
+                etiqueta = request.POST.get('etiqueta')
+                descripcion_noticia = request.POST.get('descripcion')
+                fecha_noticia = request.POST.get('fecha')
+
+                salida = editar_noticias(id_noticias, nombre_noticia, descripcion_noticia, fecha_noticia, img_noticia, etiqueta)
+
+                if salida == 1:
+                    data['mensaje_exito'] = ["Noticia actualizada correctamente."]
+                    data['noticias'] = listado_noticias()
+                else:
+                    data['mensaje_error'] = ["No se ha podido actualizar la noticia. ERROR."]
+
+            else:
+                data['mensaje_error'] = ["No se ha proporcionado un ID para la noticia a editar."]
+
+        elif 'form_eliminar' in request.POST:
+            id_noticias = request.POST.get('id')
+                
+            salida = eliminar_noticias(id_noticias)
+            if salida == 1:
+                data['mensaje_exito'] = ["Noticia eliminada correctamente."]
+                data['noticias'] = listado_noticias()
+            else:
+                data['mensaje_error'] = ["No se ha podido eliminar la noticia. ERROR."]
+        
+        elif 'form_cacelar' in request.POST:
+            
+            return redirect('crear_noticias')  # Redirige para evitar reenvío de formulario en recarga
+
+
+        
+
+
     return render (request, 'intranet/administrador/crear_noticias.html', data)
 
 
@@ -542,13 +584,43 @@ def crear_noticias(request):
 def asistencia_admin(request):
     return render (request, 'intranet/administrador/asistencia_admin.html')
 
+
+@login_required
+def gestion_galeria_disciplina_por_disciplina(request):
+    discipline_id = request.GET.get('disciplina')
+
+    data = {
+        'galeria_disciplina': listado_galeria_discipline(discipline_id)
+
+    }
+    
+    return render(request, 'intranet/administrador/listar_galeria_disciplina.html', data)
+
+
 @login_required
 def gestion_galeria(request):
 
+
+    disciplinas = listado_disciplinas()
+
+    disciplina_seleccionada = None
+    imagenes_disciplinas = []
+
+    print(listado_galeria_discipline(6))
+
+    if request.method == 'POST':
+        discipline_id = request.POST.get('disciplina')
+        if discipline_id:
+            # Recuperar los jugadores asociados a esta disciplina
+            imagenes_disciplinas = listado_galeria_discipline(discipline_id)  # Ajusta según tu modelo
+
     data = {
-        'disciplinas': listado_disciplinas(),
+        'disciplinas': disciplinas,
         'galeria': listado_galeria_general(),
+        'disciplina_seleccionada': disciplina_seleccionada,
+        'galeria_disciplina' : imagenes_disciplinas,
     }
+
 
     if request.method == 'POST':
 
@@ -602,11 +674,6 @@ def gestion_galeria(request):
 
             else:
                 data['mensaje_error'] = ["No se ha podido registrar la imagen. ERROR."]
-
-        
-        else:
-            data['mensaje_error'] = ["Debes seleccionar donde se subira la imagen."]
-            return render (request, 'intranet/administrador/gestion_galeria.html', data)
 
 
     return render (request, 'intranet/administrador/gestion_galeria.html', data)
@@ -914,6 +981,39 @@ def guardar_noticias(nombre_noticia, descripcion_noticia, img_noticia, etiqueta)
 
     return salida.getvalue()
 
+                    
+def editar_noticias(id_noticia, nombre_noticia, descripcion_noticia, fecha_noticia, img_noticia, etiqueta):
+    django_cursor = connection.cursor()
+    cursor = django_cursor.connection.cursor()
+
+    salida = cursor.var(oracledb.NUMBER)
+
+    cursor.callproc('SP_EDIT_NEWS', [
+        id_noticia,
+        nombre_noticia,
+        descripcion_noticia,
+        fecha_noticia,
+        img_noticia,
+        etiqueta,
+        salida
+    ])
+
+    return salida.getvalue()
+
+
+def eliminar_noticias(id_noticia):
+    django_cursor = connection.cursor()
+    cursor = django_cursor.connection.cursor()
+
+    salida = cursor.var(oracledb.NUMBER)
+
+    cursor.callproc('SP_DELETE_NEWS', [
+        id_noticia,
+        salida
+    ])
+
+    return salida.getvalue()
+
 
 def listado_noticias():
     django_cursor = connection.cursor()
@@ -1016,7 +1116,6 @@ def listado_jugadores_por_disciplina(discipline_id):
     try:
         django_cursor = connection.cursor()
         out_cur = django_cursor.connection.cursor()
-        print(discipline_id)
         # Ejecutar el procedimiento
         django_cursor.callproc("SP_LIST_PLAYERS_FOR_DISCIPLINE", [out_cur, str(discipline_id)])
         
@@ -1034,7 +1133,6 @@ def listado_jugadores_por_disciplina(discipline_id):
                 'promedio_asistencia': fila[7]
             }
             lista.append(jugador)
-        print(lista)
         return lista
     except Exception as e:
         print(f"Error al obtener jugadores: {str(e)}")

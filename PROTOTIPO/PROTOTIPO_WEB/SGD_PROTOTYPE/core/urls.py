@@ -32,6 +32,7 @@ urlpatterns = [
     path('<str:disciplina>/<str:seccion>/', disciplina_view, name='disciplina_view'),
     path('administrador/aceptar-solicitud/<int:id>/', aceptar_solicitud, name='aceptar_solicitud'),
     path('talento/', talento, name="talento"),
+    path('listado_galeria_disciplina/', gestion_galeria_disciplina_por_disciplina, name="gestion_galeria_disciplina_por_disciplina"),
 
 
 
