@@ -35,6 +35,8 @@ DROP TABLE Team_Roster CASCADE CONSTRAINTS;
 --------------------
 
 ---- OTHER DATA ----
+DROP TABLE Academic_period CASCADE CONSTRAINTS;
+DROP TABLE Training CASCADE CONSTRAINTS;
 DROP TABLE Status_Type CASCADE CONSTRAINTS;
 DROP TABLE Requests CASCADE CONSTRAINTS;
 --------------------
@@ -187,14 +189,17 @@ CREATE TABLE Contact (
 --  DDL for EVENTS
 ----------------------------------------------------------   
 CREATE TABLE Events (
-    events_id INTEGER GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1) NOT NULL ,
-    events_name VARCHAR(50) NOT NULL,
-    events_status VARCHAR(50) NOT NULL,
-    events_start DATE NOT NULL,
-    events_end DATE NOT NULL,
-    events_description VARCHAR(100),
-
-   CONSTRAINT pk_Events PRIMARY KEY (events_id)
+    events_id INTEGER GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1) NOT NULL,
+    events_name VARCHAR2(50) NOT NULL,
+    events_status VARCHAR2(50) NOT NULL,
+    events_start DATE,
+    events_end DATE,
+    events_description VARCHAR2(100),
+    events_type VARCHAR2(50),
+    events_recurring NUMBER(1),
+    discipline_id NUMBER(38),
+    
+    CONSTRAINT pk_Events PRIMARY KEY (events_id)
 );
 
 ----------------------------------------------------------
@@ -314,7 +319,7 @@ CREATE TABLE Player (
 );
 
 --------------------------------------------------------
---  DDL for ATTENDANCE
+--  DDL for Attendance_Status
 --------------------------------------------------------
 
 CREATE TABLE Attendance_Status (
@@ -327,6 +332,7 @@ CREATE TABLE Attendance_Status (
 --------------------------------------------------------
 --  DDL for ATTENDANCE
 --------------------------------------------------------
+
 CREATE TABLE Attendance (
     attendance_id INTEGER GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1) NOT NULL,
     attendance_date DATE NOT NULL,
@@ -334,11 +340,48 @@ CREATE TABLE Attendance (
     creation_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     -- Llaves foráneas
     player_id INT NOT NULL,
+    training_id INT NOT NULL, 
     discipline_id INT NOT NULL,
     status_id INT NOT NULL,
+    period_id NUMBER, 
     
     CONSTRAINT pk_Attendance PRIMARY KEY (attendance_id)
 );
+
+--------------------------------------------------------
+--  DDL for academic_period
+--------------------------------------------------------
+-- Tabla para Periodos Académicos
+CREATE TABLE Academic_Period (
+    period_id INTEGER GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1) NOT NULL,
+    period_name VARCHAR(100) NOT NULL,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    semester NUMBER(1) NOT NULL CHECK (semester IN (1, 2)),
+    is_active NUMBER(1) DEFAULT 1 CHECK (is_active IN (0, 1)),
+    creation_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    CONSTRAINT pk_Academic_Period PRIMARY KEY (period_id),
+    CONSTRAINT chk_period_dates CHECK (start_date < end_date)
+);
+
+--------------------------------------------------------
+--  DDL for Entrenamientos
+--------------------------------------------------------
+CREATE TABLE Training (
+    training_id INTEGER GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1) NOT NULL,
+    training_name VARCHAR(100) NOT NULL,
+    discipline_id INT NOT NULL,
+    period_id INT NOT NULL,
+    weekdays VARCHAR(20) NOT NULL, -- Ejemplo: 'LUN,MIE,VIE'
+    start_time TIMESTAMP,
+    end_time TIMESTAMP,
+    is_active NUMBER(1) DEFAULT 1 CHECK (is_active IN (0, 1)),
+    creation_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    CONSTRAINT pk_Training PRIMARY KEY (training_id)
+);
+
 
 
 --------------------------------------------------------
@@ -383,6 +426,34 @@ ALTER TABLE Attendance
 	 ADD CONSTRAINT Attendance_Player_fk FOREIGN KEY (player_id)
 	  REFERENCES Player (player_id);
 
+ALTER TABLE attendance     
+    ADD CONSTRAINT fk_Attendance_Training  FOREIGN KEY (training_id) 
+        REFERENCES Training(training_id);
+
+ALTER TABLE attendance     
+    ADD CONSTRAINT fk_Attendance_Discipline FOREIGN KEY (discipline_id) 
+        REFERENCES Discipline(discipline_id);
+        
+ALTER TABLE attendance     
+    ADD CONSTRAINT fk_Attendance_Status FOREIGN KEY (status_id) 
+        REFERENCES Attendance_Status(status_id);
+
+--ALTER TABLE attendance     
+--    ADD CONSTRAINT fk_Attendance_Period FOREIGN KEY (period_id) 
+ --       REFERENCES Academic_period(period_id) ;
+
+
+    ------------------------------
+    ------ ALTER training --------
+     ------------------------------
+ALTER TABLE Training      
+    ADD CONSTRAINT fk_training_discipline FOREIGN KEY (discipline_id) 
+        REFERENCES Discipline(discipline_id);
+ALTER TABLE Training   
+    ADD CONSTRAINT fk_training_period FOREIGN KEY (period_id) 
+        REFERENCES Academic_Period(period_id);
+
+
      ------------------------------
     ------ ALTER STATISTIC --------
      ------------------------------
@@ -398,6 +469,16 @@ ALTER TABLE Statistic
 ALTER TABLE Team_Roster
 	 ADD CONSTRAINT Team_Roster_Player_fk FOREIGN KEY (player_id)
 	  REFERENCES Player (player_id);
+
+     ------------------------------
+    ------ ALTER EVENTS --------
+     ------------------------------
+     
+ALTER TABLE Events 
+    ADD CONSTRAINT Events_fk FOREIGN KEY (DISCIPLINE_ID) 
+      REFERENCES Discipline(discipline_id);
+
+
 
 --------------------------------------------------------
 --  DDL for PLAYER
@@ -2066,19 +2147,6 @@ INSERT INTO Attendance_Status (status_name, status_description) VALUES
     ('absent', 'El jugador no asistió a la actividad');
 INSERT INTO Attendance_Status (status_name, status_description) VALUES
     ('justified', 'El jugador no asistió pero presentó justificación');
-    
- 
-ALTER TABLE attendance     
-    ADD CONSTRAINT fk_Attendance_Player FOREIGN KEY (player_id) 
-        REFERENCES Player(player_id);
-
-ALTER TABLE attendance     
-    ADD CONSTRAINT fk_Attendance_Discipline FOREIGN KEY (discipline_id) 
-        REFERENCES Discipline(discipline_id);
-        
-ALTER TABLE attendance     
-    ADD CONSTRAINT fk_Attendance_Status FOREIGN KEY (status_id) 
-        REFERENCES Attendance_Status(status_id);
     
 commit;
       

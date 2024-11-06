@@ -1,0 +1,67 @@
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from django.db import models
+from .managers import MainUserManager 
+
+
+
+class Admin(models.Model):
+    admin_id = models.CharField(primary_key=True, max_length=20)
+    admin_name = models.CharField(max_length=50)
+    admin_img = models.BinaryField(blank=True, null=True)
+    user = models.ForeignKey('MainUser', models.DO_NOTHING)
+
+    class Meta:
+        managed = False
+        db_table = 'admin'
+
+
+
+
+class Coach(models.Model):
+    coach_id = models.CharField(primary_key=True, max_length=20)
+    coach_name = models.CharField(max_length=50)
+    coach_img = models.BinaryField(blank=True, null=True)
+    user = models.ForeignKey('MainUser', models.DO_NOTHING, related_name='coach')  # Añadir related_name
+    coach_type = models.ForeignKey('CoachType', models.DO_NOTHING)
+    disciplines = models.ManyToManyField('Discipline', through='CoachDiscipline', related_name='coaches')
+
+    class Meta:
+        managed = False
+        db_table = 'coach'
+
+
+class CoachDiscipline(models.Model):
+    coach = models.ForeignKey(Coach, models.DO_NOTHING)
+    discipline = models.ForeignKey('Discipline', models.DO_NOTHING)
+
+    class Meta:
+        managed = False
+        db_table = 'coach_discipline'
+        unique_together = (('coach', 'discipline'),)
+
+
+class MainUser(AbstractBaseUser, PermissionsMixin):
+    user_id = models.BigAutoField(primary_key=True)
+    email = models.CharField(max_length=100, unique=True)
+    password = models.CharField(max_length=100) 
+    user_type = models.CharField(max_length=50)
+
+
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+    is_superuser = models.BooleanField(default=False)
+    last_login = models.DateTimeField(null=True, blank=True)
+    date_joined = models.DateTimeField(auto_now_add=True)
+
+    objects = MainUserManager()
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['user_type']
+
+    class Meta:
+        managed = False  
+        db_table = 'Main_user'  
+
+    def __str__(self):
+        return self.email
+

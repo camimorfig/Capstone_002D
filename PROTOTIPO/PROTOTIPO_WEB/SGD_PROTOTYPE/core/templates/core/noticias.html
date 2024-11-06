@@ -38,9 +38,9 @@
 
   <main role="main">
     
-    {% if noticias %}
+    {% if entity %}
         <div class="card-group">
-            {% for n in noticias %} 
+            {% for n in entity %} 
                 <article class="card" news-id="{{ n.data.0 }}">
                 <span class="card-category">{{ n.data.6 }}</span>
                 <div class="card-img-container">
@@ -56,6 +56,7 @@
                     {{ n.data.4 }}
                 </div>
                 <div class="full-news-content" style="display: none;">
+                    <img src="data:imagen/png;base64, {{ n.imagen }}" class="card-img-top" alt="">
                     <h2>{{ n.data.1 }}</h2>
                     <p>{{ n.data.3 }}</p>
                 </div>
@@ -67,7 +68,10 @@
         <div class="first-banner"> <h1><strong> No hay Noticias registradas </strong></h1> </div>  
     
     {% endif %}  
-
+    <!-- Paginador -->
+    <div>
+        {% include 'core/paginator.html' %}
+    </div>
   </main>
 
   <div id="newsModal" class="modal">

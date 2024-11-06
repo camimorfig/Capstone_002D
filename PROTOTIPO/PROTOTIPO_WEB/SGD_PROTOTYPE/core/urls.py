@@ -34,7 +34,8 @@ urlpatterns = [
     path('talento/', talento, name="talento"),
     path('listado_galeria_disciplina/', gestion_galeria_disciplina_por_disciplina, name="gestion_galeria_disciplina_por_disciplina"),
 
-
+    path('gestion_eventos/', gestion_eventos, name='gestion_eventos'),
+    path('gestionar_periodos/', gestionar_periodos, name='gestionar_periodos'),
 
 
 

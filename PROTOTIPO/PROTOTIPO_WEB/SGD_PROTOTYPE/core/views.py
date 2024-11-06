@@ -20,7 +20,8 @@ import json
 from django.shortcuts import get_object_or_404
 from django.core.paginator import Paginator
 from django.http import Http404
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
+
 
 
 
@@ -88,8 +89,20 @@ def nosotros(request):
 
 
 def noticias(request):
+    noticia = listado_noticias_por_tiempo()
+    page = request.GET.get('page',1)
+
+    try:
+        paginator = Paginator(noticia, 5)
+        noticia = paginator.page(page)
+    except:
+        raise Http404            
+
+    
     data = {
-    'noticias': listado_noticias()
+        'entity': noticia,
+        'paginator': paginator
+
     }
     return render (request, 'core/noticias.html', data)
 
@@ -168,11 +181,10 @@ class CoachDashboardView(LoginRequiredMixin, TemplateView):
 
     def dispatch(self, request, *args, **kwargs):
 
+        if not request.user.is_authenticated:
+            return redirect('login')  
 
-        if request.user == 'AnonymousUser':
-            return HttpResponseForbidden("Debes tener una sesion iniciada para poder entrar.")
-
-        elif request.user.user_type != 'coach01':
+        if not hasattr(request.user, 'user_type') or request.user.user_type != 'coach01':
             return HttpResponseForbidden("No tienes permiso para acceder a esta página.")
 
         return super().dispatch(request, *args, **kwargs)
@@ -262,8 +274,6 @@ def crear_perfil_Jugador(request):
             return render (request, 'intranet/entrenador/crear_perfil_Jugador.html', data)
 
 
-     #  position_id = request.POST.get('position_id')
-
         # Guardar el jugador en la base de datos
         salida = guardar_jugador(rut, nombre, apellido, headquarters, career, imagen, discipline_id, entrenador_id)
 
@@ -299,75 +309,6 @@ def asistencia_entrenador(request):
 
     return render (request, 'intranet/entrenador/asistencia_entrenador.html', data)
 
-
-def tomar_asistencia(request):
-    discipline_id = request.GET.get('disciplina_id')
-
-    if not discipline_id:
-        messages.error(request, 'Disciplina no especificada')
-        return redirect('asistencia_entrenador')
-
-
-    try:
-        discipline_id = int(discipline_id)
-
-        # Obtener jugadores
-        jugadores = listado_jugadores_por_disciplina(discipline_id)
-        if not jugadores:
-            messages.warning(request, 'No hay jugadores registrados en esta disciplina')
-            return redirect('asistencia_entrenador')
-
-        # Procesar POST
-        if request.method == 'POST':
-            print("Procesando POST para asistencia")  # Debug
-            success_count = 0
-            error_count = 0
-            
-            for jugador in jugadores:
-                player_id = jugador['id']
-                estado = request.POST.get(f'estado_{player_id}')
-                comentario = request.POST.get(f'comentario_{player_id}', '')
-                
-                print(f"Procesando jugador {player_id}: estado={estado}")  # Debug
-                
-                if estado:  # Solo procesar si se seleccionó un estado
-                    result = registrar_asistencia(
-                        player_id=player_id,
-                        discipline_id=discipline_id,
-                        status=estado,
-                        comments=comentario
-                    )
-                    
-                    if result == 1:
-                        success_count += 1
-                        print(f"Asistencia registrada exitosamente para jugador {player_id}")
-                    else:
-                        error_count += 1
-                        print(f"Error al registrar asistencia para jugador {player_id}")
-            
-            if error_count == 0 and success_count > 0:
-                messages.success(request, f'Asistencia registrada correctamente para {success_count} jugadores')
-                return redirect('asistencia_entrenador')
-            elif error_count > 0:
-                messages.error(request, f'Hubo errores al registrar {error_count} asistencias')
-            else:
-                messages.warning(request, 'No se seleccionó ningún estado de asistencia')
-        
-        context = {
-            'jugadores': jugadores,
-            'disciplina_id': discipline_id,
-            'fecha_actual': date.today()
-        }
-                
-    except Exception as e:
-        print(f"Error en tomar_asistencia: {str(e)}")
-        messages.error(request, f'Error: {str(e)}')
-        return redirect('asistencia_entrenador')
-
-    return render(request, 'intranet/entrenador/tomar_asistencia.html', context)
-
-
-
 @login_required
 def jugadores_por_disciplina(request):
     
@@ -384,6 +325,131 @@ def jugadores_por_disciplina(request):
 def grafico(request):
     return render (request, 'intranet/entrenador/grafico.html')
 
+@login_required
+def asistencia_entrenador(request):
+    if not hasattr(request.user, 'coach'):
+        return HttpResponseForbidden("El usuario no está asociado a ningún entrenador.")
+
+    entrenador = request.user.coach.first()  
+
+    if not entrenador:
+        return HttpResponseForbidden("No hay entrenadores asociados a este usuario.")
+
+    # Obtener el ID del entrenador
+    entrenador_id = entrenador.coach_id
+
+    # Llamar al procedimiento almacenado para listar las disciplinas del entrenador
+    # Llamar al procedimiento almacenado para listar los entrenamientos del entrenador
+    entrenamientos = listado_entrenamientos_por_entrenador(entrenador_id)
+    
+    data = {
+        'entrenamientos': entrenamientos
+    }
+    return render(request, 'intranet/entrenador/asistencia_entrenador.html', data)
+
+@login_required
+def tomar_asistencia(request):
+    try:
+        discipline_id = int(request.GET.get('disciplina_id', 0))
+        training_id = int(request.GET.get('training_id', 0))
+        
+        if not discipline_id or not training_id:
+            messages.error(request, 'Disciplina o entrenamiento no especificado')
+            return redirect('asistencia_entrenador')
+        
+        # Obtener jugadores
+        jugadores = listado_jugadores_por_disciplina(discipline_id)
+        if not jugadores:
+            messages.warning(request, 'No hay jugadores registrados en esta disciplina')
+            return redirect('asistencia_entrenador')
+
+        if request.method == 'POST':
+            for jugador in jugadores:
+                player_id = jugador['id']
+                estado = request.POST.get(f'estado_{player_id}')
+                comentario = request.POST.get(f'comentario_{player_id}', '')
+                
+                if estado:
+                    print(f"Registrando asistencia para jugador {player_id}")
+                    result = registrar_asistencia(
+                        player_id=int(player_id),
+                        discipline_id=discipline_id,
+                        training_id=training_id,
+                        status=estado,
+                        comments=comentario
+                    )
+                    
+                    if result:
+                        print(f"Asistencia registrada exitosamente para jugador {player_id}")
+                    else:
+                        print(f"Error al registrar asistencia para jugador {player_id}")
+                        messages.warning(
+                            request, 
+                            f'No se pudo registrar la asistencia para el jugador {jugador.get("nombre", player_id)}'
+                        )
+        context = {
+            'jugadores': jugadores,
+            'disciplina_id': discipline_id,
+            'training_id': training_id,
+            'fecha_asistencia': datetime.now().strftime('%Y-%m-%d')
+        }
+        
+        return render(request, 'intranet/entrenador/tomar_asistencia.html', context)
+                
+    except Exception as e:
+        print(f"Error en tomar_asistencia: {str(e)}")
+        messages.error(request, f'Error: {str(e)}')
+        return redirect('asistencia_entrenador')
+
+@login_required
+def registrar_asistencia(player_id, discipline_id, training_id, status, comments=''):
+    try:
+        django_cursor = connection.cursor()
+        cursor = django_cursor.connection.cursor()
+        out_cur = django_cursor.connection.cursor()
+
+        # Llamar al procedimiento
+        cursor.callproc("SP_REGISTRAR_ASISTENCIA", [
+            player_id,
+            training_id,
+            discipline_id,
+            status,
+            comments if comments else '',
+            out_cur
+        ])
+
+        # Obtener resultado
+        result = 0
+        for fila in out_cur:
+            result = fila[0]
+            break
+
+        return result == 1
+
+    except Exception as e:
+        print(f"Error al llamar SP_REGISTRAR_ASISTENCIA: {str(e)}")
+        print(f"Parámetros: player_id={player_id}, training_id={training_id}, "
+              f"discipline_id={discipline_id}, status={status}, comments={comments}")
+        return False
+
+@login_required
+def verificar_asistencia_existente(discipline_id):
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT COUNT(*) 
+                FROM Attendance 
+                WHERE discipline_id = :1 
+                AND TRUNC(attendance_date) = TRUNC(SYSDATE)
+            """, [discipline_id])
+            
+            count = cursor.fetchone()[0]
+            return count > 0
+    except Exception as e:
+        print(f"Error al verificar asistencia: {str(e)}")
+        return False
+
+
 
 ###################### ADMIN ######################
 class AdminDashboardView(LoginRequiredMixin, TemplateView):
@@ -391,11 +457,10 @@ class AdminDashboardView(LoginRequiredMixin, TemplateView):
 
     def dispatch(self, request, *args, **kwargs):
 
+        if not request.user.is_authenticated:
+            return redirect('login')  
 
-        if request.user == 'AnonymousUser':
-            return HttpResponseForbidden("Debes tener una sesion iniciada para poder entrar.")
-
-        elif request.user.user_type != 'admin01':
+        if not hasattr(request.user, 'user_type') or request.user.user_type != 'admin01':
             return HttpResponseForbidden("No tienes permiso para acceder a esta página.")
 
         return super().dispatch(request, *args, **kwargs)
@@ -425,7 +490,6 @@ def crear_perfil_entrenador(request):
             return render(request, 'intranet/administrador/crear_perfil_entrenador.html', data)
 
         disciplinas_seleccionadas = request.POST.getlist('lista_de_disciplina')
-
 
         # Validaciones
         if not rut:
@@ -488,9 +552,19 @@ def crear_perfil_entrenador(request):
 
 @login_required
 def crear_noticias(request):
+    noticia = listado_noticias()
+    page = request.GET.get('page',1)
 
+    try:
+        paginator = Paginator(noticia, 9)
+        noticia = paginator.page(page)
+    except:
+        raise Http404            
+
+    
     data = {
-        'noticias': listado_noticias()
+        'entity': noticia,
+        'paginator': paginator
 
     }
 
@@ -500,90 +574,76 @@ def crear_noticias(request):
                 imagen_file = request.FILES['img']
                 img_noticia = imagen_file.read()
             else:
+                messages.error(request, "Debes subir una imagen para la noticia.")
+                return redirect('crear_noticias')
 
-                data['mensaje_error'] = ["Debes subir una imagen para la noticia."]
-                return render(request, 'intranet/crear_galeria.html', data)
-    
             nombre_noticia = request.POST.get('nombre')
             if not nombre_noticia:
-                data['mensaje_error'] = ["Debes ingresar un nombre para la noticia."]
-                return render(request, 'intranet/crear_galeria.html', data)
+                messages.error(request, "Debes ingresar un nombre para la noticia.")
+                return redirect('crear_noticias')
 
             descripcion_noticia = request.POST.get('descripcion')
             if not descripcion_noticia:
-                data['mensaje_error'] = ["Debes ingresar una descripción para la noticia."]
-                return render(request, 'intranet/crear_galeria.html', data)
+                messages.error(request, "Debes ingresar una descripción para la noticia.")
+                return redirect('crear_noticias')
 
             etiqueta = request.POST.get('etiqueta')
             if not etiqueta:
-                data['mensaje_error'] = ["Debes ingresar una etiqueta para la noticia."]
-                return render(request, 'intranet/crear_galeria.html', data)
+                messages.error(request, "Debes ingresar una etiqueta para la noticia.")
+                return redirect('crear_noticias')
 
             # Guardar la galería en la base de datos
             salida = guardar_noticias(nombre_noticia, descripcion_noticia, img_noticia, etiqueta)
 
             if salida == 1:
-                data['mensaje_exito'] = ["Imagen registrada correctamente."]
-                data['noticias'] = listado_noticias()
+                messages.success(request, "Imagen registrada correctamente.")
             else:
-                data['mensaje_error'] = ["No se ha podido registrar la galería. ERROR."]
-
-
+                messages.error(request, "No se ha podido registrar la galería. ERROR.")
+            return redirect('crear_noticias')
 
         elif 'form_editar' in request.POST:
             id_noticias = request.POST.get('id')
-
             if id_noticias:
                 noticia = get_object_or_404(News, news_id=id_noticias)
-
                 if 'imagen' in request.FILES:
                     imagen_file = request.FILES['imagen']
-                    img_noticia = imagen_file.read()  # Nueva imagen
+                    img_noticia = imagen_file.read()
                 else:
-                    img_noticia = noticia.news_img  # Imagen actual de la BD
+                    img_noticia = noticia.news_img
 
-                # Obtener otros campos del formulario
                 nombre_noticia = request.POST.get('titulo')
                 etiqueta = request.POST.get('etiqueta')
                 descripcion_noticia = request.POST.get('descripcion')
                 fecha_noticia = request.POST.get('fecha')
 
+                fecha_noticia = datetime.strptime(fecha_noticia, '%Y-%m-%dT%H:%M').strftime('%Y-%m-%d %H:%M:%S')
+
                 salida = editar_noticias(id_noticias, nombre_noticia, descripcion_noticia, fecha_noticia, img_noticia, etiqueta)
 
                 if salida == 1:
-                    data['mensaje_exito'] = ["Noticia actualizada correctamente."]
-                    data['noticias'] = listado_noticias()
+                    messages.success(request, "Noticia actualizada correctamente.")
                 else:
-                    data['mensaje_error'] = ["No se ha podido actualizar la noticia. ERROR."]
-
+                    messages.error(request, "No se ha podido actualizar la noticia. ERROR.")
+                return redirect('crear_noticias')
+    
             else:
-                data['mensaje_error'] = ["No se ha proporcionado un ID para la noticia a editar."]
+                messages.error(request, "No se ha proporcionado un ID para la noticia a editar.")
+            return redirect('crear_noticias')
 
         elif 'form_eliminar' in request.POST:
             id_noticias = request.POST.get('id')
-                
             salida = eliminar_noticias(id_noticias)
             if salida == 1:
-                data['mensaje_exito'] = ["Noticia eliminada correctamente."]
-                data['noticias'] = listado_noticias()
+                messages.success(request, "Noticia eliminada correctamente.")
             else:
-                data['mensaje_error'] = ["No se ha podido eliminar la noticia. ERROR."]
-        
-        elif 'form_cacelar' in request.POST:
-            
-            return redirect('crear_noticias')  # Redirige para evitar reenvío de formulario en recarga
+                messages.error(request, "No se ha podido eliminar la noticia. ERROR.")
+            return redirect('crear_noticias')
 
-
-        
-
-
-    return render (request, 'intranet/administrador/crear_noticias.html', data)
-
+    return render(request, 'intranet/administrador/crear_noticias.html', data)
 
 @login_required
 def asistencia_admin(request):
     return render (request, 'intranet/administrador/asistencia_admin.html')
-
 
 @login_required
 def gestion_galeria_disciplina_por_disciplina(request):
@@ -596,84 +656,117 @@ def gestion_galeria_disciplina_por_disciplina(request):
     
     return render(request, 'intranet/administrador/listar_galeria_disciplina.html', data)
 
-
 @login_required
 def gestion_galeria(request):
 
+    galerias = listado_galeria_general()
+    page = request.GET.get('page',1)
 
-    disciplinas = listado_disciplinas()
+    try:
+        paginator = Paginator(galerias, 9)
+        galerias = paginator.page(page)
+    except:
+        raise Http404            
 
-    disciplina_seleccionada = None
-    imagenes_disciplinas = []
-
-    print(listado_galeria_discipline(6))
-
-    if request.method == 'POST':
-        discipline_id = request.POST.get('disciplina')
-        if discipline_id:
-            # Recuperar los jugadores asociados a esta disciplina
-            imagenes_disciplinas = listado_galeria_discipline(discipline_id)  # Ajusta según tu modelo
 
     data = {
-        'disciplinas': disciplinas,
-        'galeria': listado_galeria_general(),
-        'disciplina_seleccionada': disciplina_seleccionada,
-        'galeria_disciplina' : imagenes_disciplinas,
-    }
+    'entity':galerias,
+    'paginator': paginator
+    }   
 
 
     if request.method == 'POST':
+        if 'form_crear' in request.POST:
+            publicar_en = request.POST.get('publicar_en')
+            if publicar_en == 'galeria-general':
 
-        publicar_en = request.POST.get('publicar_en')
-        if publicar_en == 'galeria-general':
+                if 'imagen' in request.FILES:
+                    imagen_file = request.FILES['imagen']
+                    imagen = imagen_file.read()
+                else:
+                    data['mensaje_error'] = ["Debes subir una imagen para publicar en la galería general."]
+                    return render (request, 'intranet/administrador/gestion_galeria.html', data)
+                
+                etiqueta = request.POST.get('etiqueta')
+                if not etiqueta:
+                    data['mensaje_error'] = ["Debes ingresar una etiqueta para publicar en la galería general."]
+                    return render (request, 'intranet/administrador/gestion_galeria.html', data)
 
-            if 'imagen' in request.FILES:
-                imagen_file = request.FILES['imagen']
-                imagen = imagen_file.read()
-            else:
-                data['mensaje_error'] = ["Debes subir una imagen para publicar en la galería general."]
-                return render (request, 'intranet/administrador/gestion_galeria.html', data)
-            
-            etiqueta = request.POST.get('etiqueta')
-            if not etiqueta:
-                data['mensaje_error'] = ["Debes ingresar una etiqueta para publicar en la galería general."]
-                return render (request, 'intranet/administrador/gestion_galeria.html', data)
+                # Guardar la imagen en la galeria general de la base de datos
+                salida = guardar_galeria_general(imagen, etiqueta)
 
-            # Guardar la imagen en la galeria general de la base de datos
-            salida = guardar_galeria_general(imagen, etiqueta)
+                if salida == 1:
+                    data['mensaje_exito'] = ["Imagen registrada correctamente en galeria general."]
+                else:
+                    data['mensaje_error'] = ["No se ha podido registrar la imagen. ERROR."]
+                return redirect('gestion_galeria')
+
+
+            elif publicar_en == 'galeria-disciplina':
+                
+                if 'imagen' in request.FILES:
+                    imagen_file = request.FILES['imagen']
+                    imagen = imagen_file.read()
+                else:
+                    data['mensaje_error'] = ["Debes subir una imagen para publicar en la galeria de disciplina."]
+                    return render (request, 'intranet/administrador/gestion_galeria.html', data)
+                
+                discipline_id = request.POST.get('discipline_id')
+                if not discipline_id:
+                    data['mensaje_error'] = ["Debes ingresar una Disciplina para registrar una imagen en la galeria de disciplina."]
+                    return render (request, 'intranet/administrador/gestion_galeria.html', data)
+
+                etiqueta = request.POST.get('etiqueta')
+                if not etiqueta:
+                    data['mensaje_error'] = ["Debes ingresar una etiqueta para publicar en la galeria de disciplina."]
+                    return render (request, 'intranet/administrador/gestion_galeria.html', data)
+
+                salida = guardar_galeria_disciplina(imagen, discipline_id, etiqueta)
+
+                if salida == 1:
+                    data['mensaje_exito'] = ["Imagen registrada correctamente en galeria de disciplina."]
+                    data['galeria'] = listado_galeria_general()
+
+                else:
+                    data['mensaje_error'] = ["No se ha podido registrar la imagen. ERROR."]
+        
+        
+        elif 'form_editar' in request.POST:
+            id_galeria = request.POST.get('id')
+            if id_galeria:
+                galeria = get_object_or_404(GaleryGeneral, galery_gen_id=id_galeria)
+                if 'imagen' in request.FILES:
+                    imagen_file = request.FILES['imagen']
+                    img_galeria = imagen_file.read()
+                else:
+                    img_galeria = galeria.galery_gen_img
+                
+                nombre_galeria = request.POST.get('titulo')
+                fecha_galeria = request.POST.get('fecha')
+                
+                fecha_galeria = datetime.strptime(fecha_galeria, '%Y-%m-%dT%H:%M').strftime('%Y-%m-%d %H:%M:%S')
+        
+                salida = editar_galeria_general(id_galeria, img_galeria ,nombre_galeria, fecha_galeria)
+
+                if salida == 1:
+                    messages.success(request, "Imagen actualizada correctamente.")
+                else:
+                    messages.error(request, "No se ha podido actualizar la imagen. ERROR.")
+                return redirect('gestion_galeria')
+
+        elif 'form_eliminar' in request.POST:
+            id_galeria = request.POST.get('id')
+            salida = eliminar_galeria_general(id_galeria)
+
+            print('Print id= '+ id_galeria)
 
             if salida == 1:
-                data['mensaje_exito'] = ["Imagen registrada correctamente en galeria general."]
+                messages.success(request, "La imagen fue eliminada correctamente.")
+                print('a')
             else:
-                data['mensaje_error'] = ["No se ha podido registrar la imagen. ERROR."]
-
-        elif publicar_en == 'galeria-disciplina':
-            
-            if 'imagen' in request.FILES:
-                imagen_file = request.FILES['imagen']
-                imagen = imagen_file.read()
-            else:
-                data['mensaje_error'] = ["Debes subir una imagen para publicar en la galeria de disciplina."]
-                return render (request, 'intranet/administrador/gestion_galeria.html', data)
-            
-            discipline_id = request.POST.get('discipline_id')
-            if not discipline_id:
-                data['mensaje_error'] = ["Debes ingresar una Disciplina para registrar una imagen en la galeria de disciplina."]
-                return render (request, 'intranet/administrador/gestion_galeria.html', data)
-
-            etiqueta = request.POST.get('etiqueta')
-            if not etiqueta:
-                data['mensaje_error'] = ["Debes ingresar una etiqueta para publicar en la galeria de disciplina."]
-                return render (request, 'intranet/administrador/gestion_galeria.html', data)
-
-            salida = guardar_galeria_disciplina(imagen, discipline_id, etiqueta)
-
-            if salida == 1:
-                data['mensaje_exito'] = ["Imagen registrada correctamente en galeria de disciplina."]
-                data['galeria'] = listado_galeria_general()
-
-            else:
-                data['mensaje_error'] = ["No se ha podido registrar la imagen. ERROR."]
+                messages.error(request, "No se ha podido eliminar la Imagen. ERROR.")
+                print('b')
+            return redirect('gestion_galeria')        
 
 
     return render (request, 'intranet/administrador/gestion_galeria.html', data)
@@ -688,8 +781,7 @@ def solicitud_jugador(request):
     }
     return render (request, 'intranet/administrador/solicitud_jugador.html', data)
 
-
-
+@login_required
 def aceptar_solicitud(request, id):
     
     data = {
@@ -716,7 +808,7 @@ def aceptar_solicitud(request, id):
         data['mensaje_error'] = ["No se pudo procesar la solicitud."]
         return render(request, 'intranet/administrador/solicitud_jugador.html', data)
 
-
+@login_required
 def gestion_disciplina(request):
     disciplinas = listado_disciplinas()
     disciplina_seleccionada = None
@@ -736,7 +828,7 @@ def gestion_disciplina(request):
     }
     return render(request, 'intranet/administrador/gestion_disciplina.html', context)
 
-
+@login_required
 def update_discipline(request):
     discipline_id = request.POST.get('discipline_id')
     discipline = get_object_or_404(Discipline, discipline_id=discipline_id)
@@ -760,6 +852,372 @@ def update_discipline(request):
             'success': False,
             'error': str(e)
         }, status=400)
+
+@login_required
+def gestion_eventos(request):
+    if request.method == 'POST':
+        try:
+            # Obtener y loggear todos los datos del POST
+            print("POST data:", request.POST)
+            
+            event_scope = request.POST.get('eventScope')
+            events_type = request.POST.get('events_type')
+            events_name = request.POST.get('events_name')
+            events_description = request.POST.get('events_description')
+            events_recurring = request.POST.get('events_recurring')
+            
+            # Manejar discipline_id
+            discipline_id = None
+            if event_scope == 'especifica':
+                discipline_id = request.POST.get('discipline_id')
+                print(f"Disciplina seleccionada: {discipline_id}")
+                if discipline_id:
+                    try:
+                        discipline_id = int(discipline_id)
+                    except ValueError:
+                        raise ValueError("ID de disciplina inválido")
+                else:
+                    raise ValueError("Se requiere seleccionar una disciplina")
+            # Procesar fechas
+            if events_recurring == '0':  # Si es evento único
+                events_start = request.POST.get('events_start')
+                events_end = request.POST.get('events_end')
+                start_date = datetime.strptime(events_start, '%Y-%m-%dT%H:%M')
+                end_date = datetime.strptime(events_end, '%Y-%m-%dT%H:%M')
+            else:
+                start_date = datetime.now()
+                end_date = datetime.now()
+
+            print("Valores a enviar al SP:", {
+                "events_name": events_name,
+                "events_type": events_type,
+                "events_status": 'activo',
+                "start_date": start_date,
+                "end_date": end_date,
+                "events_description": events_description,
+                "events_recurring": events_recurring,
+                "discipline_id": discipline_id
+            })
+
+            # Llamada al procedimiento almacenado
+            with connection.cursor() as cursor:
+                cursor.callproc("SP_INSERT_EVENT", [
+                    events_name,
+                    events_type,
+                    'activo',
+                    start_date,
+                    end_date,
+                    events_description,
+                    int(events_recurring),
+                    discipline_id  # Asegurarse que sea None o un entero válido
+                ])
+            
+            messages.success(request, 'Evento creado exitosamente')
+            
+        except ValueError as ve:
+            messages.error(request, f'Error de validación: {str(ve)}')
+            print(f"Error de validación: {str(ve)}")
+        except Exception as e:
+            messages.error(request, f'Error al crear el evento: {str(e)}')
+            print(f"Error general: {str(e)}")
+    
+    # Preparar datos para el template
+    try:
+        data = {
+            'disciplinas': listado_disciplinas(),
+            'eventos': listado_eventos()
+        }
+    except Exception as e:
+        print(f"Error al preparar datos: {str(e)}")
+        data = {
+            'disciplinas': [],
+            'eventos': []
+        }
+        messages.error(request, 'Error al cargar los datos')
+
+    return render(request, 'intranet/administrador/gestion_eventos.html', data)
+
+
+def listado_eventos_entrenador(coach_id):
+    try:
+        django_cursor = connection.cursor()
+        cursor = django_cursor.connection.cursor()
+        out_cur = django_cursor.connection.cursor()
+
+        # Convertimos el coach_id a string si es necesario
+        coach_id_str = str(coach_id)
+        
+        cursor.callproc("SP_LIST_EVENTS_FOR_COACH", [out_cur, coach_id_str])
+
+        lista = []
+        for fila in out_cur:
+            data = {
+                'events_id': fila[0],
+                'events_name': fila[1],
+                'events_type': fila[2],
+                'events_description': fila[3],
+                'events_start': fila[4],
+                'events_end': fila[5],
+                'discipline_id': fila[6],
+                'discipline_name': fila[7] if fila[7] else 'Todas las disciplinas'
+            }
+            lista.append(data)
+
+        return lista
+    except Exception as e:
+        print(f"Error en listado_eventos_entrenador: {str(e)}")
+        return []
+    finally:
+        if 'out_cur' in locals():
+            out_cur.close()
+        if 'cursor' in locals():
+            cursor.close()
+        if 'django_cursor' in locals():
+            django_cursor.close()
+
+
+def listado_entrenamientos_por_entrenador(id_entrenador):
+    django_cursor = connection.cursor()
+    cursor = django_cursor.connection.cursor()
+    out_cur = django_cursor.connection.cursor()
+
+    cursor.callproc("SP_LIST_TRAININGS_FOR_COACH", [out_cur, id_entrenador])
+    
+    lista = []
+    for fila in out_cur:
+        lista.append(fila)
+    return lista
+
+
+def gestionar_periodos(request):
+    disciplinas = listado_disciplinas()
+    
+    if request.method == 'POST':
+        if 'form-period' in request.POST:
+            try:
+                
+                # Obtener los datos del formulario
+                period_name = request.POST.get('period_name')
+                start_date = request.POST.get('start_date')
+                end_date = request.POST.get('end_date')
+                semester = request.POST.get('semester')
+                is_active = 1 if request.POST.get('is_active') == 'on' else 0
+
+                # Validar que los campos requeridos no estén vacíos
+                if not all([period_name, start_date, end_date, semester]):
+                    messages.error(request, 'Por favor complete todos los campos requeridos.')
+                    return redirect('gestionar_periodos')
+
+                # Convertir las fechas a objetos datetime
+                try:
+                    start_date_obj = datetime.strptime(start_date, '%Y-%m-%d')
+                    end_date_obj = datetime.strptime(end_date, '%Y-%m-%d')
+                except ValueError:
+                    messages.error(request, 'Formato de fecha inválido')
+                    return redirect('gestionar_periodos')
+
+                # Ejecutar el procedimiento almacenado
+                with connection.cursor() as cursor:
+                    # Crear variable de salida para el resultado
+                    output_value = cursor.var(oracledb.NUMBER)
+                    
+                    # Ejecutar el procedimiento almacenado
+                    cursor.execute("""
+                        BEGIN
+                            sp_insert_academic_period(
+                                :period_name, 
+                                :start_date,
+                                :end_date,
+                                :semester,
+                                :is_active,
+                                :result
+                            );
+                        END;
+                    """, {
+                        'period_name': period_name,
+                        'start_date': start_date_obj,
+                        'end_date': end_date_obj,
+                        'semester': int(semester),
+                        'is_active': is_active,
+                        'result': output_value
+                    })
+
+                    # Obtener el resultado
+                    result = output_value.getvalue()
+
+                    if result == 1:
+                        messages.success(request, 'Periodo académico creado exitosamente.')
+                    elif result == 0:
+                        messages.error(request, 'Error: La fecha de inicio debe ser anterior a la fecha de fin.')
+                    else:
+                        messages.error(request, 'Error al crear el periodo académico.')
+
+            except oracledb.Error as e:
+                error, = e.args
+                messages.error(request, f'Error de Oracle: {str(error)}')
+            except Exception as e:
+                messages.error(request, f'Error al crear el periodo: {str(e)}')
+            if result == 1:
+                    messages.success(request, "Periodo creado correctamente.")
+            else:
+                    messages.error(request, "No se ha podido crear la Periodo. ERROR.")
+            return redirect('gestionar_periodos')
+
+
+        elif 'form-training' in request.POST:
+            try:
+                # Obtener los datos del formulario
+                training_name = request.POST.get('training_name')
+                discipline_id = request.POST.get('discipline_id')
+                period_id = request.POST.get('period_id')
+                weekdays = ','.join(request.POST.getlist('weekdays'))  # Convierte la lista de días en string
+                
+                # Convertir las horas a timestamp
+                start_time = request.POST.get('start_time')
+                end_time = request.POST.get('end_time')
+                
+                # Convertir a datetime
+                start_timestamp = datetime.strptime(start_time, '%H:%M')
+                end_timestamp = datetime.strptime(end_time, '%H:%M')
+                
+                is_active = request.POST.get('is_active')
+
+                # Validar que los campos requeridos no estén vacíos
+                if not all([training_name, discipline_id, period_id, weekdays, start_time, end_time]):
+                    messages.error(request, 'Por favor complete todos los campos requeridos.')
+                    return redirect('submit_training')
+
+                with connection.cursor() as cursor:
+                    # Variable de salida para el resultado
+                    output_value = cursor.var(oracledb.NUMBER)
+                    
+                    # Ejecutar el procedimiento almacenado
+                    cursor.execute("""
+                        BEGIN
+                            sp_insert_training(
+                                :training_name,
+                                :discipline_id,
+                                :period_id,
+                                :weekdays,
+                                :start_time,
+                                :end_time,
+                                :is_active,
+                                :result
+                            );
+                        END;
+                    """, {
+                        'training_name': training_name,
+                        'discipline_id': int(discipline_id),
+                        'period_id': int(period_id),
+                        'weekdays': weekdays,
+                        'start_time': start_timestamp,
+                        'end_time': end_timestamp,
+                        'is_active': int(is_active),
+                        'result': output_value
+                    })
+
+                    # Obtener el resultado
+                    result = output_value.getvalue()
+                    
+                    if result == 1:
+                        messages.success(request, 'Entrenamiento creado exitosamente.')
+                    elif result == -1:
+                        messages.error(request, 'La hora de inicio debe ser anterior a la hora de fin.')
+                    elif result == -2:
+                        messages.error(request, 'La disciplina seleccionada no existe.')
+                    elif result == -3:
+                        messages.error(request, 'El período seleccionado no existe.')
+                    else:
+                        messages.error(request, 'Error al crear el entrenamiento.')
+
+            except oracledb.Error as e:
+                error, = e.args
+                messages.error(request, f'Error de Oracle: {str(error)}')
+            except Exception as e:
+                messages.error(request, f'Error al crear el entrenamiento: {str(e)}')
+        if result == 1:
+                    messages.success(request, "Entrenamiento actualizado correctamente.")
+        else:
+            messages.error(request, "No se ha podido actualizar el entrenamiento. ERROR.")
+        return redirect('gestionar_periodos')
+
+    # Para mostrar los periodos existentes
+    periodos = []
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT period_id, period_name, 
+                TO_CHAR(start_date, 'YYYY-MM-DD') as start_date, 
+                TO_CHAR(end_date, 'YYYY-MM-DD') as end_date, 
+                semester, is_active, 
+                TO_CHAR(creation_timestamp, 'YYYY-MM-DD HH24:MI:SS') as creation_timestamp
+                FROM Academic_Period
+                ORDER BY creation_timestamp DESC
+            """)
+            columns = [col[0] for col in cursor.description]
+            periodos = [dict(zip(columns, row)) for row in cursor.fetchall()]
+    
+            
+    except Exception as e:
+        messages.error(request, f'Error al obtener los periodos: {str(e)}')
+    # Para mostrar los entrenamientos existentes
+    # Para mostrar los entrenamientos existentes
+    entrenamientos = []
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT t.training_name,
+                    CASE 
+                        WHEN t.weekdays LIKE '%1%' THEN 'Lunes '
+                        ELSE ''
+                    END ||
+                    CASE 
+                        WHEN t.weekdays LIKE '%2%' THEN 'Martes '
+                        ELSE ''
+                    END ||
+                    CASE 
+                        WHEN t.weekdays LIKE '%3%' THEN 'Miércoles '
+                        ELSE ''
+                    END ||
+                    CASE 
+                        WHEN t.weekdays LIKE '%4%' THEN 'Jueves '
+                        ELSE ''
+                    END ||
+                    CASE 
+                        WHEN t.weekdays LIKE '%5%' THEN 'Viernes '
+                        ELSE ''
+                    END ||
+                    CASE 
+                        WHEN t.weekdays LIKE '%6%' THEN 'Sábado '
+                        ELSE ''
+                    END ||
+                    CASE 
+                        WHEN t.weekdays LIKE '%7%' THEN 'Domingo'
+                        ELSE ''
+                    END as dias,
+                    TO_CHAR(t.start_time, 'HH24:MI') as start_time,
+                    TO_CHAR(t.end_time, 'HH24:MI') as end_time,
+                    d.discipline_name,
+                    p.period_name,
+                    t.is_active
+                FROM Training t
+                JOIN Discipline d ON t.discipline_id = d.discipline_id
+                JOIN Academic_Period p ON t.period_id = p.period_id
+                ORDER BY t.creation_timestamp DESC
+            """)
+            columns = [col[0] for col in cursor.description]
+            entrenamientos = [dict(zip(columns, row)) for row in cursor.fetchall()]
+            
+            
+    except Exception as e:
+        messages.error(request, f'Error al obtener los entrenamientos: {str(e)}')
+
+    data = {
+            'disciplinas': disciplinas,
+            'periodos': periodos,
+            'entrenamientos': entrenamientos
+        }
+    return render(request, 'intranet/administrador/gestionar_periodos.html', data)
 
 
 ##################  LOGIN  ##########################
@@ -964,6 +1422,7 @@ def listado_jugador_por_disciplinas(id_disciplina):
 
     return lista
 
+##############  NOTICIAS ##############
 
 def guardar_noticias(nombre_noticia, descripcion_noticia, img_noticia, etiqueta):
     django_cursor = connection.cursor()
@@ -1015,6 +1474,25 @@ def eliminar_noticias(id_noticia):
     return salida.getvalue()
 
 
+def listado_noticias_por_tiempo():
+    django_cursor = connection.cursor()
+    cursor = django_cursor.connection.cursor()
+    out_cur = django_cursor.connection.cursor()
+
+    cursor.callproc("SP_LIST_NEWS_FOR_TIME", [out_cur])
+
+    lista = []
+    for fila in out_cur:
+        data={
+            'data':fila,
+            'imagen':str(base64.b64encode(fila[5].read()), 'utf-8'),        
+        }
+
+        lista.append(data)
+
+    return lista
+
+
 def listado_noticias():
     django_cursor = connection.cursor()
     cursor = django_cursor.connection.cursor()
@@ -1032,8 +1510,10 @@ def listado_noticias():
         lista.append(data)
 
     return lista
+##############################################
 
 
+##############  GALERIA_GENERAL ##############
 def listado_galeria_general():
     django_cursor = connection.cursor()
     cursor = django_cursor.connection.cursor()
@@ -1054,6 +1534,38 @@ def listado_galeria_general():
     return lista
 
 
+def editar_galeria_general(id_galeria, img_galeria ,nombre_galeria, fecha_galeria):
+    django_cursor = connection.cursor()
+    cursor = django_cursor.connection.cursor()
+
+    salida = cursor.var(oracledb.NUMBER)
+
+    cursor.callproc('SP_EDIT_GALERY_GENERAL', [
+        id_galeria, 
+        img_galeria, 
+        nombre_galeria,
+        fecha_galeria,
+
+        salida
+    ])
+
+    return salida.getvalue()
+
+
+def eliminar_galeria_general(id_galeria_general):
+    django_cursor = connection.cursor()
+    cursor = django_cursor.connection.cursor()
+
+    salida = cursor.var(oracledb.NUMBER)
+
+    cursor.callproc('SP_DELETE_GALERY_GENERAL', [
+        id_galeria_general,
+        salida
+    ])
+
+    return salida.getvalue()
+
+
 def listado_galeria_discipline(disciplina_id):
     django_cursor = connection.cursor()
     cursor = django_cursor.connection.cursor()
@@ -1072,6 +1584,7 @@ def listado_galeria_discipline(disciplina_id):
         lista.append(data)
 
     return lista
+#############################################
 
 
 def listado_solicitud():
@@ -1202,6 +1715,7 @@ def verificar_asistencia_existente(discipline_id):
         print(f"Error al verificar asistencia: {str(e)}")
         return False
 
+
 def listado_disciplinas_por_fechahoy_con_entrenador(id_entrenador):
     django_cursor = connection.cursor()
     cursor = django_cursor.connection.cursor()
@@ -1214,3 +1728,42 @@ def listado_disciplinas_por_fechahoy_con_entrenador(id_entrenador):
         lista.append(fila)
 
     return lista
+
+
+def listado_eventos():
+    try:
+        django_cursor = connection.cursor()
+        cursor = django_cursor.connection.cursor()
+        out_cur = django_cursor.connection.cursor()
+
+        cursor.callproc("SP_LIST_EVENTS", [out_cur])
+
+        lista = []
+        for fila in out_cur:
+            # Convertir los valores de recurring a string para comparación
+            recurring = str(fila[7]) if fila[7] is not None else '0'
+            
+            data = {
+                'events_id': fila[0],
+                'events_name': fila[1],
+                'events_type': fila[2],
+                'events_status': fila[3],
+                'events_start': fila[4],
+                'events_end': fila[5],
+                'events_description': fila[6],
+                'events_recurring': recurring,  # Aseguramos que sea string
+                'discipline_name': fila[8] if fila[8] is not None else 'Todas las disciplinas'
+            }
+            lista.append(data)
+    
+        return lista
+    except Exception as e:
+        print(f"Error en listado_eventos: {str(e)}")
+        return []
+    finally:
+        if 'out_cur' in locals():
+            out_cur.close()
+        if 'cursor' in locals():
+            cursor.close()
+        if 'django_cursor' in locals():
+            django_cursor.close()

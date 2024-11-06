@@ -67,50 +67,38 @@
                 <div class="row">
                     <div class="col-lg-12">
 
-                        <div class="card mb-5">
-                            <div class="card-body pb-0 m-5">
+                        <div class="card ">
+                            <div class="card-body pb-0 ">
                                 <div class="row d-flex justify-content-center">
-                                    <h4><i class="bi bi-journal-text text-primary font-size-22"></i> Gestion de
-                                        Entrenamientos</h4>
+                                    <h4><i class="bi bi-journal-text text-primary font-size-22"></i> Eventos DUOCUC</h4>
                                     <div class="container mt-4">
-                                        <!-- <div class="row mb-3">
-                                            <div class="col-auto">
-                                                <div class="input-group">
-                                                    <span class="input-group-text">Buscar:</span>
-                                                    <input type="text" class="form-control" placeholder="Buscar...">
-                                                </div>
-                                            </div>
-                                        </div> -->
 
                                         <table class="table table-striped table-hover">
                                             <thead>
                                                 <tr>
-                                                    <th>Detalles</th>
-                                                    <th>Día de Entrenamiento</th>
+                                                    <th>Nombre</th>
+                                                    <th>Tipo</th>
+                                                    <th>Descripción</th>
+                                                    <th>Fecha Inicio</th>
+                                                    <th>Fecha Fin</th>
                                                     <th>Disciplina</th>
-                                                    <th>Ubicacion</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
+                                                {% for evento in eventos %}
                                                 <tr>
-                                                    <td>Entrenamiento</td>
-                                                    <td>17/03/2023 16:24:05</td>
-                                                    <td>Futbol Varones</td>
-                                                    <td>Sede Antonio Varas Cancha</td>
+                                                    <td>{{ evento.events_name }}</td>
+                                                    <td>{{ evento.events_type }}</td>
+                                                    <td>{{ evento.events_description }}</td>
+                                                    <td>{{ evento.events_start }}</td>
+                                                    <td>{{ evento.events_end }}</td>
+                                                    <td>{{ evento.discipline_name }}</td>
                                                 </tr>
+                                                {% empty %}
                                                 <tr>
-                                                    <td>Entrenamiento</td>
-                                                    <td>17/03/2023 16:24:05</td>
-                                                    <td>Futbol Varones</td>
-                                                    <td>Sede Antonio Varas Cancha</td>
+                                                    <td colspan="6" class="text-center">No hay eventos disponibles</td>
                                                 </tr>
-                                                <tr>
-                                                    <td>Feriado</td>
-                                                    <td>17/03/2023 16:24:05</td>
-                                                    <td>-</td>
-                                                    <td>Chile</td>
-                                                </tr>
-                                                <!-- Add more rows as needed -->
+                                                {% endfor %}
                                             </tbody>
                                         </table>
                                     </div>

@@ -9,8 +9,6 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
 from .managers import MainUserManager 
 
-
-
 class Admin(models.Model):
     admin_id = models.CharField(primary_key=True, max_length=20)
     admin_name = models.CharField(max_length=50)
@@ -24,111 +22,39 @@ class Admin(models.Model):
 
 class Attendance(models.Model):
     attendance_id = models.BigAutoField(primary_key=True)
-    attendance_status = models.CharField(max_length=20)
     attendance_date = models.DateField()
-    attendace_comments = models.CharField(max_length=200, blank=True, null=True)
+    attendance_comments = models.CharField(max_length=200, blank=True, null=True)
+    creation_timestamp = models.DateTimeField(blank=True, null=True)
     player = models.ForeignKey('Player', models.DO_NOTHING)
+    discipline = models.ForeignKey('Discipline', models.DO_NOTHING)
+    status = models.ForeignKey('AttendanceStatus', models.DO_NOTHING)
 
     class Meta:
         managed = False
         db_table = 'attendance'
 
 
-class AuthGroup(models.Model):
-    name = models.CharField(unique=True, max_length=150, blank=True, null=True)
+class AttendanceStatus(models.Model):
+    status_id = models.BigAutoField(primary_key=True)
+    status_name = models.CharField(max_length=20)
+    status_description = models.CharField(max_length=100, blank=True, null=True)
 
     class Meta:
         managed = False
-        db_table = 'auth_group'
-
-
-class AuthGroupPermissions(models.Model):
-    id = models.BigAutoField(primary_key=True)
-    group = models.ForeignKey(AuthGroup, models.DO_NOTHING)
-    permission = models.ForeignKey('AuthPermission', models.DO_NOTHING)
-
-    class Meta:
-        managed = False
-        db_table = 'auth_group_permissions'
-        unique_together = (('group', 'permission'),)
-
-
-class AuthPermission(models.Model):
-    name = models.CharField(max_length=255, blank=True, null=True)
-    content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING)
-    codename = models.CharField(max_length=100, blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'auth_permission'
-        unique_together = (('content_type', 'codename'),)
-
-
-class AuthUser(models.Model):
-    password = models.CharField(max_length=128, blank=True, null=True)
-    last_login = models.DateTimeField(blank=True, null=True)
-    is_superuser = models.BooleanField()
-    username = models.CharField(unique=True, max_length=150, blank=True, null=True)
-    first_name = models.CharField(max_length=150, blank=True, null=True)
-    last_name = models.CharField(max_length=150, blank=True, null=True)
-    email = models.CharField(max_length=254, blank=True, null=True)
-    is_staff = models.BooleanField()
-    is_active = models.BooleanField()
-    date_joined = models.DateTimeField()
-
-    class Meta:
-        managed = False
-        db_table = 'auth_user'
-
-
-class AuthUserGroups(models.Model):
-    id = models.BigAutoField(primary_key=True)
-    user = models.ForeignKey(AuthUser, models.DO_NOTHING)
-    group = models.ForeignKey(AuthGroup, models.DO_NOTHING)
-
-    class Meta:
-        managed = False
-        db_table = 'auth_user_groups'
-        unique_together = (('user', 'group'),)
-
-
-class AuthUserUserPermissions(models.Model):
-    id = models.BigAutoField(primary_key=True)
-    user = models.ForeignKey(AuthUser, models.DO_NOTHING)
-    permission = models.ForeignKey(AuthPermission, models.DO_NOTHING)
-
-    class Meta:
-        managed = False
-        db_table = 'auth_user_user_permissions'
-        unique_together = (('user', 'permission'),)
+        db_table = 'attendance_status'
 
 
 class Coach(models.Model):
     coach_id = models.CharField(primary_key=True, max_length=20)
-    coach_name = models.CharField(max_length=50)
+    coach_name = models.CharField(max_length=100)
     coach_img = models.BinaryField(blank=True, null=True)
-    user = models.ForeignKey('MainUser', models.DO_NOTHING, related_name='coach')  # Añadir related_name
+    user = models.ForeignKey('MainUser', models.DO_NOTHING, related_name='coach')
     coach_type = models.ForeignKey('CoachType', models.DO_NOTHING)
-    disciplines = models.ManyToManyField('Discipline', through='CoachDiscipline', related_name='coaches')
 
     class Meta:
         managed = False
         db_table = 'coach'
 
-
-
-
-
-class Contact(models.Model):
-    contact_id = models.BigAutoField(primary_key=True)
-    contact_name = models.CharField(max_length=50)
-    contact_email = models.CharField(max_length=50)
-    contact_description = models.CharField(max_length=100)
-    admin = models.ForeignKey(Admin, models.DO_NOTHING)
-
-    class Meta:
-        managed = False
-        db_table = 'contact'
 
 class CoachDiscipline(models.Model):
     coach = models.ForeignKey(Coach, models.DO_NOTHING)
@@ -149,108 +75,82 @@ class CoachType(models.Model):
         managed = False
         db_table = 'coach_type'
 
+
+class Contact(models.Model):
+    contact_id = models.BigAutoField(primary_key=True)
+    contact_name = models.CharField(max_length=50)
+    contact_email = models.CharField(max_length=50)
+    contact_description = models.CharField(max_length=2000)
+    admin = models.ForeignKey(Admin, models.DO_NOTHING)
+
+    class Meta:
+        managed = False
+        db_table = 'contact'
+
+
 class Discipline(models.Model):
     discipline_id = models.BigAutoField(primary_key=True)
     discipline_name = models.CharField(max_length=50)
     discipline_description = models.CharField(max_length=500)
     galery_img = models.BinaryField(blank=True, null=True)
-    
+
     class Meta:
         managed = False
         db_table = 'discipline'
 
 
-class DjangoAdminLog(models.Model):
-    action_time = models.DateTimeField()
-    object_id = models.TextField(blank=True, null=True)
-    object_repr = models.CharField(max_length=200, blank=True, null=True)
-    action_flag = models.IntegerField()
-    change_message = models.TextField(blank=True, null=True)
-    content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING, blank=True, null=True)
-    user = models.ForeignKey(AuthUser, models.DO_NOTHING)
-
-    class Meta:
-        managed = False
-        db_table = 'django_admin_log'
-
-
-class DjangoContentType(models.Model):
-    app_label = models.CharField(max_length=100, blank=True, null=True)
-    model = models.CharField(max_length=100, blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'django_content_type'
-        unique_together = (('app_label', 'model'),)
-
-
-class DjangoMigrations(models.Model):
-    id = models.BigAutoField(primary_key=True)
-    app = models.CharField(max_length=255, blank=True, null=True)
-    name = models.CharField(max_length=255, blank=True, null=True)
-    applied = models.DateTimeField()
-
-    class Meta:
-        managed = False
-        db_table = 'django_migrations'
-
-
-class DjangoSession(models.Model):
-    session_key = models.CharField(primary_key=True, max_length=40)
-    session_data = models.TextField(blank=True, null=True)
-    expire_date = models.DateTimeField()
-
-    class Meta:
-        managed = False
-        db_table = 'django_session'
-
-
-class EliteAthlete(models.Model):
-    elite_athlete_id = models.BigAutoField(primary_key=True)
-    elite_athlete_name = models.CharField(max_length=100)
-    elite_athlete_headquarters = models.CharField(max_length=50, blank=True, null=True)
-    elite_athlete_descipline = models.CharField(max_length=30)
-    elite_athlete_description = models.CharField(max_length=100)
-    elite_athlete_img = models.BinaryField(blank=True, null=True)
-    elite_athlete_career = models.CharField(max_length=30)
-    player_status = models.CharField(max_length=30)
-
-    class Meta:
-        managed = False
-        db_table = 'elite_athlete'
-
-
 class Events(models.Model):
-    events_id = models.BigAutoField(primary_key=True)
+    events_id = models.AutoField(primary_key=True)
     events_name = models.CharField(max_length=50)
     events_status = models.CharField(max_length=50)
-    events_start = models.DateField()
-    events_end = models.DateField()
-    events_description = models.CharField(max_length=100, blank=True, null=True)
+    events_start = models.DateTimeField(null=True, blank=True)
+    events_end = models.DateTimeField(null=True, blank=True)
+    events_description = models.CharField(max_length=100, null=True, blank=True)
+    events_type = models.CharField(max_length=50)
+    events_recurring = models.IntegerField(null=True, blank=True)
+    discipline = models.ForeignKey('Discipline', models.DO_NOTHING, null=True, blank=True)
 
     class Meta:
-        managed = False
         db_table = 'events'
 
 
-class Galery(models.Model):
-    galery_id = models.BigAutoField(primary_key=True)
-    galery_img = models.BinaryField()
-    galery_status = models.CharField(max_length=50)
-    galery_description = models.CharField(max_length=100, blank=True, null=True)
+class GaleryDiscipline(models.Model):
+    galery_dis_id = models.BigAutoField(primary_key=True)
+    galery_dis_img = models.BinaryField()
+    galery_dis_status = models.FloatField()
+    galery_dis_tag = models.CharField(max_length=50, blank=True, null=True)
+    galery_dis_date = models.DateField(blank=True, null=True)
+    discipline = models.ForeignKey(Discipline, models.DO_NOTHING, blank=True, null=True)
 
     class Meta:
         managed = False
-        db_table = 'galery'
+        db_table = 'galery_discipline'
 
 
-class GamePosition(models.Model):
-    game_position_id = models.BigAutoField(primary_key=True)
-    game_position_name = models.CharField(max_length=50)
+class GaleryFront(models.Model):
+    galery_front_id = models.BigAutoField(primary_key=True)
+    galery_front_img = models.BinaryField()
+    galery_front_status = models.FloatField()
+    galery_front_title = models.CharField(max_length=100, blank=True, null=True)
+    galery_front_description = models.CharField(max_length=200, blank=True, null=True)
+    galery_front_place = models.CharField(max_length=200, blank=True, null=True)
+    galery_front_date = models.DateField(blank=True, null=True)
 
     class Meta:
         managed = False
-        db_table = 'game_position'
+        db_table = 'galery_front'
+
+
+class GaleryGeneral(models.Model):
+    galery_gen_id = models.BigAutoField(primary_key=True)
+    galery_gen_img = models.BinaryField()
+    galery_gen_tag = models.CharField(max_length=50, blank=True, null=True)
+    galery_gen_status = models.FloatField()
+    galery_gen_date = models.DateField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'galery_general'
 
 
 class MainUser(AbstractBaseUser, PermissionsMixin):
@@ -286,6 +186,7 @@ class News(models.Model):
     news_description = models.CharField(max_length=500, blank=True, null=True)
     news_date = models.DateField()
     news_img = models.BinaryField(blank=True, null=True)
+    news_tag = models.CharField(max_length=50)
 
     class Meta:
         managed = False
@@ -299,13 +200,33 @@ class Player(models.Model):
     player_last_name = models.CharField(max_length=50)
     player_headquarters = models.CharField(max_length=50, blank=True, null=True)
     player_career = models.CharField(max_length=30)
-    player_img = models.ImageField(upload_to='player_images/', null=True, blank=True)    
+    player_img = models.BinaryField(blank=True, null=True)
     player_status = models.CharField(max_length=30)
+    player_horary = models.CharField(max_length=30)
+    player_birthday = models.DateField()
     discipline = models.ForeignKey(Discipline, models.DO_NOTHING)
 
     class Meta:
         managed = False
         db_table = 'player'
+
+
+class Requests(models.Model):
+    request_id = models.BigAutoField(primary_key=True)
+    coach_name = models.CharField(max_length=100)
+    player_rut = models.CharField(max_length=13)
+    player_name = models.CharField(max_length=50)
+    player_last_name = models.CharField(max_length=50)
+    discipline_name = models.CharField(max_length=50)
+    player_headquarters = models.CharField(max_length=50, blank=True, null=True)
+    player_career = models.CharField(max_length=30)
+    request_status = models.CharField(max_length=30)
+    request_date = models.DateField()
+    coach = models.ForeignKey(Coach, models.DO_NOTHING)
+
+    class Meta:
+        managed = False
+        db_table = 'requests'
 
 
 class Statistic(models.Model):
@@ -315,6 +236,15 @@ class Statistic(models.Model):
     class Meta:
         managed = False
         db_table = 'statistic'
+
+
+class StatusType(models.Model):
+    status_id = models.BigIntegerField(primary_key=True)
+    status_type_name = models.CharField(max_length=100)
+
+    class Meta:
+        managed = False
+        db_table = 'status_type'
 
 
 class TeamRoster(models.Model):

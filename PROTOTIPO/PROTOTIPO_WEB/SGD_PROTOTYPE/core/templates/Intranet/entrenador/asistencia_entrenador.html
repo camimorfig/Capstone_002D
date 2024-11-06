@@ -9,7 +9,8 @@
 
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 {% endblock css %}
 
 <!-- Enlace JS -->
@@ -18,33 +19,34 @@
 {% endblock js %}
 
 {% block contenido %}
+
 <body>
 
     <main>
         <div class="main-entrenador d-flex">
             <!-- Sidebar a la izquierda -->
-        <!-- ========== Left Sidebar Start ========== -->
-        <div class="col-md-3 justify-content-flex-start ">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Buen Día {{ nombre_entrenador  }}!</h5>
-                    <ul class="nav flex-column">
-                        <li class="nav-item"><a class="nav-link" href="{% url 'entrenador_dashboard' %}"><i
-                                    class="bi bi-house"></i> Inicio</a>
-                        </li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'asistencia_entrenador' %}"><i
-                                    class="bi bi-calendar-check"></i>
-                                Asistencia</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'perfil_jugadores' %}"><i
-                                    class="bi bi-people"></i> Perfil de Jugadores</a></li>
-                        
-                        <li class="nav-item"><a class="nav-link" href="{% url 'grafico' %}"><i
-                                    class="bi bi-graph-up"></i>  Grafico</a></li>
-                    
-                    </ul>
+            <!-- ========== Left Sidebar Start ========== -->
+            <div class="col-md-3 justify-content-flex-start ">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Buen Día {{ nombre_entrenador }}!</h5>
+                        <ul class="nav flex-column">
+                            <li class="nav-item"><a class="nav-link" href="{% url 'entrenador_dashboard' %}"><i
+                                        class="bi bi-house"></i> Inicio</a>
+                            </li>
+                            <li class="nav-item"><a class="nav-link" href="{% url 'asistencia_entrenador' %}"><i
+                                        class="bi bi-calendar-check"></i>
+                                    Asistencia</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{% url 'perfil_jugadores' %}"><i
+                                        class="bi bi-people"></i> Perfil de Jugadores</a></li>
+
+                            <li class="nav-item"><a class="nav-link" href="{% url 'grafico' %}"><i
+                                        class="bi bi-graph-up"></i> Grafico</a></li>
+
+                        </ul>
+                    </div>
                 </div>
             </div>
-        </div>
             <!-- Left Sidebar End -->
             <!-- Start MAIN -->
             <div class="container-fluid ">
@@ -63,19 +65,20 @@
                                         <table class="table table-striped table-hover">
                                             <thead>
                                                 <tr>
-                                                    <th>Disciplina</th>
-                                                    <th>Fecha de Hoy</th>
+                                                    <th>Entrenamiento</th>
+                                                    <th>Horario</th>
                                                     <th>Opciones</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {% for disciplina in disciplinas %}
+                                                {% for entrenamiento in entrenamientos %}
                                                 <tr>
-                                                    <td>{{ disciplina.1 }}</td>
-                                                    <td>{{ disciplina.2|date:"d/m/Y H:i:s" }}</td>
+                                                    <td>{{ entrenamiento.1 }}</td>
+                                                    <td>{{ entrenamiento.4}} - {{ entrenamiento.5 }}</td>
                                                     <td>
                                                         <button class="btn btn-outline-dark">
-                                                            <a href="{% url 'tomar_asistencia' %}?disciplina_id={{ disciplina.0 }}" style="color: black; text-decoration: none;">
+                                                            <a href="{% url 'tomar_asistencia' %}?training_id={{ entrenamiento.0 }}&disciplina_id={{ entrenamiento.6 }}&fecha={{ entrenamiento.4|date:'Y-m-d H:i:s'|urlencode }}"
+                                                                style="color: black; text-decoration: none;">
                                                                 <i class="bi bi-pencil text-primary"></i> Registrar
                                                             </a>
                                                         </button>
@@ -83,10 +86,9 @@
                                                 </tr>
                                                 {% empty %}
                                                 <tr>
-                                                    <td colspan="3" class="text-center">No hay disciplinas asignadas</td>
+                                                    <td colspan="5" class="text-center">No hay entrenamientos asignados</td>
                                                 </tr>
                                                 {% endfor %}
-                                                <!-- Add more rows as needed -->
                                             </tbody>
                                         </table>
 
@@ -96,8 +98,8 @@
                             </div>
                         </div>
                     </div>
-                </div>  
+                </div>
             </div>
         </div>
     </main>
-{% endblock %}
+    {% endblock %}
