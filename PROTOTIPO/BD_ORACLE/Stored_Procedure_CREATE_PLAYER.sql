@@ -4,7 +4,11 @@ create or replace PROCEDURE sp_create_player(
     p_last_name VARCHAR2,
     p_headquarters VARCHAR2,
     p_career VARCHAR2,
+    p_horary VARCHAR2,
+    p_birthday DATE,
     p_img BLOB,
+
+     
     p_discipline_id NUMBER,
     p_coach_id VARCHAR2,
     
@@ -18,7 +22,7 @@ create or replace PROCEDURE sp_create_player(
 
     v_coach_name VARCHAR2(100);
     v_discipline_name VARCHAR2(100);
-    
+
     v_count_rut NUMBER;
 
 
@@ -28,20 +32,20 @@ BEGIN
 
     v_request_date:= SYSDATE;
 
-    
+
     -- Verificar rut
     SELECT COUNT(*)
     INTO v_count_rut
     FROM player
     WHERE player_rut = p_rut;  
-    
+
     -- Validar
     IF v_count_rut > 0 THEN
         v_salida := -1; -- RUT ya existe
         RETURN;
-    
+
     ELSE
-    
+
         INSERT INTO player (
             player_rut,
             player_name,
@@ -50,6 +54,8 @@ BEGIN
             player_career,
             player_img,
             player_status,
+            player_horary,
+            player_birthday,
             discipline_id
         ) VALUES (
             p_rut,
@@ -59,6 +65,8 @@ BEGIN
             p_career,
             p_img,
             v_status_player,
+            p_horary,
+            p_birthday,
             p_discipline_id
         );
 
@@ -66,13 +74,13 @@ BEGIN
         INTO v_discipline_name
         FROM discipline
         where discipline_id = p_discipline_id;
-    
+
         SELECT coach_name
         INTO v_coach_name
         FROM coach
         where coach_id = p_coach_id;
-    
-    
+
+
         INSERT INTO requests (
             coach_name,
             player_rut,
@@ -101,7 +109,7 @@ BEGIN
         v_salida := 1;  -- Indica éxito
         COMMIT;
     END IF;
-    
+
 EXCEPTION
     WHEN OTHERS THEN
         v_salida := 0;  -- Indica error

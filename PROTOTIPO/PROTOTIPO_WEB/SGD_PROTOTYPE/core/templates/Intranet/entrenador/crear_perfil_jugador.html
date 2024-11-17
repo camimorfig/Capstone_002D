@@ -109,6 +109,15 @@
                                                     accept="image/*" required>
                                             </div>
                                         </div>
+
+                                        <div class="form-outline mb-3">
+                                            <label for="rut">Rut</label>
+                                            <input type="text"
+                                                name="rut"
+                                                class="form-control" id="rut"
+                                                placeholder="11111111-1"required>
+                                        </div>                                        
+
                                         <div class="row mb-3">
                                             <div class="col">
                                                 <div class="form-outline">
@@ -117,7 +126,7 @@
                                                     <input type="text"
                                                         name="nombre"
                                                         id="first_name"
-                                                        class="form-control">
+                                                        class="form-control"required>
                                                 </div>
                                             </div>
                                             <div class="col">
@@ -127,7 +136,7 @@
                                                     <input type="text"
                                                         name="apellido"
                                                         id="last_name"
-                                                        class="form-control">
+                                                        class="form-control"required>
                                                 </div>
                                             </div>
                                         </div>
@@ -139,7 +148,7 @@
                                                     <input type="text"
                                                         name="headquarters"
                                                         id="headquarters"
-                                                        class="form-control">
+                                                        class="form-control"required>
                                                 </div>
                                             </div>
                                             <div class="col">
@@ -149,16 +158,45 @@
                                                     <input type="text"
                                                         name="career"
                                                         id="career"
-                                                        class="form-control">
+                                                        class="form-control"required>
                                                 </div>
                                             </div>
                                         </div>
+
+
+                                        <div class="form-group">
+                                            <label for="publicar_en"><strong>Horario</strong></label>
+                                            <select class="form-control" id="horario" name="horario" required>
+                                                <option value="" disabled selected>Seleccione una opción</option>
+
+                                                <option value="D">Diurno</option>
+                                                <option value="V">Vespertino</option>
+                                                <option value="O">Online</option>
+
+                                            </select>
+                                        </div>
+
+                                        <br>
+
+                                        <div class="form-group">
+                                            <label for="publicar_en"><strong>Horario</strong></label>
+                                            <select class="form-control" id="horario" name="horario" required>
+                                                <option value="" disabled selected>Seleccione una opción</option>
+
+                                                <option value="D">Diurno</option>
+                                                <option value="V">Vespertino</option>
+                                                <option value="O">Online</option>
+
+                                            </select>
+                                        </div>
+
+                                        <br>
+
                                         <div class="form-outline mb-3">
-                                            <label for="rut">Rut</label>
-                                            <input type="text"
-                                                name="rut"
-                                                class="form-control" id="rut"
-                                                placeholder="11111111-1">
+                                            <label for="fecha_nacimiento">Fecha de Nacimiento</label>
+                                            <input type="date"
+                                                name="fecha_nacimiento"
+                                                class="form-control" id="fecha_nacimiento">
                                         </div>
 
                                         <!-- INICIO FORMULARIO DISCIPLINA -->

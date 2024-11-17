@@ -28,12 +28,12 @@ from datetime import date, datetime, timedelta
 ###########  views de Templates  ###########
 def index(request):
     
+
     data = {
         
-        'disciplinas': listado_disciplinas(), 
-        'galeria_pf':listado_galeria_portada()
+        'noticias_index': listado_noticias_index(), 
+        'galeria_index':listado_galeria_portada()
         }
-        
     return render (request, 'core/index.html', data)
 
 
@@ -179,6 +179,8 @@ def talento(request):
 class CoachDashboardView(LoginRequiredMixin, TemplateView):
     template_name = 'intranet/entrenador/entrenador.html'
 
+
+
     def dispatch(self, request, *args, **kwargs):
 
         if not request.user.is_authenticated:
@@ -268,6 +270,17 @@ def crear_perfil_Jugador(request):
             data['mensaje_error'] = ["Debes ingresar una Carrera para registrar un jugador."]
             return render (request, 'intranet/entrenador/crear_perfil_Jugador.html', data)
 
+        horario = request.POST.get('horario')
+        if not horario:
+            data['mensaje_error'] = ["Debes Seleccionar un horario para registrar un jugador."]
+            return render (request, 'intranet/entrenador/crear_perfil_Jugador.html', data)
+
+        fecha_nacimiento = request.POST.get('fecha_nacimiento')
+        if not fecha_nacimiento:
+            data['mensaje_error'] = ["Debes ingresar una fwcha de nacimiento para registrar un jugador."]
+            return render (request, 'intranet/entrenador/crear_perfil_Jugador.html', data)
+
+
         discipline_id = request.POST.get('disciplina')
         if not discipline_id:
             data['mensaje_error'] = ["Debes ingresar una Disciplina para registrar un jugador."]
@@ -275,7 +288,7 @@ def crear_perfil_Jugador(request):
 
 
         # Guardar el jugador en la base de datos
-        salida = guardar_jugador(rut, nombre, apellido, headquarters, career, imagen, discipline_id, entrenador_id)
+        salida = guardar_jugador(rut, nombre, apellido, headquarters, career, horario, fecha_nacimiento, imagen, discipline_id, entrenador_id)
 
         if salida == 1:
             data['mensaje_exito'] = ["Solicitud de Creación de Jugador enviada correctamente."]
@@ -729,8 +742,7 @@ def gestion_galeria(request):
 
                 else:
                     data['mensaje_error'] = ["No se ha podido registrar la imagen. ERROR."]
-        
-        
+            
         elif 'form_editar' in request.POST:
             id_galeria = request.POST.get('id')
             if id_galeria:
@@ -762,10 +774,8 @@ def gestion_galeria(request):
 
             if salida == 1:
                 messages.success(request, "La imagen fue eliminada correctamente.")
-                print('a')
             else:
                 messages.error(request, "No se ha podido eliminar la Imagen. ERROR.")
-                print('b')
             return redirect('gestion_galeria')        
 
 
@@ -936,6 +946,131 @@ def gestion_eventos(request):
         messages.error(request, 'Error al cargar los datos')
 
     return render(request, 'intranet/administrador/gestion_eventos.html', data)
+
+@login_required
+def gestion_Jugador_elite(request):
+
+    jugador_elite = listado_jugar_elite()
+    page = request.GET.get('page',1)
+
+    try:
+        paginator = Paginator(jugador_elite, 9)
+        jugador_elite = paginator.page(page)
+    except:
+        raise Http404            
+
+
+    data = {
+    'entity':jugador_elite,
+    'paginator': paginator
+    }   
+
+    if request.method == 'POST':
+        # Obtener los datos del formulario
+        if 'crear_jugador_elite' in request.POST:
+
+            imagen = request.FILES.get('imagen').read()
+            if not imagen:
+                data['mensaje_error'] = ["Debes subir una imagen para registrar un jugador."]
+                return render (request, 'intranet/administrador/gestion_Jugador_elite.html', data)
+
+            rut = request.POST.get('rut')
+            if not rut:
+                data['mensaje_error'] = ["Debes ingresar un Rut para registrar un jugador."]
+                return render (request, 'intranet/administrador/gestion_Jugador_elite.html', data)
+
+            nombre = request.POST.get('nombre')
+            if not nombre:
+                data['mensaje_error'] = ["Debes ingresar un Nombre para registrar un jugador."]
+                return render (request, 'intranet/administrador/gestion_Jugador_elite.html', data)
+
+            apellido = request.POST.get('apellido')
+            if not apellido:
+                data['mensaje_error'] = ["Debes ingresar un Apellido para registrar un jugador."]
+                return render (request, 'intranet/administrador/gestion_Jugador_elite.html', data)
+
+            disciplina = request.POST.get('disciplina')
+            if not disciplina:
+                data['mensaje_error'] = ["Debes ingresar una disciplina para registrar un jugador."]
+                return render (request, 'intranet/administrador/gestion_Jugador_elite.html', data)
+
+            fecha_nacimiento = request.POST.get('fecha_nacimiento')
+            if not fecha_nacimiento:
+                data['mensaje_error'] = ["Debes ingresar una fwcha de nacimiento para registrar un jugador."]
+                return render (request, 'intranet/administrador/gestion_Jugador_elite.html', data)
+
+            discipline_id = request.POST.get('disciplina_id')
+            if not discipline_id:
+                data['mensaje_error'] = ["Debes ingresar una Disciplina para registrar un jugador."]
+                return render (request, 'intranet/administrador/gestion_Jugador_elite.html', data)
+
+            # Guardar el jugador en la base de datos
+            salida = guardar_jugador_elite(rut, nombre, apellido, disciplina, fecha_nacimiento, imagen, discipline_id)
+
+            if salida == 1:
+                data['mensaje_exito'] = ["Creación de Jugador enviada correctamente."]
+                jugador_elite = listado_jugar_elite()
+
+                data = {
+                'entity':jugador_elite,
+                'paginator': paginator
+                }  
+            elif salida == -1:
+                data['mensaje_error'] = ["Rut ya registrado. Cambie el rut o contacto con el administrador."] 
+                print("Rut ya registrado. Cambie el rut o contacto con el administrador.")            
+            else:
+                data['mensaje_error'] = ["No se ha podido registrar. ERROR."]
+                print("No se ha podido registrar. ERROR.")
+        
+        
+        elif 'form_editar' in request.POST:
+            id_jugador_elite = request.POST.get('id')
+            if id_jugador_elite:
+                jugador_elite = get_object_or_404(PlayerElite, player_elite_id = id_jugador_elite)
+                if 'imagen' in request.FILES:
+                    imagen_file = request.FILES['imagen']
+                    imagen = imagen_file.read()
+                else:
+                    imagen = jugador_elite.player_img
+
+                rut = request.POST.get('rut')
+                nombre = request.POST.get('nombre')
+                apellido = request.POST.get('apellido')
+                disciplina = request.POST.get('disciplina')
+                fecha_nacimiento = request.POST.get('fecha')
+                discipline_id = request.POST.get('id_disciplina')
+                
+                print(f"id_jugador_elite: {id_jugador_elite} \n  rut: {rut} \n nombre: {nombre} \n apellido: {apellido} \n disciplina: {disciplina} \n fecha_nacimiento: {fecha_nacimiento} \n discipline_id: {discipline_id} \n ")
+                print(id_jugador_elite)
+
+                print(discipline_id)
+                # fecha_galeria = datetime.strptime(fecha_galeria, '%Y-%m-%dT%H:%M').strftime('%Y-%m-%d %H:%M:%S')
+        
+                salida = editar_jugador_elite(id_jugador_elite, rut, nombre, apellido, disciplina, fecha_nacimiento, imagen, discipline_id)
+
+                if salida == 1:
+                    messages.success(request, "Imagen actualizada correctamente.")
+                    print("Imagen actualizada correctamente.")
+                else:
+                    messages.error(request, "No se ha podido actualizar la imagen. ERROR.")
+                    print("Imagen actualizada correctamente.")
+
+                return redirect('gestion_Jugador_elite')
+
+
+        elif 'form_eliminar' in request.POST:
+            id_jugador_elite = request.POST.get('id')
+            salida = eliminar_jugador_elite(id_jugador_elite)
+
+            if salida == 1:
+                messages.success(request, "El jugador de elite fue eliminado correctamente.")
+            else:
+                messages.error(request, "No se ha podido eliminar al jugador. ERROR.")
+            return redirect('gestion_Jugador_elite')  
+        
+
+
+    return render (request, 'intranet/administrador/gestion_Jugador_elite.html', data)
 
 
 def listado_eventos_entrenador(coach_id):
@@ -1332,13 +1467,13 @@ def guardar_entrenador(rut, nombre, apellido, imagen, tipo_entrenador, email, pa
     return salida.getvalue()
 
 
-def guardar_jugador(rut, nombre, apellido, headquarters, career, imagen, discipline_id, entrenador_id):
+def guardar_jugador(rut, nombre, apellido, headquarters, career, horario, fecha_nacimiento, imagen, discipline_id, entrenador_id):
     django_cursor = connection.cursor()
     cursor = django_cursor.connection.cursor()
 
     salida = cursor.var(oracledb.NUMBER)
 
-    cursor.callproc('SP_CREATE_PLAYER', [   rut, nombre, apellido, headquarters, career, imagen, discipline_id, entrenador_id, salida])
+    cursor.callproc('SP_CREATE_PLAYER', [   rut, nombre, apellido, headquarters, career, horario, fecha_nacimiento, imagen, discipline_id, entrenador_id, salida])
 
     return salida.getvalue()
 
@@ -1380,7 +1515,7 @@ def listado_galeria_portada():
     cursor = django_cursor.connection.cursor()
     out_cur = django_cursor.connection.cursor()
 
-    cursor.callproc("sp_list_images_front", [out_cur])
+    cursor.callproc("SP_LIST_IMAGES_GENERAL_INDEX", [out_cur])
 
     lista = []
     for fila in out_cur:
@@ -1510,6 +1645,26 @@ def listado_noticias():
         lista.append(data)
 
     return lista
+
+
+def listado_noticias_index():
+    django_cursor = connection.cursor()
+    cursor = django_cursor.connection.cursor()
+    out_cur = django_cursor.connection.cursor()
+
+    cursor.callproc("SP_LIST_NEWS_INDEX", [out_cur])
+
+    lista = []
+    for fila in out_cur:
+        data={
+            'data':fila,
+            'imagen':str(base64.b64encode(fila[5].read()), 'utf-8'),        
+        }
+
+        lista.append(data)
+    return lista
+
+
 ##############################################
 
 
@@ -1585,7 +1740,6 @@ def listado_galeria_discipline(disciplina_id):
 
     return lista
 #############################################
-
 
 def listado_solicitud():
     django_cursor = connection.cursor()
@@ -1767,3 +1921,63 @@ def listado_eventos():
             cursor.close()
         if 'django_cursor' in locals():
             django_cursor.close()
+
+##############  JUGADOR_ELITE ##############
+
+def guardar_jugador_elite(rut, nombre, apellido, disciplina, fecha_nacimiento, imagen, discipline_id):
+    django_cursor = connection.cursor()
+    cursor = django_cursor.connection.cursor()
+
+    salida = cursor.var(oracledb.NUMBER)
+
+    cursor.callproc('SP_CREATE_ELITE_PLAYER', [ rut, nombre, apellido, disciplina, fecha_nacimiento, imagen, discipline_id, salida])
+
+    return salida.getvalue()
+
+
+def listado_jugar_elite():
+    django_cursor = connection.cursor()
+    cursor = django_cursor.connection.cursor()
+    out_cur = django_cursor.connection.cursor()
+
+    cursor.callproc("SP_LIST_PLAYER_ELITE", [out_cur])
+
+    lista = []
+    for fila in out_cur:
+        data={
+            'data':fila,
+            'imagen':str(base64.b64encode(fila[5].read()), 'utf-8'),    
+            
+        }
+
+        lista.append(data)
+
+    return lista
+
+
+def eliminar_jugador_elite(id_jugador_elite):
+    django_cursor = connection.cursor()
+    cursor = django_cursor.connection.cursor()
+
+    salida = cursor.var(oracledb.NUMBER)
+
+    cursor.callproc('SP_DELETE_PLAYER_ELITE', [
+        id_jugador_elite,
+        salida
+    ])
+
+    return salida.getvalue()
+
+
+def editar_jugador_elite(id_jugador_elite, rut, nombre, apellido, disciplina, fecha_nacimiento, imagen, discipline_id):
+    django_cursor = connection.cursor()
+    cursor = django_cursor.connection.cursor()
+
+    salida = cursor.var(oracledb.NUMBER)
+
+    cursor.callproc('SP_EDIT_ELITE_PLAYER', [ id_jugador_elite, rut, nombre, apellido, disciplina, fecha_nacimiento, imagen, discipline_id, salida ])
+
+    return salida.getvalue()
+#############################################
+
+

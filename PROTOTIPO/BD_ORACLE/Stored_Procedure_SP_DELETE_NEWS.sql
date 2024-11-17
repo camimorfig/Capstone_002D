@@ -2,7 +2,7 @@ create or replace PROCEDURE sp_delete_news(
     
     p_news_id number,
     
-    salida out number
+    salida out number   
 ) AS
 
 BEGIN

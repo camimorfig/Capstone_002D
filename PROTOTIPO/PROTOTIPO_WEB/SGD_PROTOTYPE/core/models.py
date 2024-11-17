@@ -211,6 +211,22 @@ class Player(models.Model):
         db_table = 'player'
 
 
+class PlayerElite (models.Model):
+    player_elite_id = models.BigAutoField(primary_key=True)
+    player_elite_rut = models.CharField(max_length=13)
+    player_elite_name = models.CharField(max_length=50)
+    player_elite_last_name = models.CharField(max_length=50)
+    player_elite_discipline = models.CharField(max_length=50)
+    player_img = models.BinaryField(blank=True, null=True)
+    player_status = models.CharField(max_length=30)
+    player_birthday = models.DateField()
+    discipline = models.ForeignKey(Discipline, models.DO_NOTHING)
+
+    class Meta:
+        managed = False
+        db_table = 'player_elite'
+
+
 class Requests(models.Model):
     request_id = models.BigAutoField(primary_key=True)
     coach_name = models.CharField(max_length=100)
