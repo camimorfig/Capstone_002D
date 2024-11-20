@@ -116,8 +116,7 @@ def disciplina_view(request, disciplina, seccion):
             'disciplina': disciplina_obj,
             'seccion': seccion,
         }
-        
-    elif seccion == "plantel":
+
       # Recuperar jugadores relacionados con esta disciplina
         jugadores = Player.objects.filter(discipline=disciplina_obj, player_status = 1)
         
@@ -126,7 +125,7 @@ def disciplina_view(request, disciplina, seccion):
         for jugador in jugadores:
             if jugador.player_img:  # Verifica que haya una imagen
                 # Codifica la imagen en base64 sin usar .read()
-                imagen_base64 = base64.b64encode(jugador.player_img.read()).decode('utf-8')
+                imagen_base64 = base64.b64encode(jugador.player_img).decode('utf-8')
                 jugadores_listo.append({
                     'jugador': jugador,
                     'imagen_base64': imagen_base64
@@ -354,7 +353,7 @@ def asistencia_entrenador(request):
     # Llamar al procedimiento almacenado para listar las disciplinas del entrenador
     # Llamar al procedimiento almacenado para listar los entrenamientos del entrenador
     entrenamientos = listado_entrenamientos_por_entrenador(entrenador_id)
-    
+    print(entrenamientos)
     data = {
         'entrenamientos': entrenamientos
     }
@@ -411,6 +410,11 @@ def tomar_asistencia(request):
                 
     except Exception as e:
         print(f"Error en tomar_asistencia: {str(e)}")
+        print(player_id)
+        print(training_id)
+        print(discipline_id)
+        print(estado)
+        print(comentario)
         messages.error(request, f'Error: {str(e)}')
         return redirect('asistencia_entrenador')
 
@@ -441,8 +445,8 @@ def registrar_asistencia(player_id, discipline_id, training_id, status, comments
 
     except Exception as e:
         print(f"Error al llamar SP_REGISTRAR_ASISTENCIA: {str(e)}")
-        print(f"Parámetros: player_id={player_id}, training_id={training_id}, "
-              f"discipline_id={discipline_id}, status={status}, comments={comments}")
+
+        print(f"Parámetros: player_id={player_id}, training_id={training_id}, discipline_id={discipline_id}, status={status}, comments={comments}")
         return False
 
 @login_required
@@ -564,7 +568,7 @@ def crear_perfil_entrenador(request):
     return render(request, 'intranet/administrador/crear_perfil_entrenador.html', data)
 
 @login_required
-def crear_noticias(request):
+def gestion_noticias(request):
     noticia = listado_noticias()
     page = request.GET.get('page',1)
 
@@ -588,22 +592,22 @@ def crear_noticias(request):
                 img_noticia = imagen_file.read()
             else:
                 messages.error(request, "Debes subir una imagen para la noticia.")
-                return redirect('crear_noticias')
+                return redirect('gestion_noticias')
 
             nombre_noticia = request.POST.get('nombre')
             if not nombre_noticia:
                 messages.error(request, "Debes ingresar un nombre para la noticia.")
-                return redirect('crear_noticias')
+                return redirect('gestion_noticias')
 
             descripcion_noticia = request.POST.get('descripcion')
             if not descripcion_noticia:
                 messages.error(request, "Debes ingresar una descripción para la noticia.")
-                return redirect('crear_noticias')
+                return redirect('gestion_noticias')
 
             etiqueta = request.POST.get('etiqueta')
             if not etiqueta:
                 messages.error(request, "Debes ingresar una etiqueta para la noticia.")
-                return redirect('crear_noticias')
+                return redirect('gestion_noticias')
 
             # Guardar la galería en la base de datos
             salida = guardar_noticias(nombre_noticia, descripcion_noticia, img_noticia, etiqueta)
@@ -612,7 +616,7 @@ def crear_noticias(request):
                 messages.success(request, "Imagen registrada correctamente.")
             else:
                 messages.error(request, "No se ha podido registrar la galería. ERROR.")
-            return redirect('crear_noticias')
+            return redirect('gestion_noticias')
 
         elif 'form_editar' in request.POST:
             id_noticias = request.POST.get('id')
@@ -637,11 +641,11 @@ def crear_noticias(request):
                     messages.success(request, "Noticia actualizada correctamente.")
                 else:
                     messages.error(request, "No se ha podido actualizar la noticia. ERROR.")
-                return redirect('crear_noticias')
+                return redirect('gestion_noticias')
     
             else:
                 messages.error(request, "No se ha proporcionado un ID para la noticia a editar.")
-            return redirect('crear_noticias')
+            return redirect('gestion_noticias')
 
         elif 'form_eliminar' in request.POST:
             id_noticias = request.POST.get('id')
@@ -650,9 +654,9 @@ def crear_noticias(request):
                 messages.success(request, "Noticia eliminada correctamente.")
             else:
                 messages.error(request, "No se ha podido eliminar la noticia. ERROR.")
-            return redirect('crear_noticias')
+            return redirect('gestion_noticias')
 
-    return render(request, 'intranet/administrador/crear_noticias.html', data)
+    return render(request, 'intranet/administrador/gestion_noticias.html', data)
 
 @login_required
 def asistencia_admin(request):
@@ -697,21 +701,22 @@ def gestion_galeria(request):
                     imagen_file = request.FILES['imagen']
                     imagen = imagen_file.read()
                 else:
-                    data['mensaje_error'] = ["Debes subir una imagen para publicar en la galería general."]
-                    return render (request, 'intranet/administrador/gestion_galeria.html', data)
+                    messages.error(request, "Debes subir una imagen para publicar en la galería general.")
+                    return redirect('gestion_galeria')
                 
+
                 etiqueta = request.POST.get('etiqueta')
                 if not etiqueta:
-                    data['mensaje_error'] = ["Debes ingresar una etiqueta para publicar en la galería general."]
-                    return render (request, 'intranet/administrador/gestion_galeria.html', data)
+                    messages.error(request, "Debes ingresar una etiqueta para publicar en la galería general.")
+                    return redirect('gestion_galeria')
 
                 # Guardar la imagen en la galeria general de la base de datos
                 salida = guardar_galeria_general(imagen, etiqueta)
 
                 if salida == 1:
-                    data['mensaje_exito'] = ["Imagen registrada correctamente en galeria general."]
+                    messages.success(request, "Imagen registrada correctamente en galeria general.")            
                 else:
-                    data['mensaje_error'] = ["No se ha podido registrar la imagen. ERROR."]
+                    messages.error(request, "No se ha podido registrar la imagen. ERROR.")            
                 return redirect('gestion_galeria')
 
 
@@ -721,28 +726,30 @@ def gestion_galeria(request):
                     imagen_file = request.FILES['imagen']
                     imagen = imagen_file.read()
                 else:
-                    data['mensaje_error'] = ["Debes subir una imagen para publicar en la galeria de disciplina."]
-                    return render (request, 'intranet/administrador/gestion_galeria.html', data)
+                    messages.error(request, "Debes subir una imagen para publicar en la galeria de disciplina.")            
+                    return redirect('gestion_galeria')
                 
                 discipline_id = request.POST.get('discipline_id')
                 if not discipline_id:
-                    data['mensaje_error'] = ["Debes ingresar una Disciplina para registrar una imagen en la galeria de disciplina."]
-                    return render (request, 'intranet/administrador/gestion_galeria.html', data)
+                    messages.error(request, "Debes ingresar una Disciplina para registrar una imagen en la galeria de disciplina.")
+                    return redirect('gestion_galeria')
 
                 etiqueta = request.POST.get('etiqueta')
                 if not etiqueta:
-                    data['mensaje_error'] = ["Debes ingresar una etiqueta para publicar en la galeria de disciplina."]
-                    return render (request, 'intranet/administrador/gestion_galeria.html', data)
+                    messages.error(request, "Debes ingresar una etiqueta para publicar en la galeria de disciplina.")
+                    return redirect('gestion_galeria')
 
                 salida = guardar_galeria_disciplina(imagen, discipline_id, etiqueta)
 
                 if salida == 1:
-                    data['mensaje_exito'] = ["Imagen registrada correctamente en galeria de disciplina."]
                     data['galeria'] = listado_galeria_general()
+                    messages.success(request, "Imagen registrada correctamente en galeria de disciplina.",data)            
+                    return redirect('gestion_galeria')
 
                 else:
-                    data['mensaje_error'] = ["No se ha podido registrar la imagen. ERROR."]
-            
+                    messages.error(request, "No se ha podido registrar la imagen. ERROR.")
+                    return redirect('gestion_galeria')
+
         elif 'form_editar' in request.POST:
             id_galeria = request.POST.get('id')
             if id_galeria:
@@ -762,21 +769,21 @@ def gestion_galeria(request):
 
                 if salida == 1:
                     messages.success(request, "Imagen actualizada correctamente.")
+                    return redirect('gestion_galeria')
                 else:
                     messages.error(request, "No se ha podido actualizar la imagen. ERROR.")
-                return redirect('gestion_galeria')
+                    return redirect('gestion_galeria')
 
         elif 'form_eliminar' in request.POST:
             id_galeria = request.POST.get('id')
             salida = eliminar_galeria_general(id_galeria)
 
-            print('Print id= '+ id_galeria)
-
             if salida == 1:
                 messages.success(request, "La imagen fue eliminada correctamente.")
+                return redirect('gestion_galeria')
             else:
                 messages.error(request, "No se ha podido eliminar la Imagen. ERROR.")
-            return redirect('gestion_galeria')        
+                return redirect('gestion_galeria')        
 
 
     return render (request, 'intranet/administrador/gestion_galeria.html', data)
@@ -821,22 +828,70 @@ def aceptar_solicitud(request, id):
 @login_required
 def gestion_disciplina(request):
     disciplinas = listado_disciplinas()
-    disciplina_seleccionada = None
-    jugadores = []
+    page = request.GET.get('page',1)
+
+    try:
+        paginator = Paginator(disciplinas, 9)
+        disciplinas = paginator.page(page)
+    except:
+        raise Http404            
+
+
+    data = {
+    'entity':disciplinas,
+    'paginator': paginator
+    }  
 
     if request.method == 'POST':
-        discipline_id = request.POST.get('disciplina')
-        if discipline_id:
-            disciplina_seleccionada = Discipline.objects.get(discipline_id=discipline_id)
-            # Recuperar los jugadores asociados a esta disciplina
-            jugadores = Player.objects.filter(discipline=disciplina_seleccionada)  # Ajusta según tu modelo
+        if 'form_crear' in request.POST:
+            None
+    
+        elif 'form_editar' in request.POST:
 
-    context = {
-        'disciplinas': disciplinas,
-        'disciplina_seleccionada': disciplina_seleccionada,
-        'jugadores': jugadores,
-    }
-    return render(request, 'intranet/administrador/gestion_disciplina.html', context)
+            discipline_id = request.POST.get('id')
+            print(discipline_id)
+            if discipline_id:
+                print("aaaa")
+
+                if 'imagen' in request.FILES:
+                    imagen_file = request.FILES['imagen']
+                    img_disciplina = imagen_file.read()
+                else:
+                    disciplina = get_object_or_404(Discipline, discipline_id=discipline_id)
+                    img_disciplina = disciplina.galery_img
+                
+                nombre_disciplina = request.POST.get('nombre')
+                descripcion_disciplina = request.POST.get('descripcion')  
+
+                salida = editar_disciplinas(discipline_id, img_disciplina ,nombre_disciplina, descripcion_disciplina)
+                
+                if salida == 1:
+                    messages.success(request, "Disciplina actualizada correctamente.")
+                    return redirect('gestion_disciplina')
+                else:
+                    messages.error(request, "No se ha podido actualizar la disciplina. ERROR.")
+                    return redirect('gestion_disciplina')
+
+        elif 'form_confirmacion' in request.POST:
+            
+
+            confirmacion_disciplina(discipline_id)
+            
+            
+            
+            
+            if 'form_eliminar' in request.POST:
+                discipline_id = request.POST.get('id')
+                salida = eliminar_disciplina(discipline_id)
+
+                if salida == 1:
+                    messages.success(request, "La disciplina fue eliminada correctamente.")
+                    return redirect('gestion_disciplina')
+                else:
+                    messages.error(request, "No se ha podido eliminar la Disciplina. ERROR.")
+                    return redirect('gestion_disciplina')        
+
+    return render(request, 'intranet/administrador/gestion_disciplina.html', data)
 
 @login_required
 def update_discipline(request):
@@ -1426,6 +1481,74 @@ def listado_disciplinas():
     return lista
 
 
+def editar_disciplinas(discipline_id, img_disciplina ,nombre_disciplina, descripcion_disciplina):
+    django_cursor = connection.cursor()
+    cursor = django_cursor.connection.cursor()
+
+    salida = cursor.var(oracledb.NUMBER)
+
+    cursor.callproc('SP_EDIT_DISCIPLINE', [
+        
+        discipline_id, 
+        img_disciplina,
+        nombre_disciplina, 
+        descripcion_disciplina,
+        
+        salida
+    ])
+
+    return salida.getvalue()
+
+
+def confirmacion_disciplina(id_disciplina):
+    django_cursor = connection.cursor()
+    cursor = django_cursor.connection.cursor()
+
+    v_count_player = cursor.var(oracledb.NUMBER)
+    v_count_player_elite = cursor.var(oracledb.NUMBER)
+    v_count_galery_discipline = cursor.var(oracledb.NUMBER)
+    v_count_attendance = cursor.var(oracledb.NUMBER)
+    v_count_events = cursor.var(oracledb.NUMBER)
+    v_count_coach_discipline = cursor.var(oracledb.NUMBER)
+
+
+    cursor.callproc('SP_LIST_CASCADE_DISCIPLINE', [
+        id_disciplina,
+
+        v_count_player,
+        v_count_player_elite,
+        v_count_galery_discipline,
+        v_count_attendance,
+        v_count_events,
+        v_count_coach_discipline
+    ])
+
+    lista= []
+    lista.append(v_count_player.getvalue(),
+    v_count_player_elite.getvalue(),
+    v_count_galery_discipline.getvalue(),
+    v_count_attendance.getvalue(),
+    v_count_events.getvalue(),
+    v_count_coach_discipline.getvalue()
+    ) 
+
+    return lista
+
+
+def eliminar_disciplina(id_disciplina):
+    django_cursor = connection.cursor()
+    cursor = django_cursor.connection.cursor()
+
+    salida = cursor.var(oracledb.NUMBER)
+
+    cursor.callproc('SP_DELETE_DISCIPLINE', [
+        id_disciplina,
+        salida
+    ])
+
+    return salida.getvalue()
+
+
 def listado_tipo_entrenador():
     django_cursor = connection.cursor()
     cursor = django_cursor.connection.cursor()
@@ -1575,7 +1698,7 @@ def guardar_noticias(nombre_noticia, descripcion_noticia, img_noticia, etiqueta)
 
     return salida.getvalue()
 
-                    
+
 def editar_noticias(id_noticia, nombre_noticia, descripcion_noticia, fecha_noticia, img_noticia, etiqueta):
     django_cursor = connection.cursor()
     cursor = django_cursor.connection.cursor()

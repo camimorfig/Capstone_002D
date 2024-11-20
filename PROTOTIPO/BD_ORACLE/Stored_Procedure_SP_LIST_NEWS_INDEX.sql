@@ -12,8 +12,7 @@ BEGIN
 
     from news
     where news_status = 1
-    order by news_id
-    FETCH FIRST 2
-    ROWS ONLY;
+    order by news_id desc
+    FETCH FIRST 2 ROWS ONLY;
 
 end;

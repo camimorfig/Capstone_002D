@@ -69,16 +69,19 @@ header {
     display: flex;
     gap: 30px;
     align-items: center;
+    list-style-type: none;
 }
 
 .nav-links a {
     color: var(--primary-white);
     text-decoration: none;
-    font-size: 20px;
+    font-size: 22px;
     font-weight: 300;
     transition: color 0.3s ease;
     padding: 8px 0;
     position: relative;
+    margin-left: 25px;
+
 }
 
 /* Hover en enlaces con borde inferior animado */
@@ -114,7 +117,7 @@ header {
     display: flex;
     align-items: center;
     text-decoration: none;
-    font-size: 14px;
+    font-size: 20px;
     font-weight: 700;
     transition: all 0.3s ease;
 }

@@ -49,13 +49,11 @@
                         {% if d.imagen %}
 
                             <img src="data:image/png;base64,{{ d.imagen }}" alt="{{ d.data.1 }}">
-                
                         {% else %}
-            
+
                             <img src="{% static 'core/media/logo-disciplinas/1.png' %}" alt="Placeholder">
-            
-                       {% endif %}
-                       
+                        {% endif %}
+
                     </div>
                     <h3>{{ d.data.1 }}</h3>
                     <!-- <p>{{ d.data.2 }}</p> -->
@@ -63,7 +61,7 @@
                 </div>
 
             {% endfor %}
-  
+
         </div>
     </main>
 
