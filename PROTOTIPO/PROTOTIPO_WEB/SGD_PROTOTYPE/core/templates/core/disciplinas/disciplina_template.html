@@ -9,15 +9,17 @@
 {% block css %}
 <link rel="stylesheet" href="{% static 'core/css/style.css' %}">
 <link rel="stylesheet" href="{% static 'core/css/style-team-us.css' %}">
+<link rel="stylesheet" href="{% static 'core/css/style-selecciones-simple.css' %}">
 <link rel="stylesheet" href="{% static 'core/css/style-team-galery.css' %}">
+<link rel="stylesheet" href="{% static 'core/css/nosotros.css' %}">
 
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"  integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 {% endblock css %}
 
 <!-- Enlace JS -->
 {% block js %}
-
 <link rel="stylesheet" href="{% static 'core/javascript/script-team-gallery.js' %}">
 <link rel="stylesheet" href="{% static 'core/javascript/script.js' %}">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -40,11 +42,12 @@
                     <p class="main-subtitle">
                         {{ disciplina.discipline_description }}
                     </p>
-                    <a href="{% url 'disciplina_view' disciplina.discipline_name 'galeria' %}" class="cta-button">
+                    <a href="#plantel" class="cta-button">
                         CONÓCENOS
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M5 12h14M12 5l7 7-7 7" />
-                        </svg>
+                    </a>
+
+                    <a href="{% url 'disciplina_view' disciplina.discipline_name 'galeria' %}" class="cta-button_owo">
+                        GALERÍA
                     </a>
 
                     <!-- Estadísticas -->
@@ -72,7 +75,7 @@
             <!-- sección del plantel  -->
 
             {% if jugadores %}
-                <section class="team-roster">
+                <section class="team-roster" id="plantel">
                     <div class="roster-container">
                         <header class="roster-header">
                             <h2 class="roster-title">PLANTEL OFICIAL</h2>
@@ -119,7 +122,7 @@
                                     </div>
                                 </div>
                                 <!-- Modal -->
-                                <div id="playerModal{{ n.data.0 }}" class="modal" tabindex="-1" aria-labelledby="viewNewModalLabel{{ n.data.0 }}" aria-hidden="true">
+                                <div id="playerModal{{ n.data.0 }}" class="modal fade" tabindex="-1" aria-labelledby="viewNewModalLabel{{ n.data.0 }}" aria-hidden="true">
                                     <div class="modal-content">
                                         <div class="modal-header">
                                             <button class="modal-close">&times;</button>
@@ -164,40 +167,88 @@
 
     {% elif seccion == "galeria" %}
 
-    <!-- Sección principal -->
-    <section class="teams-section">
-        <div class="title-container">
-            <h1 class="discipline-title">{{ disciplina.discipline_name }}</h1>
-            <h1 class="discipline-title-overlay">{{ disciplina.discipline_name }}</h1>
-        </div>    
+    <div class="main-container">
+        <!-- Contenido de texto -->
+        <div class="main-content">
+            <div class="decorative-cross"></div>
+            <h1 class="main-title">
+                <span class="title-accent">{{ disciplina.discipline_name }}</span>
 
+            </h1>
+            <p class="main-subtitle">
+                {{ disciplina.discipline_description }}
+            </p>
+            <a href="{% url 'disciplina_view' disciplina.discipline_name 'acerca' %}" class="cta-button">
+                CONÓCENOS
+            </a>
 
-        <div class="section-container-galeria">
-            <div class="gallery-grid">
-                {% for i in imagenes %}
+            <a href="#galeria" class="cta-button_owo">
+                GALERÍA
+            </a>
 
-                    <div class="gallery-item" data-bs-toggle="modal" data-bs-target="#imageModal{{ i.imagen }}">
-                        <img src="data:imagen/png;base64, {{ i.imagen }}"
-                            alt="Imagen galería">
-                    </div>
-                    
-                    {% endfor %}
-
-            </div>
         </div>
+        <!-- Contenedor de imagen -->
+        <div class="main-image-container">
+            <img src="{% static 'core/media/new3.png'%}" alt="Deportes DuocUC" class="main-image">
+        </div>
+    </div>
 
-        <!-- Modal -->
-        <div class="modal fade" id="imageModal{{ i.imagen }}" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    <div class="modal-body">
-                        <img src="data:imagen/png;base64, {{ i.imagen }}" id="modalImage" class="img-fluid" alt="Imagen ampliada">
-                    </div>
+
+    <section class="container galeria" id="galeria">
+        {% if imagenes %}
+            {% for i in imagenes %}
+            <div class="col-lg-4 col-md-6 mb-4">
+                <img src="data:imagen/png;base64, {{ i.imagen }}" 
+                    alt="Imagen galería" 
+                    class="gallery-item gallery-img rounded shadow"
+                    loading="lazy">
+            </div>
+            {% endfor %}
+
+            <!-- Modal para ver imagen -->
+            <div class="modal fade" id="galleryModal" tabindex="-1" aria-labelledby="galleryModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content bg-transparent border-0">
+                    <button type="button" class="btn-close bg-white position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <img src="" id="imgModal" class="rounded" alt="Imagen ampliada">
+                </div>
                 </div>
             </div>
-        </div>
+        {% else %}             
+            <div class="row">
+                <div class="col-lg-4">
+                    <img src="{% static 'core/media/img-horiz.png' %}" alt="Imagenes" class="rounded img">
+                </div>
+                <div class="col-lg-4">
+                    <img src="{% static 'core/media/img-horiz.png' %}" alt="Imagenes" class="rounded img">
+                </div>
+                <div class="col-lg-4">
+                    <img src="{% static 'core/media/img-horiz.png' %}" alt="Imagenes" class="rounded img">
+                </div>
+                <div class="col-lg-4">
+                    <img src="{% static 'core/media/img-horiz.png' %}" alt="Imagenes" class="rounded img">
+                </div>
+                <div class="col-lg-4">
+                    <img src="{% static 'core/media/img-horiz.png' %}" alt="Imagenes" class="rounded img">
+                </div>
+                <div class="col-lg-4">
+                    <img src="{% static 'core/media/img-horiz.png' %}" alt="Imagenes" class="rounded img">
+                </div>                
+                <div class="col-lg-4">
+                    <img src="{% static 'core/media/img-horiz.png' %}" alt="Imagenes" class="rounded img">
+                </div>
+                <div class="col-lg-4">
+                    <img src="{% static 'core/media/img-horiz.png' %}" alt="Imagenes" class="rounded img">
+                </div>
+                <div class="col-lg-4">
+                    <img src="{% static 'core/media/img-horiz.png' %}" alt="Imagenes" class="rounded img">
+                </div>
+            </div>
+        {% endif %}
+
     </section>
+
+<br>
 
     {% endif %}
 {% endblock %}

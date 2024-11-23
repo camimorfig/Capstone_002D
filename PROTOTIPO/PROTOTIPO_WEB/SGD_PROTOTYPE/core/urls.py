@@ -23,7 +23,6 @@ urlpatterns = [
     path('asistencia_entrenador/', asistencia_entrenador, name='asistencia_entrenador'),   
     path('asistencia_entrenador/tomar_asistencia/', tomar_asistencia, name='tomar_asistencia'),   
     path('gestion_disciplina/', gestion_disciplina, name='gestion_disciplina'),
-    path('update_discipline/', update_discipline, name='update_discipline'),
     path('gestion_galeria/', gestion_galeria, name='gestion_galeria'),   
     path('jugadores/', jugadores_por_disciplina, name='jugadores_por_disciplina'),   
     path('grafico/', grafico, name='grafico'),   
@@ -38,6 +37,8 @@ urlpatterns = [
     path('gestionar_periodos/', gestionar_periodos, name='gestionar_periodos'),
 
     path('gestion_Jugador_elite/', gestion_Jugador_elite, name='gestion_Jugador_elite'),   
+
+    path('gestion_disciplina/portada_disciplina', gestion_portada_disciplina, name='portada_disciplina'),   
 
 
 

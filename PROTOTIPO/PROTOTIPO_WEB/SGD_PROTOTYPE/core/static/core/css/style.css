@@ -129,6 +129,46 @@
 
 
 
+
+
+
+/* Botón CTA */
+.cta-button_owo {
+    background-color: var(--primary-yellow);
+    color: var(--primary-black);
+    padding: 14px 28px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Lato', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    margin-left: 10px;
+}
+
+.cta-button_owo :hover {
+    background-color: #e6a600;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.cta-button_owo span {
+    transition: transform 0.3s ease;
+}
+
+.cta-button_owo :hover span {
+    transform: translateX(4px);
+}
+
+
+
 /* Sección Nosotros */
 
 .about-container {

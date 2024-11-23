@@ -117,7 +117,7 @@ def disciplina_view(request, disciplina, seccion):
             'seccion': seccion,
         }
 
-      # Recuperar jugadores relacionados con esta disciplina
+        # Recuperar jugadores relacionados con esta disciplina
         jugadores = Player.objects.filter(discipline=disciplina_obj, player_status = 1)
         
         # Lista para almacenar jugadores con sus imágenes en base64
@@ -178,15 +178,43 @@ def talento(request):
 class CoachDashboardView(LoginRequiredMixin, TemplateView):
     template_name = 'intranet/entrenador/entrenador.html'
 
-
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        try:
+            # Obtener el entrenador y su ID
+            entrenador = self.request.user.coach.first()
+            entrenador_id = entrenador.coach_id
+            
+            # Obtener las disciplinas del entrenador
+            disciplinas = listado_disciplinas_por_entrenador(entrenador_id)
+            # print(f"Disciplinas del entrenador: {disciplinas}")  # Para depuración
+            
+            # Obtener eventos para el entrenador
+            eventos = listado_eventos_entrenador(entrenador_id)
+            context['eventos'] = eventos
+            context['disciplinas'] = disciplinas
+            
+            # print(f"Eventos obtenidos: {eventos}")  # Para depuración
+            
+        except Exception as e:
+            print(f"Error al obtener datos: {str(e)}")
+            context['eventos'] = []
+            context['disciplinas'] = []
+            messages.error(self.request, "Error al cargar los datos")
+        return context
 
     def dispatch(self, request, *args, **kwargs):
-
-        if not request.user.is_authenticated:
-            return redirect('login')  
-
-        if not hasattr(request.user, 'user_type') or request.user.user_type != 'coach01':
+        if request.user.is_anonymous:
+            return HttpResponseForbidden("Debes tener una sesion iniciada para poder entrar.")
+        elif request.user.user_type != 'coach01':
             return HttpResponseForbidden("No tienes permiso para acceder a esta página.")
+            
+        if not hasattr(request.user, 'coach'):
+            return HttpResponseForbidden("El usuario no está asociado a ningún entrenador.")
+
+        entrenador = request.user.coach.first()
+        if not entrenador:
+            return HttpResponseForbidden("No hay entrenadores asociados a este usuario.")
 
         return super().dispatch(request, *args, **kwargs)
 
@@ -694,61 +722,28 @@ def gestion_galeria(request):
 
     if request.method == 'POST':
         if 'form_crear' in request.POST:
-            publicar_en = request.POST.get('publicar_en')
-            if publicar_en == 'galeria-general':
 
-                if 'imagen' in request.FILES:
-                    imagen_file = request.FILES['imagen']
-                    imagen = imagen_file.read()
-                else:
-                    messages.error(request, "Debes subir una imagen para publicar en la galería general.")
-                    return redirect('gestion_galeria')
-                
+            if 'imagen' in request.FILES:
+                imagen_file = request.FILES['imagen']
+                imagen = imagen_file.read()
+            else:
+                messages.error(request, "Debes subir una imagen para publicar en la galería general.")
+                return redirect('gestion_galeria')
+            
 
-                etiqueta = request.POST.get('etiqueta')
-                if not etiqueta:
-                    messages.error(request, "Debes ingresar una etiqueta para publicar en la galería general.")
-                    return redirect('gestion_galeria')
-
-                # Guardar la imagen en la galeria general de la base de datos
-                salida = guardar_galeria_general(imagen, etiqueta)
-
-                if salida == 1:
-                    messages.success(request, "Imagen registrada correctamente en galeria general.")            
-                else:
-                    messages.error(request, "No se ha podido registrar la imagen. ERROR.")            
+            etiqueta = request.POST.get('etiqueta')
+            if not etiqueta:
+                messages.error(request, "Debes ingresar una etiqueta para publicar en la galería general.")
                 return redirect('gestion_galeria')
 
+            # Guardar la imagen en la galeria general de la base de datos
+            salida = guardar_galeria_general(imagen, etiqueta)
 
-            elif publicar_en == 'galeria-disciplina':
-                
-                if 'imagen' in request.FILES:
-                    imagen_file = request.FILES['imagen']
-                    imagen = imagen_file.read()
-                else:
-                    messages.error(request, "Debes subir una imagen para publicar en la galeria de disciplina.")            
-                    return redirect('gestion_galeria')
-                
-                discipline_id = request.POST.get('discipline_id')
-                if not discipline_id:
-                    messages.error(request, "Debes ingresar una Disciplina para registrar una imagen en la galeria de disciplina.")
-                    return redirect('gestion_galeria')
-
-                etiqueta = request.POST.get('etiqueta')
-                if not etiqueta:
-                    messages.error(request, "Debes ingresar una etiqueta para publicar en la galeria de disciplina.")
-                    return redirect('gestion_galeria')
-
-                salida = guardar_galeria_disciplina(imagen, discipline_id, etiqueta)
-
-                if salida == 1:
-                    data['galeria'] = listado_galeria_general()
-                    messages.success(request, "Imagen registrada correctamente en galeria de disciplina.",data)            
-                    return redirect('gestion_galeria')
-
-                else:
-                    messages.error(request, "No se ha podido registrar la imagen. ERROR.")
-                    return redirect('gestion_galeria')
+            if salida == 1:
+                messages.success(request, "Imagen registrada correctamente en galeria general.")            
+            else:
+                messages.error(request, "No se ha podido registrar la imagen. ERROR.")            
+            return redirect('gestion_galeria')
 
         elif 'form_editar' in request.POST:
             id_galeria = request.POST.get('id')
@@ -825,6 +820,8 @@ def aceptar_solicitud(request, id):
         data['mensaje_error'] = ["No se pudo procesar la solicitud."]
         return render(request, 'intranet/administrador/solicitud_jugador.html', data)
 
+### Disciplina ###
+
 @login_required
 def gestion_disciplina(request):
     disciplinas = listado_disciplinas()
@@ -843,11 +840,9 @@ def gestion_disciplina(request):
     }  
 
     if request.method == 'POST':
-        if 'form_crear' in request.POST:
-            None
     
-        elif 'form_editar' in request.POST:
-
+        if 'form_editar' in request.POST:
+        
             discipline_id = request.POST.get('id')
             print(discipline_id)
             if discipline_id:
@@ -894,29 +889,42 @@ def gestion_disciplina(request):
     return render(request, 'intranet/administrador/gestion_disciplina.html', data)
 
 @login_required
-def update_discipline(request):
-    discipline_id = request.POST.get('discipline_id')
-    discipline = get_object_or_404(Discipline, discipline_id=discipline_id)
+def gestion_portada_disciplina(request):
 
-    try:
-        if 'title' in request.POST:
-            discipline.discipline_name = request.POST['title']
-        if 'description' in request.POST:
-            discipline.discipline_description = request.POST['description']
-        if 'image' in request.FILES:
-            discipline.discipline_image = request.FILES['image']
+    data = {
+    }
 
-        discipline.save()
+    if request.method == 'POST':
 
-        return JsonResponse({
-            'success': True,
-            'image_url': discipline.discipline_image.url if discipline.discipline_image else None
-        })
-    except Exception as e:
-        return JsonResponse({
-            'success': False,
-            'error': str(e)
-        }, status=400)
+
+        if 'imagen' in request.FILES:
+            imagen_file = request.FILES['imagen']
+            imagen = imagen_file.read()
+        else:
+            messages.error(request, "Debes subir una imagen para publicar en la galería general.")
+            return redirect('portada_disciplina')
+        
+
+        etiqueta = request.POST.get('etiqueta')
+        if not etiqueta:
+            messages.error(request, "Debes ingresar una etiqueta para publicar en la galería general.")
+            return redirect('portada_disciplina')
+
+        # Guardar la imagen en la galeria general de la base de datos
+        salida = guardar_galeria_general(imagen, etiqueta)
+
+        if salida == 1:
+            messages.success(request, "Imagen registrada correctamente en galeria general.")            
+        else:
+            messages.error(request, "No se ha podido registrar la imagen. ERROR.")            
+        return redirect('portada_disciplina')
+
+
+
+
+    return render(request, 'intranet/administrador/gestion_portada_disciplina.html', data)
+
+###################
 
 @login_required
 def gestion_eventos(request):

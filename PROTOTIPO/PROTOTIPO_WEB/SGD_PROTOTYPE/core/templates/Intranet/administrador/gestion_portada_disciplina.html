@@ -83,7 +83,7 @@
             <div class="col-md-9">
                 <div class="card">
                     <div class="card-body">
-                        <h4><i class="bi bi-journal-text text-primary"></i> Gestionar Galería </h4>
+                        <h4><i class="bi bi-journal-text text-primary"></i> Gestion Galeria </h4>
                         <br>                                                                           
                         {% if messages %}
                             <div class="alert-container">
@@ -101,13 +101,13 @@
                                 <li class="nav-item" role="presentation">
                                     <button class="nav-link active" id="gg-tab" data-bs-toggle="tab"
                                         data-bs-target="#gg" type="button" role="tab" aria-controls="gg"
-                                        aria-selected="false"><strong>Gestión Galería</strong></button>
+                                        aria-selected="false"><strong>Galeria General</strong></button>
                                 </li>
 
                                 <li class="nav-item" role="presentation">
                                     <button class="nav-link " id="subir-tab" data-bs-toggle="tab" data-bs-target="#subir"
                                         type="button" role="tab" aria-controls="subir" aria-selected="true">
-                                        <strong>Subir Imagen a Galería</strong></button>
+                                        <strong>Subir Imagen a Galeria</strong></button>
                                 </li>
 
                                 
@@ -130,10 +130,10 @@
                                                                 
                                                                     <div class="form-outline mb-4 d-flex align-items-center">
                                                                         <div class="overflow-hidden" style="width: 70px; height: 70px;">
-                                                                            <img id="avatar-preview" src="{% static 'core/media/avatar.png'%}" alt="Avatar" class="img-fluid rounded-circle border border-3">
+                                                                            <img id="avatar-preview" src="{% static 'core/media/equipo.png'%}" alt="Avatar" class="img-fluid rounded-circle border border-3">
                                                                         </div>
                                                                         <div class="ms-2">
-                                                                            <label for="avatar" class="custom-label-class"><strong> Subir imagen </strong></label>
+                                                                            <label for="avatar" class="custom-label-class"><strong> Subir imágenes </strong></label>
                                                                             <input type="file" name="imagen" id="avatar" class="form-control form-control-sm" accept="image/*">
                                                                         </div>
                                                                     </div>
@@ -165,7 +165,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <!-- GESTIONAR Galería GENERAL -->
+                                <!-- GESTIONAR GALERIA GENERAL -->
                                 <div class="tab-pane fade show active" id="gg" role="tabpanel" aria-labelledby="gg-tab">
                                     <hr>
                                     {% if not entity %}
@@ -182,7 +182,7 @@
 
                                         <div class="card py-2 px-2">
 
-                                            <div> <h4><strong> No hay Imagenes registradas en la Galería general </strong></h4> </div>  
+                                            <div> <h4><strong> No hay Imagenes registradas en la galeria general </strong></h4> </div>  
                                         </div> 
                                     {% else %}
                                         <div class="card py-2 px-2">

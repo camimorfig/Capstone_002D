@@ -84,119 +84,99 @@
         <div class="col-md-9">
             <div class="card">
                 <div class="card-body">
-                    <h4><i class="bi bi-journal-text text-primary"></i> Gestion Disciplina </h4>
+                    <h4><i class="bi bi-journal-text text-primary"></i> Gestionar Disciplina </h4>
                     <br>                                                                           
-                    {% if messages %}
-                        <div class="alert-container">
-                            {% for message in messages %}
-                                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
-                                    {{ message }}
-                                </div>
-                            {% endfor %}
+
+            <div>
+                <!-- GESTIONAR PORTADAS -->
+                <button class="btn btn-primary me-0">
+                    <a href="{% url 'portada_disciplina' %}"
+                        style="color: white; text-decoration: none;">
+                        Gestionar de portadas
+                    </a>
+                </button>
+            </div>
+            {% if messages %}
+                <div class="alert-container">
+                    {% for message in messages %}                        
+                        <br>
+                        <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                            {{ message }}
                         </div>
-                    {% endif %}   
-                    <br>    
+                        <br>
+                    {% endfor %}
+                </div>
+            {% endif %}   
                     <div class="container">
                         <ul class="nav nav-tabs" id="myTab" role="tablist">
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link active" id="gd-tab" data-bs-toggle="tab" data-bs-target="#gd"
                                     type="button" role="tab" aria-controls="gd" aria-selected="true">
-                                    <strong>Galeria Disciplina</strong></button>
+                                    <strong>Gestión Disciplina</strong></button>
                             </li>
 
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link " id="subir-tab" data-bs-toggle="tab" data-bs-target="#subir"
-                                    type="button" role="tab" aria-controls="subir" aria-selected="false">
-                                    <strong>Resumen General</strong></button>
-                            </li>
 
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link " id="gg-tab" data-bs-toggle="tab"
                                     data-bs-target="#gg" type="button" role="tab" aria-controls="gg"
-                                    aria-selected="false"><strong>Portada disciplina</strong></button>
+                                    aria-selected="false"><strong>Crear Disciplina</strong></button>
                             </li>
 
                         </ul>
                         <div class="tab-content" id="myTabContent">
-                            <!-- GENERAL JUGADORES Y PLANTEL-->
-                            <div class="tab-pane fade show " id="subir" role="tabpanel" aria-labelledby="subir-tab">
-                                
-                                <hr>
-                                
-                                <div class="card">
-                                    <div class="card-header">Resumen Jugadores</div>    
-                                    <table class="table table-striped table-hover">
-                                        <thead>
-                                            <tr>
-                                                <th>ID</th>
-                                                <th>RUT</th>
-                                                <th>Nombre</th>
-                                                <th>Apellido</th>
-                                                <th>Disciplina</th>
-                                                <th>Sede</th>
-                                                <th>Carrera</th>
-                                                <th>Estado</th>
-                                                <th>Acciones</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="datos_jugadores">
-                                            <tr>
-                                                <td colspan="9" class="text-center">La idea es que aqui se vean todos los jugadores de todas las disciplinas</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-            
-                                
 
-                            </div>
-                            <!-- GESTIONAR PORTADAS -->
-                            <div class="tab-pane fade show " id="gg" role="tabpanel" aria-labelledby="gg-tab">
+                            <!-- CREAR DISCIPLINA    -->
+                            <div class="tab-pane fade show " id="subir" role="tabpanel" aria-labelledby="subir-tab">
+                                <div class="container-fluid">
                                 <hr>
-                                <div class="card mb-3">
-                                    <div class="card-header">Resumen Portada</div>
-                                    <div class="card-body">
-                                        <div class="mb-3 row">
-                                            <label class="col-sm-2 col-form-label">TITULO:</label>
-                                            <div class="col-sm-8">
-                                                <span id="titleDisplay">{{ disciplina_seleccionada.discipline_name }}</span>
-                                            </div>
-                                            <div class="col-sm-2">
-                                                <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
-                                                    data-bs-target="#titleModal">EDITAR</button>
-                                            </div>
-                                        </div>
-                                        <div class="mb-3 row">
-                                            <label class="col-sm-2 col-form-label">DESCRIPCION:</label>
-                                            <div class="col-sm-8">
-                                                <span id="descriptionDisplay">
-                                                    {{ disciplina_seleccionada.discipline_description}}</span>
-                                            </div>
-                                            <div class="col-sm-2">
-                                                <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
-                                                    data-bs-target="#descriptionModal">EDITAR</button>
-                                            </div>
-                                        </div>
-                                        <div class="mb-3 row">
-                                            <label class="col-sm-2 col-form-label">IMAGEN:</label>
-                                            <div class="col-sm-8">
-                                                <span id="imageDisplay">
-                                                    {{ disciplina_seleccionada.discipline_image}}</span>
-                                                <!-- Ajusta esto según cómo manejes las imágenes -->
-                                            </div>
-                                            <div class="col-sm-2">
-                                                <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
-                                                    data-bs-target="#imageModal">EDITAR</button>
+                        
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="card">
+                                                <div class="card-body pb-0">
+                                                    <div class="row d-flex justify-content-center">
+                                                        <br>
+                                                        <div style="max-width:50%">
+                                                            <form method="POST" enctype="multipart/form-data">
+                                                                {% csrf_token %}
+                                                            
+                                                                <div class="form-outline mb-4 d-flex align-items-center">
+                                                                    <div class="overflow-hidden" style="width: 70px; height: 70px;">
+                                                                        <img id="avatar-preview" src="{% static 'core/media/avatar.png'%}" alt="Avatar" class="img-fluid rounded-circle border border-3">
+                                                                    </div>
+                                                                    <div class="ms-2">
+                                                                        <label for="avatar" class="custom-label-class"><strong> Subir imagen </strong></label>
+                                                                        <input type="file" name="imagen" id="avatar" class="form-control form-control-sm" accept="image/*">
+                                                                    </div>
+                                                                </div>
+                                                            
+                                                                <div class="form-group mt-2">
+                                                                    <label for="descripcion"><strong>Nombre</strong></label>
+                                                                    <input type="text" class="form-control" id="etiqueta" name="nombre" placeholder="" required>
+                                                                </div>
+
+                                                                <div class="form-group mt-2">
+                                                                    <label for="descripcion"><strong>Descripción</strong></label>
+                                                                    <textarea class="form-control" id="descripcion" name="descripcion"
+                                                                        rows="6" placeholder="Descripción del evento" required></textarea>                                                                </div>
+                                                            
+                                                                <hr>
+                                                                <button type="submit" class="btn btn-primary btn-block mb-4" name="form_crear">Agregar</button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <!-- GESTIONAR GALERIA DISCIPLINA -->
+                            
+                            <!-- GESTIONAR DISCIPLINA -->
                             <div class="tab-pane fade show active" id="gd" role="tabpanel" aria-labelledby="gd-tab">
                                 <hr>
                                 <div class="card">
-                                    <div class="card-header">Resumen Galeria</div>
+                                    <div class="card-header">Resumen Disciplinas</div>
                                     <table class="table table-striped table-hover">
                                         <thead>
                                             <tr>
