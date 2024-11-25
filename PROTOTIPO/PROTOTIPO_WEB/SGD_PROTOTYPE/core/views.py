@@ -169,7 +169,9 @@ def selecciones(request):
 
 
 def talento(request):
+    
     data = {
+        'jugador_elite' : listado_jugar_elite()
         }
     return render (request, 'core/talento.html', data)
 
@@ -784,6 +786,45 @@ def gestion_galeria(request):
     return render (request, 'intranet/administrador/gestion_galeria.html', data)
 
 @login_required
+def gestion_portada(request):
+    
+    data = {
+    'galeria_portada':galerias,
+    'paginator': paginator
+    }   
+
+
+    if request.method == 'POST':
+
+        if 'form_editar' in request.POST:
+            id_galeria = request.POST.get('id')
+            if id_galeria:
+                galeria = get_object_or_404(GaleryGeneral, galery_gen_id=id_galeria)
+                if 'imagen' in request.FILES:
+                    imagen_file = request.FILES['imagen']
+                    img_galeria = imagen_file.read()
+                else:
+                    img_galeria = galeria.galery_gen_img
+                
+                nombre_galeria = request.POST.get('titulo')
+                fecha_galeria = request.POST.get('fecha')
+                
+                fecha_galeria = datetime.strptime(fecha_galeria, '%Y-%m-%dT%H:%M').strftime('%Y-%m-%d %H:%M:%S')
+        
+                salida = editar_galeria_general(id_galeria, img_galeria ,nombre_galeria, fecha_galeria)
+
+                if salida == 1:
+                    messages.success(request, "Imagen actualizada correctamente.")
+                    return redirect('gestion_portada')
+                else:
+                    messages.error(request, "No se ha podido actualizar la imagen. ERROR.")
+                    return redirect('gestion_portada')
+     
+
+
+    return render (request, 'intranet/administrador/gestion_portada.html', data)
+
+@login_required
 def solicitud_jugador(request):
 
     data = {
@@ -840,13 +881,39 @@ def gestion_disciplina(request):
     }  
 
     if request.method == 'POST':
-    
-        if 'form_editar' in request.POST:
+
+        if 'form_crear' in request.POST:
+
+            if 'imagen' in request.FILES:
+                imagen_file = request.FILES['imagen']
+                imagen = imagen_file.read()
+            else:
+                messages.error(request, "Debes subir una imagen para crear la disciplina.")
+                return redirect('gestion_disciplina')
+            
+            nombre = request.POST.get('nombre')
+            if not nombre:
+                messages.error(request, "Debes ingresar un nombre para crear una disciplina.")
+                return redirect('gestion_disciplina')
+            
+            descripcion = request.POST.get('descripcion')
+            if not descripcion:
+                messages.error(request, "Debes ingresar una descripcion para crear una disciplina.")
+                return redirect('gestion_disciplina')
+            # Guardar la imagen en la galeria general de la base de datos
+            salida = crear_disciplina(nombre, descripcion, imagen)
+
+            if salida == 1:
+                messages.success(request, "Disciplina creada correctamente.")            
+            else:
+                messages.error(request, "No se ha podido crear la disciplina. ERROR.")            
+            return redirect('gestion_disciplina')
+
+
+        elif 'form_editar' in request.POST:
         
             discipline_id = request.POST.get('id')
-            print(discipline_id)
             if discipline_id:
-                print("aaaa")
 
                 if 'imagen' in request.FILES:
                     imagen_file = request.FILES['imagen']
@@ -867,24 +934,17 @@ def gestion_disciplina(request):
                     messages.error(request, "No se ha podido actualizar la disciplina. ERROR.")
                     return redirect('gestion_disciplina')
 
-        elif 'form_confirmacion' in request.POST:
-            
+        elif 'form_eliminar' in request.POST:
+            discipline_id = request.POST.get('id')
+            print(discipline_id)
+            salida = eliminar_disciplina(discipline_id)
 
-            confirmacion_disciplina(discipline_id)
-            
-            
-            
-            
-            if 'form_eliminar' in request.POST:
-                discipline_id = request.POST.get('id')
-                salida = eliminar_disciplina(discipline_id)
-
-                if salida == 1:
-                    messages.success(request, "La disciplina fue eliminada correctamente.")
-                    return redirect('gestion_disciplina')
-                else:
-                    messages.error(request, "No se ha podido eliminar la Disciplina. ERROR.")
-                    return redirect('gestion_disciplina')        
+            if salida == 1:
+                messages.success(request, "La disciplina fue eliminada correctamente.")
+                return redirect('gestion_disciplina')
+            else:
+                messages.error(request, "No se ha podido eliminar la Disciplina. ERROR.")
+                return redirect('gestion_disciplina')        
 
     return render(request, 'intranet/administrador/gestion_disciplina.html', data)
 
@@ -1417,7 +1477,6 @@ def gestionar_periodos(request):
         }
     return render(request, 'intranet/administrador/gestionar_periodos.html', data)
 
-
 ##################  LOGIN  ##########################
 class CustomLoginView(LoginView):
     form_class = CustomLoginForm
@@ -1426,7 +1485,6 @@ class CustomLoginView(LoginView):
     def form_invalid(self, form):
         messages.error(self.request, "Credenciales incorrectas. Por favor, intenta de nuevo.")
         return super().form_invalid(form)
-
 
 @login_required  
 def profile_redirect(request):
@@ -1437,7 +1495,6 @@ def profile_redirect(request):
         return redirect('admin_dashboard')  # Redirigir a la página del administrador
     else:
         return redirect('index')  
-
 
 ###########  Procedimientos Almacenados  ###########
 def listado_entrenadores():
@@ -1689,7 +1746,6 @@ def listado_jugador_por_disciplinas(id_disciplina):
     return lista
 
 ##############  NOTICIAS ##############
-
 def guardar_noticias(nombre_noticia, descripcion_noticia, img_noticia, etiqueta):
     django_cursor = connection.cursor()
     cursor = django_cursor.connection.cursor()
@@ -1794,10 +1850,7 @@ def listado_noticias_index():
 
         lista.append(data)
     return lista
-
-
 ##############################################
-
 
 ##############  GALERIA_GENERAL ##############
 def listado_galeria_general():
@@ -1871,6 +1924,25 @@ def listado_galeria_discipline(disciplina_id):
 
     return lista
 #############################################
+
+def listado_portadas():
+    django_cursor = connection.cursor()
+    cursor = django_cursor.connection.cursor()
+    out_cur = django_cursor.connection.cursor()
+
+    cursor.callproc("SP_LIST_FRONT_PAGES", [out_cur])
+
+    lista = []
+    for fila in out_cur:
+        data={
+            'data':fila,
+            'imagen':str(base64.b64encode(fila[1].read()), 'utf-8'),    
+            
+        }
+
+        lista.append(data)
+
+    return lista
 
 def listado_solicitud():
     django_cursor = connection.cursor()
@@ -2110,5 +2182,15 @@ def editar_jugador_elite(id_jugador_elite, rut, nombre, apellido, disciplina, fe
 
     return salida.getvalue()
 #############################################
+
+def crear_disciplina( nombre, descripcion, imagen):
+    django_cursor = connection.cursor()
+    cursor = django_cursor.connection.cursor()
+
+    salida = cursor.var(oracledb.NUMBER)
+
+    cursor.callproc('SP_CREATE_DISCIPLINA', [ nombre, descripcion, imagen, salida])
+
+    return salida.getvalue()
 
 

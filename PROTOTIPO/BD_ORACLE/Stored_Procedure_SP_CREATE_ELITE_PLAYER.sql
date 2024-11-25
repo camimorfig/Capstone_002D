@@ -15,7 +15,7 @@ create or replace PROCEDURE sp_create_elite_player(
 
 
 BEGIN
-    v_status_player:= 0; -- 1 = Active 0 = Inactive
+    v_status_player:= 1; -- 1 = Active 0 = Inactive
 
 
     -- Verificar rut

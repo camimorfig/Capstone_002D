@@ -19,8 +19,8 @@
         <img src="{% static 'core/media/media_selecciones/banner_talento.jpg'%}" alt="selecciones" class="first-banner-img">
         <div class="first-banner-content">
             <div class="first-banner-text">
-                <h1>TALENTO DEPORTIVO</h1>
-                <p>Conoce el talento deportivo que representa
+                <h1>Deportista Elite</h1>
+                <p>Conoce nuestros Deportista Elite que representan
                     con orgullo a la institución.
                     Conoce el corazón y la pasión de Duoc UC: nuestros talentos deportivos que con
                     esfuerzo y dedicación nos llenan de orgullo en cada competencia.
@@ -32,14 +32,20 @@
     <!-- sección principal -->
     <section class="team-section">
         <div class="team-container">
-            <div class="team-card">
-                <img src="{% static 'core/media/user.png'%}" alt="Juan Araya">
-                <div class="team-info">
-                    <h2>Juan Araya</h2>
-                    <p>Delantero</p>
-                    <p>Sede Antonio Varas</p>
+
+            {% for jf in jugador_elite %}
+
+                <div class="team-card">
+                    <img src="data:imagen/png;base64, {{ jf.imagen }}" alt="Juan Araya">
+                    <div class="team-info">
+                        <h2>{{jf.data.2}} {{jf.data.3}} </h2>
+                        <p>{{jf.data.4}}</p>
+                        <p>{{jf.data.7}}</p>
+                    </div>
                 </div>
-            </div>
+
+            {% endfor %}
+
         </div>
     </section>
 {% endblock %}

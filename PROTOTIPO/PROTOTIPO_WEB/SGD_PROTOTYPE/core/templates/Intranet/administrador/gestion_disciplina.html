@@ -118,7 +118,7 @@
 
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link " id="gg-tab" data-bs-toggle="tab"
-                                    data-bs-target="#gg" type="button" role="tab" aria-controls="gg"
+                                    data-bs-target="#crear" type="button" role="tab" aria-controls="gg"
                                     aria-selected="false"><strong>Crear Disciplina</strong></button>
                             </li>
 
@@ -126,7 +126,7 @@
                         <div class="tab-content" id="myTabContent">
 
                             <!-- CREAR DISCIPLINA    -->
-                            <div class="tab-pane fade show " id="subir" role="tabpanel" aria-labelledby="subir-tab">
+                            <div class="tab-pane fade show " id="crear" role="tabpanel" aria-labelledby="subir-tab">
                                 <div class="container-fluid">
                                 <hr>
                         
@@ -270,18 +270,18 @@
                                                         </div>
                                                     </div>
                                                 </div>                                                
-
                                                 <!-- Modal Borrar -->
                                                 <div class="modal fade" id="deleteModal{{d.data.0}}" tabindex="-1" aria-labelledby="deleteModalLabel{{d.data.0}}" aria-hidden="true">
                                                     <div class="modal-dialog">
                                                         <div class="modal-content">
                                                             <div class="modal-header">
-                                                                <h5 class="modal-title" id="deleteModalLabel{{d.data.0}}">Borrar Noticia</h5>
+                                                                <h5 class="modal-title" id="deleteModalLabel{{d.data.0}}">Borrar Disciplimna</h5>
                                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                             </div>
                                                             <div class="modal-body">
-                                                                <p>¿Estás seguro de que deseas borrar esta noticia?</p>
+                                                                <p>¿Estás seguro de que deseas borrar {{ d.data.1 }}, al eliminar la disciplina se eliminaran todos los jugadores,  ?</p>
                                                                 <form id="deleteModalForm{{d.data.0}}" method="POST">
+
                                                                     {% csrf_token %}
                                                                     <input type="hidden" id="id" name="id" value="{{d.data.0}}">
                                                                     <div class="modal-footer">
@@ -312,64 +312,5 @@
     
 
     </main>
-    <!-- Add this at the end of your body tag -->
-    <!-- Modal for Title -->
-    <div class="modal fade" id="titleModal" tabindex="-1" aria-labelledby="titleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="titleModalLabel">Editar Título</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <input type="text" class="form-control" id="titleInput"
-                        value="{{ disciplina_seleccionada.discipline_name }}">
-                    <input type="hidden" id="disciplineId" value="{{ disciplina_seleccionada.id }}">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-primary" onclick="saveChanges('title')">Guardar cambios</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Modal for Description -->
-    <div class="modal fade" id="descriptionModal" tabindex="-1" aria-labelledby="descriptionModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="descriptionModalLabel">Editar Descripción</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <textarea class="form-control" id="descriptionInput"
-                        rows="3">{{ disciplina_seleccionada.discipline_description }}</textarea>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-primary" onclick="saveChanges('description')">Guardar cambios</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal for Image -->
-    <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="imageModalLabel">Editar Imagen</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <input type="file" class="form-control" id="imageInput">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-primary" onclick="saveChanges('image')">Guardar cambios</button>
-                </div>
-            </div>
-        </div>
-    </div>
 {% endblock %}

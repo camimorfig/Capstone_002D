@@ -83,7 +83,7 @@
             <div class="col-md-9">
                 <div class="card">
                     <div class="card-body">
-                        <h4><i class="bi bi-journal-text text-primary"></i> Gestion Galeria </h4>
+                        <h4><i class="bi bi-journal-text text-primary"></i> Gestion Portada Disciplina </h4>
                         <br>                                                                           
                         {% if messages %}
                             <div class="alert-container">
@@ -101,7 +101,7 @@
                                 <li class="nav-item" role="presentation">
                                     <button class="nav-link active" id="gg-tab" data-bs-toggle="tab"
                                         data-bs-target="#gg" type="button" role="tab" aria-controls="gg"
-                                        aria-selected="false"><strong>Galeria General</strong></button>
+                                        aria-selected="false"><strong>Disciplina</strong></button>
                                 </li>
 
                                 <li class="nav-item" role="presentation">
@@ -297,6 +297,8 @@
                                                                     </div>
                                                                     <div class="modal-body">
                                                                         <p>¿Estás seguro de que deseas borrar esta Imagen?</p>
+
+                                                                        
                                                                         <form id="deleteModalForm{{ g.data.0 }}" method="POST">
                                                                             {% csrf_token %}
                                                                             <input type="hidden" id="id" name="id" value="{{ g.data.0 }}">

@@ -40,6 +40,9 @@ urlpatterns = [
 
     path('gestion_disciplina/portada_disciplina', gestion_portada_disciplina, name='portada_disciplina'),   
 
+    path('gestion_portada/', gestion_portada, name='gestion_portada'),   
+
+
 
 
 ]
