@@ -5,6 +5,7 @@
 
 <!-- Enlace css -->
 {% block css %}
+<link rel="stylesheet" href="{% static 'core/css/administrador.css' %}">
 <link rel="stylesheet" href="{% static 'core/css/style-admin.css' %}">
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
@@ -23,7 +24,26 @@
             <div class="card">
                 <div class="card-body">
                     <h4><i class="bi bi-journal-text text-primary"></i> Gestionar Solicitudes </h4>
-                    <br>
+                    <br>                                                                           
+
+                    <div class="alert-container">
+                        {% for message in messages %}
+                            <div class="alert 
+                                {% if message.tags == 'error' %}
+                                    alert-danger
+                                {% elif message.tags == 'success' %}
+                                    alert-success
+                                {% elif message.tags == 'info' %}
+                                    alert-info
+                                {% elif message.tags == 'warning' %}
+                                    alert-warning
+                                {% endif %}
+                            ">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <br>  
                     <div class="container">
                         <ul class="nav nav-tabs" id="myTab" role="tablist">
                             <li class="nav-item" role="presentation">
@@ -45,6 +65,7 @@
                                         <div> <h4><strong> No hay Solicitudes registradas </strong></h4> </div>  
 
                                     {% else %}
+                                    <div class="table-responsive">
                                         <table class="table table-striped table-hover">
                                             <thead>
                                                 <tr>
@@ -79,12 +100,12 @@
                                                         <td>
                                                             <div class="dropdown">
                                                                 <button class="btn btn-primary btn-sm dropdown-toggle"
-                                                                    type="button" id="dropdownMenuButton1"
+                                                                    type="button" id="dropdownMenuButton{{s.data.0}}"
                                                                     data-bs-toggle="dropdown" aria-expanded="false">
                                                                     Ver Opciones
                                                                 </button>
                                                                 <ul class="dropdown-menu"
-                                                                    aria-labelledby="dropdownMenuButton1" data-bs-toggle="modal"
+                                                                    aria-labelledby="dropdownMenuButton{{s.data.0}}" data-bs-toggle="modal"
                                                                     data-bs-target="#deleteModal">
                                                                     <li><a class="dropdown-item" href="#"><i
                                                                                 class="bi bi-trash text-danger"></i> Borrar
@@ -101,6 +122,7 @@
 
                                             </tbody>
                                         </table>
+                                    </div>
                                     {% endif %}
 
                                 </div>
@@ -168,33 +190,6 @@
             <!-- Tu tabla actual -->
         </table>
     </div>
-
-    <!-- Mensajes de Sweet Alert -->
-    {% if mensaje_error %}
-        {% for m_error in mensaje_error %}
-            <script>
-                Swal.fire({
-                    "title": "Error!",
-                    "text": "{{m_error}}",
-                    "icon": "error",
-                })
-            </script>
-        {% endfor %}
-    {% endif %}
-
-    {% if mensaje_exito %}
-        {% for m_exito in mensaje_exito %}
-            <script>
-                Swal.fire({
-                    "title": "Felicidades!",
-                    "text": "{{m_exito}}",
-                    "icon": "success",
-                })
-            </script>
-        {% endfor %}
-    {% endif %}
-    
-
 </main>
 
 

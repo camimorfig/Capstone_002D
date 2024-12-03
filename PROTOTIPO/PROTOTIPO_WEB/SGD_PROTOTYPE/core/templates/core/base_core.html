@@ -34,7 +34,7 @@
                         <img src="{% static 'core/media/logo-duoc.png'%}" alt="DuocUC">
                     </a>
                 </div>
-                <nav class="nav-links" id="navLinks">
+                <!-- <nav class="nav-links" id="navLinks">
                     {% if user.user_type == 'coach01' %}
                         <li><a href="{% url 'entrenador_dashboard' %}">Perfil</a></li>    
                     {% elif user.user_type == 'admin01' %}
@@ -42,8 +42,7 @@
                     {% endif %}
                         <li><a href="{% url 'noticias' %}">Noticias</a></li>
                         <li><a href="{% url 'galeria' %}">Galería</a></li>
-                        <li><a href="{% url 'selecciones' %}">Selecciones</a></li>
-                        <li><a href="{% url 'talento' %}">Deportistas de Elite</a></li>
+                        <li><a href="{% url 'selecciones' %}">Selecciones</a></li>    
                         <li><a href="{% url 'nosotros' %}">Nosotros</a></li>
                     {% if user.is_authenticated %}
 
@@ -69,12 +68,46 @@
                         </a>
                         
                 {% endif %}
-            </div>
-            <div class="hamburger" onclick="toggleMenu()">
+            </div> -->
+            <!-- Reemplazar el div hamburger actual por este -->
+            <nav class="nav-links" id="navLinks">
+                {% if user.user_type == 'coach01' %}
+                    <li><a href="{% url 'entrenador_dashboard' %}">Perfil</a></li>    
+                {% elif user.user_type == 'admin01' %}
+                    <li><a href="{% url 'admin_dashboard' %}">Perfil</a></li>    
+                {% endif %}
+                <li><a href="{% url 'noticias' %}">Noticias</a></li>
+                <li><a href="{% url 'galeria' %}">Galería</a></li>
+                <li><a href="{% url 'selecciones' %}">Selecciones</a></li>
+                <li><a href="{% url 'talento' %}">Elite</a></li>
+                <li><a href="{% url 'nosotros' %}">Nosotros</a></li>
+                {% if user.is_authenticated %}
+                    <li>
+                        <form id="logout-form" method="post" action="{% url 'logout' %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-warning w-100">Cerrar Sesión</button>
+                        </form>
+                    </li>
+                {% else %}
+                    <li><a href="{% url 'contacto' %}">Contacto</a></li>
+                    <li >
+                        <a href="{% url 'login' %}" class="btn-login btn  mobile-login">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                                class="bi bi-person-circle" viewBox="0 0 16 16">
+                                <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0" />
+                                <path fill-rule="evenodd"
+                                    d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1" />
+                            </svg>
+                            <span>Iniciar sesión</span>
+                        </a>
+                    </li>
+                {% endif %}
+            </nav>
+            <button class="hamburger bg-dark"  type="button" aria-label="Menu">
                 <span></span>
                 <span></span>
                 <span></span>
-            </div>
+            </button>
         </header>
         
         <!-- Contenido -->
@@ -123,3 +156,43 @@
         </footer>
     </body>    
 </html>
+<script>
+    // Reemplazar el script actual con este
+document.addEventListener('DOMContentLoaded', function() {
+    const hamburger = document.querySelector('.hamburger');
+    const navLinks = document.querySelector('.nav-links');
+    
+    hamburger.addEventListener('click', function() {
+        // Toggle clases activas
+        hamburger.classList.toggle('active');
+        navLinks.classList.toggle('active');
+        
+        // Prevenir scroll cuando el menú está abierto
+        if (navLinks.classList.contains('active')) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+    });
+
+    // Cerrar menú al hacer click en un enlace
+    document.querySelectorAll('.nav-links a').forEach(link => {
+        link.addEventListener('click', () => {
+            hamburger.classList.remove('active');
+            navLinks.classList.remove('active');
+            document.body.style.overflow = '';
+        });
+    });
+
+    // Cerrar menú al hacer click fuera
+    document.addEventListener('click', (e) => {
+        if (!navLinks.contains(e.target) && 
+            !hamburger.contains(e.target) && 
+            navLinks.classList.contains('active')) {
+            hamburger.classList.remove('active');
+            navLinks.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    });
+});
+  </script>

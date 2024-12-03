@@ -21,8 +21,8 @@ BEGIN
     -- Verificar rut
     SELECT COUNT(*)
     INTO v_count_rut
-    FROM player
-    WHERE player_rut = p_rut;  
+    FROM player_elite
+    WHERE player_elite_rut = p_rut;  
 
     -- Validar
     IF v_count_rut > 0 THEN

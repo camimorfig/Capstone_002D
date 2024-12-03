@@ -1,0 +1,260 @@
+/* Importación de fuentes */
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Lato:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap');
+
+:root {
+    /* Colores principales */
+    --primary-color: #1A1A1A;
+    --white-color: #FFFFFF;
+    --yellow-duoc: #FFB800;
+    --grey-color: #666666;
+    --light-grey: #eeeeee;
+    
+
+    /* Tipografía */
+    --font-size-h1: 2.6875rem;
+    --font-size-h2: 2.1rem;
+    --font-size-h3: 1.5rem;
+    --font-size-h4: 1.25rem;
+    --font-size-h5: 1rem;
+    --font-size-body: 1rem;
+    --font-size-small: 0.8125rem;
+}
+
+.alert-error {
+    color: #721c24; /* Texto rojo */
+    background-color: #f8d7da; /* Fondo rosado claro */
+    border: 1px solid #f5c6cb; /* Borde rojo */
+    padding: 0.75rem 1.25rem;
+    border-radius: 0.25rem;
+    margin-bottom: 1rem;
+}
+
+
+/* Estilos base */
+body {
+    font-family: 'Merriweather', serif;
+    font-size: var(--font-size-body);
+    line-height: 1.5;
+    background-color: #f8f9fa;
+}
+
+/* Layout principal */
+.main-entrenador {
+    min-height: 100vh;
+    padding: 1.5rem;
+    gap: 1.5rem;
+}
+
+/* Sidebar */
+.col-md-3 {
+    transition: all 0.3s ease;
+}
+
+.card {
+    border: none;
+    border-radius: 0.5rem;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    margin-bottom: 1rem;
+}
+
+.nav-link {
+    font-family: 'Lato', sans-serif;
+    color: var(--primary-color) !important;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+    border-radius: 0.25rem;
+    text-decoration: none;
+}
+
+.nav-link:hover, .nav-link.active {
+    background-color: var(--yellow-duoc);
+    color: var(--white-color) !important;
+}
+
+.nav-link i {
+    margin-right: 0.5rem;
+}
+
+/* Encabezados */
+h4 {
+    font-family: 'Merriweather', serif;
+    font-size: var(--font-size-h4);
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+}
+
+h5.card-title {
+    font-family: 'Merriweather', serif;
+    font-size: var(--font-size-h5);
+    font-weight: 700;
+}
+
+/* Tablas */
+.table {
+    font-family: 'Lato', sans-serif;
+    margin-top: 1rem;
+    background-color: var(--white-color);
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.table th {
+    background-color: var(--primary-color);
+    color: var(--white-color);
+    font-weight: 600;
+    padding: 1rem;
+    white-space: nowrap;
+}
+
+.table td {
+    padding: 1rem;
+    vertical-align: middle;
+}
+
+/* Formularios */
+.form-control {
+    font-family: 'Lato', sans-serif;
+    padding: 0.75rem;
+    border: 2px solid var(--light-grey);
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: var(--yellow-duoc);
+    box-shadow: 0 0 0 0.2rem rgba(255, 184, 0, 0.25);
+}
+
+/* Botones */
+.btn {
+    font-family: 'Lato', sans-serif;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background-color: var(--yellow-duoc);
+    border-color: var(--yellow-duoc);
+    color: var(--primary-color);
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: var(--white-color);
+}
+
+/* Gráficos */
+.chart-container {
+    position: relative;
+    margin: auto;
+    height: 300px;
+    width: 100%;
+}
+
+/* Alertas y mensajes */
+.alert {
+    font-family: 'Lato', sans-serif;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+/* Media queries */
+@media (max-width: 992px) {
+    .main-entrenador {
+        padding: 1rem;
+    }
+    
+    .container-fluid {
+        padding: 1rem;
+    }
+    
+    .chart-container {
+        height: 250px;
+    }
+}
+
+@media (max-width: 768px) {
+    .main-entrenador {
+        flex-direction: column;
+    }
+    
+    .col-md-3 {
+        width: 100%;
+        margin-bottom: 1rem;
+    }
+    
+    .nav-link {
+        padding: 0.5rem;
+    }
+    
+    h4 {
+        font-size: calc(var(--font-size-h4) * 0.9);
+    }
+    
+    .table-responsive {
+        margin-bottom: 1rem;
+    }
+    
+    .table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+    
+    .btn {
+        padding: 0.5rem 1rem;
+    }
+    
+    .card {
+        margin: 0.5rem 0;
+    }
+}
+
+@media (max-width: 576px) {
+    .main-entrenador {
+        padding: 0.5rem;
+    }
+    
+    h4 {
+        font-size: calc(var(--font-size-h4) * 0.8);
+    }
+    
+    .table td, .table th {
+        padding: 0.5rem;
+        font-size: var(--font-size-small);
+    }
+    
+    .form-control {
+        padding: 0.5rem;
+        font-size: var(--font-size-small);
+    }
+    
+    .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+    
+    .chart-container {
+        height: 200px;
+    }
+}
+
+/* Utilidades adicionales */
+.table-hover tbody tr:hover {
+    background-color: rgba(255, 184, 0, 0.1);
+}
+
+.breadcrumb {
+    font-family: 'Lato', sans-serif;
+    font-size: var(--font-size-small);
+}
+
+.img-preview {
+    max-width: 100px;
+    height: auto;
+    border-radius: 50%;
+}

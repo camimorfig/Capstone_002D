@@ -1,4 +1,3 @@
-
 from django.shortcuts import render
 from django.urls import reverse
 from django.db import connection
@@ -21,8 +20,33 @@ from django.shortcuts import get_object_or_404
 from django.core.paginator import Paginator
 from django.http import Http404
 from datetime import date, datetime, timedelta
+from itertools import cycle
 
 
+
+def validar_rut(rut):
+    rut = rut.upper().replace("-", "").replace(".", "")
+    rut_aux = rut[:-1]
+    dv = rut[-1:]
+
+    if not rut_aux.isdigit() or not (1_000_000 <= int(rut_aux) <= 25_000_000):
+        print('no es rut')
+        return False
+
+    revertido = map(int, reversed(rut_aux))
+    factors = cycle(range(2, 8))
+    suma = sum(d * f for d, f in zip(revertido, factors))
+    residuo = suma % 11
+
+    if dv == 'K':
+        return residuo == 1
+        print(residuo)
+
+    if dv == '0':
+        return residuo == 11
+        print(residuo)
+    print(residuo)
+    return residuo == 11 - int(dv)
 
 
 ###########  views de Templates  ###########
@@ -32,7 +56,8 @@ def index(request):
     data = {
         
         'noticias_index': listado_noticias_index(), 
-        'galeria_index':listado_galeria_portada()
+        'galeria_index':listado_galeria_portada(),
+        'portada':listado_portadas()
         }
     return render (request, 'core/index.html', data)
 
@@ -57,10 +82,6 @@ def contacto(request):
     return render (request, 'core/contacto.html',data)
 
 
-def eventos(request):
-    return render (request, 'core/eventos.html')
-
-
 def galeria(request):
     galeria = listado_galeria_general()
     page = request.GET.get('page',1)
@@ -74,7 +95,9 @@ def galeria(request):
 
     data = {
     'entity':galeria,
-    'paginator': paginator
+    'paginator': paginator,
+    'portada':listado_portadas()
+
     }   
 
 
@@ -83,7 +106,8 @@ def galeria(request):
 
 def nosotros(request):
     data = {
-        'entrenadores':listado_entrenadores()
+        'entrenadores':listado_entrenadores(),
+        'portada':listado_portadas()
         }
     return render (request, 'core/nosotros.html', data)
 
@@ -101,7 +125,8 @@ def noticias(request):
     
     data = {
         'entity': noticia,
-        'paginator': paginator
+        'paginator': paginator,
+        'portada':listado_portadas()
 
     }
     return render (request, 'core/noticias.html', data)
@@ -162,7 +187,8 @@ def disciplina_view(request, disciplina, seccion):
 def selecciones(request):
 
     data = {
-        'disciplinas':listado_disciplinas()
+        'disciplinas':listado_disciplinas(),
+        'portada':listado_portadas()
         }  
 
     return render (request, 'core/selecciones.html', data)
@@ -171,7 +197,8 @@ def selecciones(request):
 def talento(request):
     
     data = {
-        'jugador_elite' : listado_jugar_elite()
+        'jugador_elite' : listado_jugar_elite(),
+        'portada':listado_portadas()
         }
     return render (request, 'core/talento.html', data)
 
@@ -220,7 +247,6 @@ class CoachDashboardView(LoginRequiredMixin, TemplateView):
 
         return super().dispatch(request, *args, **kwargs)
 
-
 @login_required
 def perfil_jugadores(request):
     # Verificar si el usuario tiene entrenadores asociados
@@ -242,6 +268,18 @@ def perfil_jugadores(request):
     data = {
         'disciplinas': disciplinas
     }
+
+    if request.method == 'POST':
+
+        if 'form_eliminar' in request.POST:
+            id_jugador = request.POST.get('id')
+            salida = eliminar_jugador(id_jugador)
+            if salida == 1:
+                messages.success(request, "Jugador eliminado correctamente.")
+            else:
+                messages.error(request, "No se ha podido eliminar al Jugador. ERROR.")
+            return redirect('perfil_jugadores')
+
 
     return render(request, 'intranet/entrenador/perfil_jugadores.html', data)
 
@@ -271,61 +309,73 @@ def crear_perfil_Jugador(request):
         # Obtener los datos del formulario
         imagen = request.FILES.get('imagen').read()
         if not imagen:
-            data['mensaje_error'] = ["Debes subir una imagen para registrar un jugador."]
-            return render (request, 'intranet/entrenador/crear_perfil_Jugador.html', data)
+            messages.error(request, "Debes subir una imagen para registrar un jugador.")
+            return redirect('crear_perfil_Jugador')
 
         rut = request.POST.get('rut')
         if not rut:
-            data['mensaje_error'] = ["Debes ingresar un Rut para registrar un jugador."]
-            return render (request, 'intranet/entrenador/crear_perfil_Jugador.html', data)
-
+            messages.error(request, "Debes ingresar un Rut para registrar un jugadorentrenador.")
+            return redirect('crear_perfil_Jugador')
+        elif not validar_rut(rut):
+            messages.error(request, "Debes ingresar un Rut valido para registrar un jugador.")
+            return redirect('crear_perfil_Jugador')
+        else:
+            rut = rut.replace(".", "")
         nombre = request.POST.get('nombre')
         if not nombre:
-            data['mensaje_error'] = ["Debes ingresar un Nombre para registrar un jugador."]
-            return render (request, 'intranet/entrenador/crear_perfil_Jugador.html', data)
+            messages.error(request, "Debes ingresar un Nombre para registrar un jugador.")
+            return redirect('crear_perfil_Jugador')
+        else:
+            nombre = nombre.upper()
 
         apellido = request.POST.get('apellido')
         if not apellido:
-            data['mensaje_error'] = ["Debes ingresar un Apellido para registrar un jugador."]
-            return render (request, 'intranet/entrenador/crear_perfil_Jugador.html', data)
+            messages.error(request, "Debes ingresar un Apellido para registrar un jugador.")
+            return redirect('crear_perfil_Jugador')
+        else:
+            apellido = apellido.upper()
+
 
         headquarters = request.POST.get('headquarters')
         if not headquarters:
-            data['mensaje_error'] = ["Debes ingresar una Sede para registrar un jugador."]
-            return render (request, 'intranet/entrenador/crear_perfil_Jugador.html', data)
+            messages.error(request, "Debes ingresar una Sede para registrar un jugador.")
+            return redirect('crear_perfil_Jugador')
 
         career = request.POST.get('career')
         if not career:
-            data['mensaje_error'] = ["Debes ingresar una Carrera para registrar un jugador."]
-            return render (request, 'intranet/entrenador/crear_perfil_Jugador.html', data)
+            messages.error(request, "Debes ingresar una Carrera para registrar un jugador.")
+            return redirect('crear_perfil_Jugador')
+            
 
         horario = request.POST.get('horario')
         if not horario:
-            data['mensaje_error'] = ["Debes Seleccionar un horario para registrar un jugador."]
-            return render (request, 'intranet/entrenador/crear_perfil_Jugador.html', data)
-
+            messages.error(request, "Debes Seleccionar un horario para registrar un jugador.")
+            return redirect('crear_perfil_Jugador')
+            
         fecha_nacimiento = request.POST.get('fecha_nacimiento')
         if not fecha_nacimiento:
-            data['mensaje_error'] = ["Debes ingresar una fwcha de nacimiento para registrar un jugador."]
-            return render (request, 'intranet/entrenador/crear_perfil_Jugador.html', data)
-
+            messages.error(request, "Debes ingresar una fecha de nacimiento para registrar un jugador.")
+            return redirect('crear_perfil_Jugador')
+            
 
         discipline_id = request.POST.get('disciplina')
         if not discipline_id:
-            data['mensaje_error'] = ["Debes ingresar una Disciplina para registrar un jugador."]
-            return render (request, 'intranet/entrenador/crear_perfil_Jugador.html', data)
-
+            messages.error(request, "Debes ingresar una Disciplina para registrar un jugador.")
+            return redirect('crear_perfil_Jugador')
+            
 
         # Guardar el jugador en la base de datos
         salida = guardar_jugador(rut, nombre, apellido, headquarters, career, horario, fecha_nacimiento, imagen, discipline_id, entrenador_id)
 
         if salida == 1:
-            data['mensaje_exito'] = ["Solicitud de Creación de Jugador enviada correctamente."]
+            messages.success(request, "Solicitud de Creación de Jugador enviada correctamente.")
+            return redirect('crear_perfil_Jugador')
         elif salida == -1:
-            data['mensaje_error'] = ["Rut ya registrado. Cambie el rut o contacto con el administrador  ."] 
+            messages.error(request, "Rut ya registrado. Cambie el rut o contacto con el administrador.")
+            return redirect('crear_perfil_Jugador')
         else:
-            data['mensaje_error'] = ["No se ha podido registrar. ERROR."]
-
+            messages.error(request, "No se ha podido registrar. ERROR.")
+            return redirect('crear_perfil_Jugador')
 
     return render (request, 'intranet/entrenador/crear_perfil_Jugador.html', data)
 
@@ -339,17 +389,14 @@ def asistencia_entrenador(request):
     if not entrenador:
         return HttpResponseForbidden("No hay entrenadores asociados a este usuario.")
 
-    # Obtener el ID del entrenador
     entrenador_id = entrenador.coach_id
-
-    # Llamar al procedimiento almacenado para listar las disciplinas del entrenador
-    disciplinas = listado_disciplinas_por_fechahoy_con_entrenador(entrenador_id)
-
+    entrenamientos = listado_entrenamientos_por_entrenador(entrenador_id)
+    
     data = {
-        'disciplinas': disciplinas
+        'entrenamientos': entrenamientos,
+        'nombre_entrenador': entrenador.name if hasattr(entrenador, 'name') else 'Entrenador'
     }
-
-    return render (request, 'intranet/entrenador/asistencia_entrenador.html', data)
+    return render(request, 'intranet/entrenador/asistencia_entrenador.html', data)
 
 @login_required
 def jugadores_por_disciplina(request):
@@ -363,33 +410,118 @@ def jugadores_por_disciplina(request):
 
     return render (request, 'intranet/entrenador/obtener_datos_entrenador.html', data)
 
+
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+from django.db.models import Count, Avg, Q, Case, When, FloatField
+
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+from django.db.models import Count, Avg, Q, Case, When, FloatField
+from .models import Attendance, AttendanceStatus, Discipline
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+from django.http import HttpResponse
+
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+from django.db.models import Count, Avg, Q, Case, When, FloatField
+from django.utils import timezone
+from datetime import datetime
+from .models import Attendance, AttendanceStatus, Discipline, Coach, CoachDiscipline
+
+
 @login_required
 def grafico(request):
-    return render (request, 'intranet/entrenador/grafico.html')
+    try:
+        # Obtener el coach asociado al usuario actual
+        coach = Coach.objects.get(user=request.user)
+        
+        # Obtener las disciplinas asociadas al coach
+        disciplinas_entrenador = Discipline.objects.filter(
+            discipline_id__in=CoachDiscipline.objects.filter(coach_id=coach.coach_id).values_list('discipline_id', flat=True)
+        )
 
-@login_required
-def asistencia_entrenador(request):
-    if not hasattr(request.user, 'coach'):
-        return HttpResponseForbidden("El usuario no está asociado a ningún entrenador.")
+    except Coach.DoesNotExist:
+        disciplinas_entrenador = Discipline.objects.none()
 
-    entrenador = request.user.coach.first()  
+    # Obtener parámetros de filtro
+    discipline_id = request.GET.get('discipline_id')
+    date_from = request.GET.get('date_from')
+    date_to = request.GET.get('date_to')
 
-    if not entrenador:
-        return HttpResponseForbidden("No hay entrenadores asociados a este usuario.")
+    # Aplicar filtros a las consultas
+    asistencias = Attendance.objects.filter(discipline__in=disciplinas_entrenador)
+    if discipline_id:
+        asistencias = asistencias.filter(discipline_id=discipline_id)
+    if date_from:
+        asistencias = asistencias.filter(attendance_date__gte=date_from)
+    if date_to:
+        asistencias = asistencias.filter(attendance_date__lte=date_to)
+    # Obtener los estados de asistencia
+    status_present = AttendanceStatus.objects.filter(status_name__icontains='present').first()
+    status_absent = AttendanceStatus.objects.filter(status_name__icontains='absent').first()
+    status_justified = AttendanceStatus.objects.filter(status_name__icontains='justified').first()
 
-    # Obtener el ID del entrenador
-    entrenador_id = entrenador.coach_id
+    # Estadísticas generales por disciplina
+    estadisticas_disciplina = []
+    for disciplina in disciplinas_entrenador:
+        asistencias_disc = asistencias.filter(discipline=disciplina)
+        total_disc = asistencias_disc.count()
+        if total_disc > 0:
+            presentes_disc = asistencias_disc.filter(status=status_present).count()
+            ausentes_disc = asistencias_disc.filter(status=status_absent).count()
+            justificados_disc = asistencias_disc.filter(status=status_justified).count()
+            
+            # Calcular regularidad de asistencia por estudiante
+            estudiantes_stats = asistencias_disc.values('player').annotate(
+                total_clases=Count('attendance_id'),
+                asistencias=Count('attendance_id', filter=Q(status=status_present))
+            )
+            
+            # Calcular promedios
+            promedio_asistencia = round(presentes_disc / total_disc * 100, 2)
+            
+            estadisticas_disciplina.append({
+                'nombre': disciplina.discipline_name,
+                'total_estudiantes': asistencias_disc.values('player').distinct().count(),
+                'promedio_asistencia': promedio_asistencia,
+                'presentes': presentes_disc,
+                'ausentes': ausentes_disc,
+                'justificados': justificados_disc,
+                'total_entrenamientos': asistencias_disc.values('attendance_date').distinct().count(),
+                'mejor_asistencia': round(max((stat['asistencias'] / stat['total_clases'] * 100) 
+                                        for stat in estudiantes_stats) if estudiantes_stats else 0, 2),
+                'peor_asistencia': round(min((stat['asistencias'] / stat['total_clases'] * 100) 
+                                        for stat in estudiantes_stats) if estudiantes_stats else 0, 2)
+            })
 
-    # Llamar al procedimiento almacenado para listar las disciplinas del entrenador
-    # Llamar al procedimiento almacenado para listar los entrenamientos del entrenador
-    entrenamientos = listado_entrenamientos_por_entrenador(entrenador_id)
-    print(entrenamientos)
-    data = {
-        'entrenamientos': entrenamientos
+    # Datos para el gráfico de tendencia mensual
+    tendencia_data = asistencias.values('attendance_date').annotate(
+        porcentaje=Avg(Case(
+            When(status=status_present, then=100),
+            When(status=status_justified, then=50),
+            default=0,
+            output_field=FloatField(),
+        ))
+    ).order_by('attendance_date')
+
+    labels = [d['attendance_date'].strftime('%b %Y') for d in tendencia_data]
+    datos = [round(d['porcentaje'], 2) for d in tendencia_data]
+
+    context = {
+        'nombre_entrenador': coach.coach_name,
+        'disciplines': disciplinas_entrenador,
+        'estadisticas_disciplina': estadisticas_disciplina,
+        'estadisticas_tendencia': {
+            'labels': labels,
+            'datos': datos
+        }
     }
-    return render(request, 'intranet/entrenador/asistencia_entrenador.html', data)
+    
+    return render(request, 'intranet/entrenador/grafico.html', context)
 
-@login_required
+
 def tomar_asistencia(request):
     try:
         discipline_id = int(request.GET.get('disciplina_id', 0))
@@ -401,51 +533,119 @@ def tomar_asistencia(request):
         
         # Obtener jugadores
         jugadores = listado_jugadores_por_disciplina(discipline_id)
+        
         if not jugadores:
             messages.warning(request, 'No hay jugadores registrados en esta disciplina')
             return redirect('asistencia_entrenador')
 
         if request.method == 'POST':
+            successful_registrations = 0
+            failed_registrations = 0
+            
             for jugador in jugadores:
                 player_id = jugador['id']
                 estado = request.POST.get(f'estado_{player_id}')
-                comentario = request.POST.get(f'comentario_{player_id}', '')
                 
-                if estado:
-                    print(f"Registrando asistencia para jugador {player_id}")
-                    result = registrar_asistencia(
-                        player_id=int(player_id),
-                        discipline_id=discipline_id,
-                        training_id=training_id,
-                        status=estado,
-                        comments=comentario
-                    )
+                if not estado:
+                    print(f"No se encontró estado para jugador {player_id}")
+                    continue
                     
-                    if result:
+                comentario = request.POST.get(f'comentario_{player_id}', '').strip() or None
+                
+                print(f"Procesando asistencia:")
+                print(f"- Jugador ID: {player_id}")
+                print(f"- Estado: {estado}")
+                print(f"- Comentario: {comentario}")
+                
+                try:
+                    with connection.cursor() as cursor:
+                        # Verificar si ya existe asistencia
+                        cursor.execute("""
+                            SELECT COUNT(*)
+                            FROM attendance
+                            WHERE player_id = :player_id
+                            AND training_id = :training_id
+                            AND TRUNC(attendance_date) = TRUNC(SYSDATE)
+                        """, {
+                            'player_id': player_id,
+                            'training_id': training_id
+                        })
+                        
+                        if cursor.fetchone()[0] > 0:
+                            print(f"Ya existe asistencia para jugador {player_id}")
+                            continue
+
+                        # Obtener status_id
+                        cursor.execute("""
+                            SELECT status_id
+                            FROM attendance_status
+                            WHERE status_name = :status
+                        """, {'status': estado})
+                        
+                        status_row = cursor.fetchone()
+                        if not status_row:
+                            print(f"Estado no válido: {estado}")
+                            continue
+                        
+                        status_id = status_row[0]
+
+                        # Insertar asistencia
+                        cursor.execute("""
+                            INSERT INTO attendance (
+                                player_id,
+                                training_id,
+                                discipline_id,
+                                status_id,
+                                attendance_date,
+                                attendance_comments,
+                                creation_timestamp
+                            ) VALUES (
+                                :player_id,
+                                :training_id,
+                                :discipline_id,
+                                :status_id,
+                                TRUNC(SYSDATE),
+                                :comments,
+                                SYSTIMESTAMP
+                            )
+                        """, {
+                            'player_id': player_id,
+                            'training_id': training_id,
+                            'discipline_id': discipline_id,
+                            'status_id': status_id,
+                            'comments': comentario
+                        })
+                        
+                        successful_registrations += 1
                         print(f"Asistencia registrada exitosamente para jugador {player_id}")
-                    else:
-                        print(f"Error al registrar asistencia para jugador {player_id}")
-                        messages.warning(
-                            request, 
-                            f'No se pudo registrar la asistencia para el jugador {jugador.get("nombre", player_id)}'
-                        )
+                        
+                except Exception as e:
+                    print(f"Error al registrar asistencia para jugador {player_id}: {str(e)}")
+                    failed_registrations += 1
+
+            if successful_registrations > 0:
+                messages.success(request, f'Se registró la asistencia de {successful_registrations} jugador(es)')
+            if failed_registrations > 0:
+                messages.warning(request, f'No se pudo registrar la asistencia de {failed_registrations} jugador(es)')
+            
+            connection.commit()  # Asegurar que los cambios se guarden
+            return redirect('asistencia_entrenador')
+        
         context = {
             'jugadores': jugadores,
             'disciplina_id': discipline_id,
             'training_id': training_id,
-            'fecha_asistencia': datetime.now().strftime('%Y-%m-%d')
+            'fecha_actual': datetime.now().strftime('%Y-%m-%d')
         }
         
         return render(request, 'intranet/entrenador/tomar_asistencia.html', context)
                 
     except Exception as e:
         print(f"Error en tomar_asistencia: {str(e)}")
-        print(player_id)
-        print(training_id)
-        print(discipline_id)
-        print(estado)
-        print(comentario)
-        messages.error(request, f'Error: {str(e)}')
+        print(f"Tipo de error: {type(e)}")
+        import traceback
+        traceback.print_exc()
+        messages.error(request, f'Error al procesar la asistencia: {str(e)}')
         return redirect('asistencia_entrenador')
 
 @login_required
@@ -497,13 +697,22 @@ def verificar_asistencia_existente(discipline_id):
         return False
 
 
-
 ###################### ADMIN ######################
+
+from django.views.generic import TemplateView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import redirect
+from django.http import HttpResponseForbidden, HttpResponse
+from django.db.models import Count, Avg, Max, Min, Case, When, FloatField, F, Q
+import pandas as pd
+from datetime import datetime
+from django.contrib import messages
+from .models import Attendance, Discipline, Player, AttendanceStatus
+
 class AdminDashboardView(LoginRequiredMixin, TemplateView):
     template_name = 'intranet/administrador/administrador.html'
 
     def dispatch(self, request, *args, **kwargs):
-
         if not request.user.is_authenticated:
             return redirect('login')  
 
@@ -512,88 +721,311 @@ class AdminDashboardView(LoginRequiredMixin, TemplateView):
 
         return super().dispatch(request, *args, **kwargs)
 
-@login_required
-def crear_perfil_entrenador(request):
-    data = {
-        'disciplinas': listado_disciplinas(),
-        'tipo_entrenador': listado_tipo_entrenador(),
-        'entrenadores':listado_entrenadores()
-
-    }
-
-    if request.method == 'POST':
-        # Obtener los datos del formulario
-        rut = request.POST.get('rut')
-        nombre = request.POST.get('nombre')
-        apellido = request.POST.get('apellido')
-        tipo_entrenador = int(request.POST.get('tipo_entrenador')) 
-        email = request.POST.get('email')
-
-        if 'img' in request.FILES:
-            imagen_file = request.FILES['img']
-            imagen = imagen_file.read()
-        else:
-            data['mensaje_error'] = ["Debes subir una imagen para registrar al entrenador."]
-            return render(request, 'intranet/administrador/crear_perfil_entrenador.html', data)
-
-        disciplinas_seleccionadas = request.POST.getlist('lista_de_disciplina')
-
-        # Validaciones
-        if not rut:
-            data['mensaje_error'] = ["Debes ingresar un Rut para registrar un entrenador."]
-            return render(request, 'intranet/administrador/crear_perfil_entrenador.html', data)
-        if not nombre:
-            data['mensaje_error'] = ["Debes ingresar un Nombre para registrar un entrenador."]
-            return render(request, 'intranet/administrador/crear_perfil_entrenador.html', data)
-        if not apellido:
-            data['mensaje_error'] = ["Debes ingresar un Apellido para registrar un entrenador."]
-            return render(request, 'intranet/administrador/crear_perfil_entrenador.html', data)
-        if not tipo_entrenador:
-            data['mensaje_error'] = ["Debes ingresar un Tipo de Entrenador para registrar un entrenador."]
-            return render(request, 'intranet/administrador/crear_perfil_entrenador.html', data)
-        if not email:
-            data['mensaje_error'] = ["Debes ingresar un Email para registrar un entrenador."]
-            return render(request, 'intranet/administrador/crear_perfil_entrenador.html', data)
-        if not disciplinas_seleccionadas:
-            data['mensaje_error'] = ["Debes seleccionar al menos una disciplina."]
-            return render(request, 'intranet/administrador/crear_perfil_entrenador.html', data)
-
-        disciplinas_seleccionadas = [int(disciplina) for disciplina in disciplinas_seleccionadas]
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
         
+        # Obtener parámetros de filtro
+        discipline_id = self.request.GET.get('discipline_id')
+        date_from = self.request.GET.get('date_from')
+        date_to = self.request.GET.get('date_to')
 
-        # Generar contraseña
-        nombre_concatenado = apellido[:2]
-        rut_extracto = rut.split('-')[0]
-        resultado_pass = nombre_concatenado.lower() + rut_extracto
-        hashed_password = make_password(resultado_pass)
+        # Aplicar filtros a las consultas
+        asistencias = Attendance.objects.all()
+        if discipline_id:
+            asistencias = asistencias.filter(discipline_id=discipline_id)
+        if date_from:
+            asistencias = asistencias.filter(attendance_date__gte=date_from)
+        if date_to:
+            asistencias = asistencias.filter(attendance_date__lte=date_to)
 
+        # Obtener los estados de asistencia
+        status_present = AttendanceStatus.objects.filter(status_name__icontains='present').first()
+        status_absent = AttendanceStatus.objects.filter(status_name__icontains='absent').first()
+        status_justified = AttendanceStatus.objects.filter(status_name__icontains='justified').first()
 
-        # Llamar a la función para guardar el entrenador
-        salida = guardar_entrenador(
-            rut, 
-            nombre, 
-            apellido, 
-            imagen, 
-            tipo_entrenador, 
-            email, 
-            hashed_password,  
-            disciplinas_seleccionadas 
+        # Calcular estadísticas generales
+        total_estudiantes = asistencias.values('player').distinct().count()
+        total_presentes = asistencias.filter(status=status_present).count()
+        total_ausentes = asistencias.filter(status=status_absent).count()
+        total_justificados = asistencias.filter(status=status_justified).count()
+        total_registros = asistencias.count()
+
+        # Calcular porcentajes
+        porcentaje_presentes = (total_presentes / total_registros * 100) if total_registros > 0 else 0
+        porcentaje_ausentes = (total_ausentes / total_registros * 100) if total_registros > 0 else 0
+        porcentaje_justificados = (total_justificados / total_registros * 100) if total_registros > 0 else 0
+
+        # Calcular regularidad por estudiante
+        estudiantes_stats = asistencias.values('player').annotate(
+            total_clases=Count('attendance_id'),
+            asistencias=Count('attendance_id', 
+                            filter=Q(status=status_present))
         )
 
-        # Manejar el resultado de salida
-        if salida == 1:
-            data['mensaje_exito'] = ["Entrenador registrado correctamente."]
-            data['entrenadores'] = listado_entrenadores()
+        asistencia_alta = sum(1 for stat in estudiantes_stats if (stat['asistencias'] / stat['total_clases'] * 100) > 75)
+        asistencia_media = sum(1 for stat in estudiantes_stats if 50 <= (stat['asistencias'] / stat['total_clases'] * 100) <= 75)
+        asistencia_baja = sum(1 for stat in estudiantes_stats if (stat['asistencias'] / stat['total_clases'] * 100) < 50)
 
-        
-        elif salida == -1:
-            data['mensaje_error'] = ["Rut ya registrado. No es posible registrar al Entrenador."]
+        # Estadísticas por disciplina
+        estadisticas_disciplina = []
+        for disciplina in Discipline.objects.all():
+            asistencias_disciplina = asistencias.filter(discipline=disciplina)
+            total_disc = asistencias_disciplina.count()
+            if total_disc > 0:
+                presentes_disc = asistencias_disciplina.filter(status=status_present).count()
+                estadisticas_disciplina.append({
+                    'nombre': disciplina.discipline_name,
+                    'total_estudiantes': asistencias_disciplina.values('player').distinct().count(),
+                    'promedio_asistencia': round(presentes_disc / total_disc * 100, 2),
+                    'presentes': presentes_disc,
+                    'ausentes': asistencias_disciplina.filter(status=status_absent).count(),
+                    'justificados': asistencias_disciplina.filter(status=status_justified).count(),
+                    'regularidad': round(presentes_disc / total_disc * 100, 2)
+                })
 
-        elif salida == -2:
-            data['mensaje_error'] = ["Email ya registrado. No es posible registrar al Entrenador."]
+        # Datos para el gráfico de tendencia
+        tendencia_data = asistencias.values('attendance_date') \
+            .annotate(porcentaje=Avg(Case(
+                When(status=status_present, then=100),
+                When(status=status_justified, then=50),
+                default=0,
+                output_field=FloatField(),
+            ))).order_by('attendance_date')
 
-        else:
-            data['mensaje_error'] = ["No se ha podido Registrar al entrenador. ERROR."]
+        labels = [d['attendance_date'].strftime('%b %Y') for d in tendencia_data]
+        datos = [round(d['porcentaje'], 2) for d in tendencia_data]
+
+        context.update({
+            'disciplines': Discipline.objects.all(),
+            'estadisticas': {
+                'total_estudiantes': total_estudiantes,
+                'total_presentes': total_presentes,
+                'total_ausentes': total_ausentes,
+                'total_justificados': total_justificados,
+                'porcentaje_presentes': round(porcentaje_presentes, 2),
+                'porcentaje_ausentes': round(porcentaje_ausentes, 2),
+                'porcentaje_justificados': round(porcentaje_justificados, 2),
+                'asistencia_alta': asistencia_alta,
+                'asistencia_media': asistencia_media,
+                'asistencia_baja': asistencia_baja,
+                'total_entrenamientos': asistencias.values('attendance_date').distinct().count(),
+                'promedio_asistencia': round(porcentaje_presentes, 2),
+                'mejor_asistencia': round(max((stat['asistencias'] / stat['total_clases'] * 100) for stat in estudiantes_stats) if estudiantes_stats else 0, 2),
+                'peor_asistencia': round(min((stat['asistencias'] / stat['total_clases'] * 100) for stat in estudiantes_stats) if estudiantes_stats else 0, 2)
+            },
+            'estadisticas_disciplina': estadisticas_disciplina,
+            'estadisticas_tendencia': {
+                'labels': labels,
+                'datos': datos
+            }
+        })
+
+        return context
+
+    def get(self, request, *args, **kwargs):
+        if request.GET.get('descargar'):
+            return self.exportar_excel(request)
+        return super().get(request, *args, **kwargs)
+
+    def exportar_excel(self, request):
+        try:
+            # Obtener parámetros de filtro
+            discipline_id = request.GET.get('discipline_id')
+            date_from = request.GET.get('date_from')
+            date_to = request.GET.get('date_to')
+
+            # Aplicar filtros
+            asistencias = Attendance.objects.all()
+            if discipline_id:
+                asistencias = asistencias.filter(discipline_id=discipline_id)
+            if date_from:
+                asistencias = asistencias.filter(attendance_date__gte=date_from)
+            if date_to:
+                asistencias = asistencias.filter(attendance_date__lte=date_to)
+
+            # Crear DataFrame
+            data = []
+            for asistencia in asistencias:
+                data.append({
+                    'Fecha': asistencia.attendance_date,
+                    'RUT': asistencia.player.player_rut,
+                    'Estudiante': f"{asistencia.player.player_name} {asistencia.player.player_last_name}",
+                    'Disciplina': asistencia.discipline.discipline_name,
+                    'Estado': asistencia.status.status_name,
+                    'Comentarios': asistencia.attendance_comments or ''
+                })
+
+            df = pd.DataFrame(data)
+
+            # Crear respuesta Excel
+            response = HttpResponse(content_type='application/vnd.ms-excel')
+            response['Content-Disposition'] = f'attachment; filename=asistencias_{datetime.now().strftime("%Y%m%d")}.xlsx'
+            
+            df.to_excel(response, index=False, engine='openpyxl')
+            
+            messages.success(request, 'Excel exportado exitosamente')
+            return response
+
+        except Exception as e:
+            messages.error(request, f'Error al exportar Excel: {str(e)}')
+            return redirect('asistencia_admin')
+
+@login_required
+def crear_perfil_entrenador(request):
+
+    entrenadores = listado_entrenadores()
+    page = request.GET.get('page',1)
+
+    try:
+        paginator = Paginator(entrenadores, 9)
+        entrenadores = paginator.page(page)
+    except:
+        raise Http404            
+
+
+    data = {
+    'entity':entrenadores,
+    'paginator': paginator,
+    'disciplinas': listado_disciplinas(),
+    'tipo_entrenador': listado_tipo_entrenador(),
+
+    } 
+
+
+    if request.method == 'POST':
+        if 'form_crear' in request.POST:
+
+            # Obtener los datos del formulario
+            rut = request.POST.get('rut')
+            nombre = request.POST.get('nombre')
+            apellido = request.POST.get('apellido')
+            tipo_entrenador = int(request.POST.get('tipo_entrenador')) 
+            email = request.POST.get('email')
+
+            if 'img' in request.FILES:
+                imagen_file = request.FILES['img']
+                imagen = imagen_file.read()
+            else:
+                messages.error(request, "Debes ingresar imagen para crear un entrenador.")
+                return redirect('crear_perfil_entrenador')
+
+            disciplinas_seleccionadas = request.POST.getlist('lista_de_disciplina')
+
+            # Validaciones
+            if not rut:
+                messages.error(request, "Debes ingresar rut para crear un entrenador.")
+                return redirect('crear_perfil_entrenador')
+            elif not validar_rut(rut):
+                messages.error(request, "Debes ingresar un Rut valido para registrar un entrenador.")
+                return redirect('crear_perfil_entrenador')
+            else:
+                rut = rut.replace(".", "")
+            
+            if not nombre:
+                messages.error(request, "Debes ingresar nombre para crear un entrenador.")
+                return redirect('crear_perfil_entrenador')
+            if not apellido:
+                messages.error(request, "Debes ingresar apellido para crear un entrenador.")
+                return redirect('crear_perfil_entrenador')
+            if not tipo_entrenador:
+                messages.error(request, "Debes seleccionar un tipo de entrenador para crear un entrenador.")
+                return redirect('crear_perfil_entrenador')
+            if not email:
+                messages.error(request, "Debes ingresar email para crear un entrenador.")
+                return redirect('crear_perfil_entrenador')
+            if not disciplinas_seleccionadas:
+                messages.error(request, "Debes ingresar una disciplina para crear un entrenador.")
+                return redirect('crear_perfil_entrenador')
+
+            disciplinas_seleccionadas = [int(disciplina) for disciplina in disciplinas_seleccionadas]
+            
+
+            # Generar contraseña
+            nombre_concatenado = apellido[:1]
+            rut_extracto = rut.split('-')[0]
+            resultado_pass = nombre_concatenado.lower() + rut_extracto
+            hashed_password = make_password(resultado_pass)
+
+
+            # Llamar a la función para guardar el entrenador
+            salida = guardar_entrenador(
+                rut, 
+                nombre, 
+                apellido, 
+                imagen, 
+                tipo_entrenador, 
+                email, 
+                hashed_password,  
+                disciplinas_seleccionadas 
+            )
+
+            # Manejar el resultado de salida
+            if salida == 1:
+                messages.success(request, "Entrenador registrado correctamente.")
+                return redirect('crear_perfil_entrenador')
+
+            elif salida == -1:
+                messages.error(request, "Rut ya registrado en otro entrenador.")
+                return redirect('crear_perfil_entrenador')
+            elif salida == -2:
+                messages.error(request, "Email ya registrado en otro entrenador.")
+                return redirect('crear_perfil_entrenador')
+            else:
+                messages.error(request, "No se ha podido registrar el entrenador. ERROR.")
+                return redirect('crear_perfil_entrenador')
+
+
+        elif 'form_editar' in request.POST:
+            id_entrenador = request.POST.get('id')
+            if id_entrenador:
+                entrenador = get_object_or_404(Coach, coach_id=id_entrenador)
+                
+                if 'imagen' in request.FILES:
+                    imagen_file = request.FILES['imagen']
+                    img_entrenador = imagen_file.read()
+                else:
+                    img_entrenador = entrenador.coach_img
+
+                nombre_entrendaor = request.POST.get('nombre')
+
+                if 'lista_de_disciplina' in request.POST:
+                    # El usuario envió disciplinas nuevas
+                    disciplinas_seleccionadas = request.POST.getlist('lista_de_disciplina')
+                    disciplinas_seleccionadas = [int(disciplina) for disciplina in disciplinas_seleccionadas]
+                    disciplinas_json = json.dumps(disciplinas_seleccionadas)
+                
+                else:
+                    disciplinas_json = None
+
+                if 'tipo_entrenador' in request.POST:
+                    tipo_entrenador = int(request.POST.get('tipo_entrenador')) 
+                    print(tipo_entrenador)               
+                else:
+                    tipo_entrenador = None   
+
+
+                print(tipo_entrenador)
+                salida = editar_entrenador(id_entrenador, img_entrenador, nombre_entrendaor, disciplinas_json, tipo_entrenador)
+
+                if salida == 1:
+                    messages.success(request, "Entrenador actualizado correctamente.")
+                else:
+                    messages.error(request, "No se ha podido actualizar al entrenador. ERROR.")
+                return redirect('crear_perfil_entrenador')
+    
+            else:
+                messages.error(request, "No se ha proporcionado un ID para el entrenador a editar.")
+            return redirect('crear_perfil_entrenador')
+
+        elif 'form_eliminar' in request.POST:
+            id_entrenador = request.POST.get('id')
+            salida = eliminar_entrenador(id_entrenador)
+            if salida == 1:
+                messages.success(request, "Entrenador eliminado correctamente.")
+            else:
+                messages.error(request, "Debes ingresar imagen para crear un entrenador.")
+            return redirect('crear_perfil_entrenador')
+
 
     return render(request, 'intranet/administrador/crear_perfil_entrenador.html', data)
 
@@ -643,9 +1075,9 @@ def gestion_noticias(request):
             salida = guardar_noticias(nombre_noticia, descripcion_noticia, img_noticia, etiqueta)
 
             if salida == 1:
-                messages.success(request, "Imagen registrada correctamente.")
+                messages.success(request, "Noticia registrada correctamente.")
             else:
-                messages.error(request, "No se ha podido registrar la galería. ERROR.")
+                messages.error(request, "No se ha podido registrar la Noticia. ERROR.")
             return redirect('gestion_noticias')
 
         elif 'form_editar' in request.POST:
@@ -682,15 +1114,85 @@ def gestion_noticias(request):
             salida = eliminar_noticias(id_noticias)
             if salida == 1:
                 messages.success(request, "Noticia eliminada correctamente.")
+                return redirect('gestion_noticias')
             else:
                 messages.error(request, "No se ha podido eliminar la noticia. ERROR.")
             return redirect('gestion_noticias')
 
     return render(request, 'intranet/administrador/gestion_noticias.html', data)
 
+
+from django.http import HttpResponse
+import pandas as pd
+from datetime import datetime
+from django.db.models import F
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse, HttpResponseForbidden
+from django.contrib import messages
+from django.db import connection
+import pandas as pd
+from datetime import datetime
+
 @login_required
 def asistencia_admin(request):
-    return render (request, 'intranet/administrador/asistencia_admin.html')
+    if request.user.user_type != 'admin01':
+        return HttpResponseForbidden("Acceso denegado. Se requieren permisos de administrador.")
+
+    try:
+        # Obtener disciplinas para el filtro
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT discipline_id, discipline_name 
+                FROM discipline 
+                ORDER BY discipline_name
+            """)
+            disciplines = [
+                {'discipline_id': row[0], 'discipline_name': row[1]} 
+                for row in cursor.fetchall()
+            ]
+
+            # Obtener entrenamientos
+            cursor.execute("""
+                SELECT t.training_id, 
+                        t.training_name || ' (' || d.discipline_name || ')' as display_name,
+                        t.discipline_id
+                FROM training t
+                JOIN discipline d ON t.discipline_id = d.discipline_id
+                ORDER BY d.discipline_name, t.training_name
+            """)
+            trainings = [
+                {'training_id': row[0], 'training_name': row[1], 'discipline_id': row[2]} 
+                for row in cursor.fetchall()
+            ]
+
+            # Obtener períodos académicos
+            cursor.execute("""
+                SELECT period_id, period_name 
+                FROM academic_period
+                WHERE is_active = 1
+                ORDER BY period_name
+            """)
+            periods = [
+                {'period_id': row[0], 'period_name': row[1]} 
+                for row in cursor.fetchall()
+            ]
+
+        if request.GET.get('descargar') == '1':
+            return descargar_asistencia(request)
+
+        context = {
+            'disciplines': disciplines,
+            'trainings': trainings,
+            'periods': periods,
+        }
+
+        return render(request, 'intranet/administrador/asistencia_admin.html', context)
+
+    except Exception as e:
+        print(f"Error en asistencia_admin: {str(e)}")
+        messages.error(request, f'Error al cargar los datos: {str(e)}')
+        return render(request, 'intranet/administrador/asistencia_admin.html', {})
 
 @login_required
 def gestion_galeria_disciplina_por_disciplina(request):
@@ -789,38 +1291,35 @@ def gestion_galeria(request):
 def gestion_portada(request):
     
     data = {
-    'galeria_portada':galerias,
-    'paginator': paginator
+        'portada':listado_portadas()
+
     }   
 
 
     if request.method == 'POST':
 
         if 'form_editar' in request.POST:
-            id_galeria = request.POST.get('id')
-            if id_galeria:
-                galeria = get_object_or_404(GaleryGeneral, galery_gen_id=id_galeria)
+            id_portada = request.POST.get('id')
+            
+            if id_portada:
+                portada = get_object_or_404(GaleryFront, galery_front_id=id_portada)
                 if 'imagen' in request.FILES:
                     imagen_file = request.FILES['imagen']
-                    img_galeria = imagen_file.read()
+                    img_portada = imagen_file.read()
                 else:
-                    img_galeria = galeria.galery_gen_img
+                    img_portada = portada.galery_front_img
                 
-                nombre_galeria = request.POST.get('titulo')
-                fecha_galeria = request.POST.get('fecha')
-                
-                fecha_galeria = datetime.strptime(fecha_galeria, '%Y-%m-%dT%H:%M').strftime('%Y-%m-%d %H:%M:%S')
-        
-                salida = editar_galeria_general(id_galeria, img_galeria ,nombre_galeria, fecha_galeria)
+                titulo_portada = request.POST.get('titulo')
+                descripcion_portada = request.POST.get('descripcion')
+                        
+                salida = editar_portadas(id_portada, img_portada ,titulo_portada, descripcion_portada)
 
                 if salida == 1:
-                    messages.success(request, "Imagen actualizada correctamente.")
+                    messages.success(request, "Portada actualizada correctamente.")
                     return redirect('gestion_portada')
                 else:
-                    messages.error(request, "No se ha podido actualizar la imagen. ERROR.")
+                    messages.error(request, "No se ha podido actualizar la portada. ERROR.")
                     return redirect('gestion_portada')
-     
-
 
     return render (request, 'intranet/administrador/gestion_portada.html', data)
 
@@ -830,36 +1329,37 @@ def solicitud_jugador(request):
     data = {
         'solicitud': listado_solicitud(),
         'contacto': listado_contacto()
-
     }
+
+
+
     return render (request, 'intranet/administrador/solicitud_jugador.html', data)
+
+from django.shortcuts import redirect
+from django.http import HttpResponse
+from django.contrib.auth.decorators import login_required
 
 @login_required
 def aceptar_solicitud(request, id):
-    
-    data = {
-
-    }
-    
     django_cursor = connection.cursor()
     cursor = django_cursor.connection.cursor()
     out_cur = django_cursor.connection.cursor()
     salida = cursor.var(oracledb.NUMBER)
-     
-    cursor.callproc('sp_acept_request', [id, salida])
-    
-    salida_final = salida.getvalue()
-    if salida_final == 1:
-        data = {    'mensaje_exito': "Solicitud aceptada exitosamente.",
-                    'solicitud': listado_solicitud(), } 
-        return render(request, 'intranet/administrador/solicitud_jugador.html', data)
 
-    elif salida_final == 0:
-        data['mensaje_error'] = ["Error en la BD."]
-        return render(request, 'intranet/administrador/solicitud_jugador.html', data)       
+    # Llamar al procedimiento almacenado
+    cursor.callproc('sp_acept_request', [id, salida])
+
+    # Obtén el resultado del procedimiento almacenado
+    resultado = salida.getvalue()
+
+    # Redirige a una página o retorna un mensaje
+    if resultado == 1:
+        # Si la operación fue exitosa, redirige o muestra un mensaje
+        return redirect('solicitud_jugador')  # Cambia por tu vista de redirección
     else:
-        data['mensaje_error'] = ["No se pudo procesar la solicitud."]
-        return render(request, 'intranet/administrador/solicitud_jugador.html', data)
+        # Si ocurrió un error, retorna un mensaje adecuado
+        return HttpResponse(f"Error al aceptar la solicitud. Código de error: {resultado}")
+
 
 ### Disciplina ###
 
@@ -936,7 +1436,6 @@ def gestion_disciplina(request):
 
         elif 'form_eliminar' in request.POST:
             discipline_id = request.POST.get('id')
-            print(discipline_id)
             salida = eliminar_disciplina(discipline_id)
 
             if salida == 1:
@@ -1094,58 +1593,65 @@ def gestion_Jugador_elite(request):
 
             imagen = request.FILES.get('imagen').read()
             if not imagen:
-                data['mensaje_error'] = ["Debes subir una imagen para registrar un jugador."]
-                return render (request, 'intranet/administrador/gestion_Jugador_elite.html', data)
+                messages.error(request, "Debes subir una imagen para registrar un jugador.")
+                return redirect('gestion_Jugador_elite')
 
             rut = request.POST.get('rut')
             if not rut:
-                data['mensaje_error'] = ["Debes ingresar un Rut para registrar un jugador."]
-                return render (request, 'intranet/administrador/gestion_Jugador_elite.html', data)
-
+                messages.error(request, "Debes ingresar un Rut para registrar un jugador.")
+                return redirect('gestion_Jugador_elite')
+            elif not validar_rut(rut):
+                messages.error(request, "Debes ingresar un Rut valido para registrar un jugador.")
+                return redirect('gestion_Jugador_elite')
+            else:
+                rut = rut.replace(".", "")
+                
             nombre = request.POST.get('nombre')
             if not nombre:
-                data['mensaje_error'] = ["Debes ingresar un Nombre para registrar un jugador."]
-                return render (request, 'intranet/administrador/gestion_Jugador_elite.html', data)
+                messages.error(request, "Debes ingresar un Nombre para registrar un jugador.")
+                return redirect('gestion_Jugador_elite')
 
             apellido = request.POST.get('apellido')
             if not apellido:
-                data['mensaje_error'] = ["Debes ingresar un Apellido para registrar un jugador."]
-                return render (request, 'intranet/administrador/gestion_Jugador_elite.html', data)
+                messages.error(request, "Debes ingresar un Apellido para registrar un jugador.")
+                return redirect('gestion_Jugador_elite')
 
             disciplina = request.POST.get('disciplina')
             if not disciplina:
-                data['mensaje_error'] = ["Debes ingresar una disciplina para registrar un jugador."]
-                return render (request, 'intranet/administrador/gestion_Jugador_elite.html', data)
+                messages.error(request, "Debes ingresar una disciplina para registrar un jugador.")
+                return redirect('gestion_Jugador_elite')
 
             fecha_nacimiento = request.POST.get('fecha_nacimiento')
             if not fecha_nacimiento:
-                data['mensaje_error'] = ["Debes ingresar una fwcha de nacimiento para registrar un jugador."]
-                return render (request, 'intranet/administrador/gestion_Jugador_elite.html', data)
+                messages.error(request, "Debes ingresar una fwcha de nacimiento para registrar un jugador.")
+                return redirect('gestion_Jugador_elite')
 
             discipline_id = request.POST.get('disciplina_id')
             if not discipline_id:
-                data['mensaje_error'] = ["Debes ingresar una Disciplina para registrar un jugador."]
-                return render (request, 'intranet/administrador/gestion_Jugador_elite.html', data)
+                messages.error(request, "Debes ingresar una Disciplina para registrar un jugador.")
+                return redirect('gestion_Jugador_elite')
 
             # Guardar el jugador en la base de datos
             salida = guardar_jugador_elite(rut, nombre, apellido, disciplina, fecha_nacimiento, imagen, discipline_id)
 
             if salida == 1:
-                data['mensaje_exito'] = ["Creación de Jugador enviada correctamente."]
+                messages.success(request, "Creación de Jugador enviada correctamente.")
                 jugador_elite = listado_jugar_elite()
 
                 data = {
                 'entity':jugador_elite,
                 'paginator': paginator
                 }  
+                return redirect('gestion_Jugador_elite')
+
             elif salida == -1:
-                data['mensaje_error'] = ["Rut ya registrado. Cambie el rut o contacto con el administrador."] 
-                print("Rut ya registrado. Cambie el rut o contacto con el administrador.")            
+                messages.error(request, "Rut ya registrado. Cambie el rut o contacto con el administrador.")
+                return redirect('gestion_Jugador_elite')
+
             else:
-                data['mensaje_error'] = ["No se ha podido registrar. ERROR."]
-                print("No se ha podido registrar. ERROR.")
-        
-        
+                messages.error(request, "No se ha podido registrar. ERROR.")
+                return redirect('gestion_Jugador_elite')
+            
         elif 'form_editar' in request.POST:
             id_jugador_elite = request.POST.get('id')
             if id_jugador_elite:
@@ -1157,26 +1663,26 @@ def gestion_Jugador_elite(request):
                     imagen = jugador_elite.player_img
 
                 rut = request.POST.get('rut')
+                if not validar_rut(rut):
+                    messages.error(request, "Debes ingresar un Rut valido para editar un jugador.")
+                    return redirect('gestion_Jugador_elite')
+                else:
+                    rut = rut.replace(".", "")
+
+
                 nombre = request.POST.get('nombre')
                 apellido = request.POST.get('apellido')
                 disciplina = request.POST.get('disciplina')
                 fecha_nacimiento = request.POST.get('fecha')
                 discipline_id = request.POST.get('id_disciplina')
                 
-                print(f"id_jugador_elite: {id_jugador_elite} \n  rut: {rut} \n nombre: {nombre} \n apellido: {apellido} \n disciplina: {disciplina} \n fecha_nacimiento: {fecha_nacimiento} \n discipline_id: {discipline_id} \n ")
-                print(id_jugador_elite)
-
-                print(discipline_id)
-                # fecha_galeria = datetime.strptime(fecha_galeria, '%Y-%m-%dT%H:%M').strftime('%Y-%m-%d %H:%M:%S')
         
                 salida = editar_jugador_elite(id_jugador_elite, rut, nombre, apellido, disciplina, fecha_nacimiento, imagen, discipline_id)
 
                 if salida == 1:
-                    messages.success(request, "Imagen actualizada correctamente.")
-                    print("Imagen actualizada correctamente.")
+                    messages.success(request, "Jugador actualizado correctamente.")
                 else:
-                    messages.error(request, "No se ha podido actualizar la imagen. ERROR.")
-                    print("Imagen actualizada correctamente.")
+                    messages.error(request, "No se ha podido actualizar al jugador. ERROR.")
 
                 return redirect('gestion_Jugador_elite')
 
@@ -1315,10 +1821,7 @@ def gestionar_periodos(request):
                 messages.error(request, f'Error de Oracle: {str(error)}')
             except Exception as e:
                 messages.error(request, f'Error al crear el periodo: {str(e)}')
-            if result == 1:
-                    messages.success(request, "Periodo creado correctamente.")
-            else:
-                    messages.error(request, "No se ha podido crear la Periodo. ERROR.")
+
             return redirect('gestionar_periodos')
 
 
@@ -1393,10 +1896,7 @@ def gestionar_periodos(request):
                 messages.error(request, f'Error de Oracle: {str(error)}')
             except Exception as e:
                 messages.error(request, f'Error al crear el entrenamiento: {str(e)}')
-        if result == 1:
-                    messages.success(request, "Entrenamiento actualizado correctamente.")
-        else:
-            messages.error(request, "No se ha podido actualizar el entrenamiento. ERROR.")
+
         return redirect('gestionar_periodos')
 
     # Para mostrar los periodos existentes
@@ -1646,6 +2146,44 @@ def guardar_entrenador(rut, nombre, apellido, imagen, tipo_entrenador, email, pa
             email, 
             password, 
             disciplinas_json,  # Pasar el JSON de disciplinas
+            salida
+        ])
+    except Exception as e:
+        print(f'Error al ejecutar el procedimiento almacenado: {str(e)}')
+        return 0
+
+    return salida.getvalue()
+
+
+def eliminar_entrenador(id_entrenador):
+    django_cursor = connection.cursor()
+    cursor = django_cursor.connection.cursor()
+
+    salida = cursor.var(oracledb.NUMBER)
+
+    cursor.callproc('SP_DELETE_COACH', [
+        id_entrenador,
+        salida
+    ])
+
+    return salida.getvalue()
+
+
+def editar_entrenador(id_entrenador, img_entrenador, nombre_entrendaor, disciplinas_json, tipo_entrenador):
+    django_cursor = connection.cursor()
+    cursor = django_cursor.connection.cursor()
+
+    salida = cursor.var(oracledb.NUMBER)
+
+    
+    try:
+        cursor.callproc('SP_EDIT_COACH', [
+            id_entrenador, 
+            img_entrenador, 
+            nombre_entrendaor, 
+            disciplinas_json, 
+            tipo_entrenador,
+
             salida
         ])
     except Exception as e:
@@ -1925,6 +2463,8 @@ def listado_galeria_discipline(disciplina_id):
     return lista
 #############################################
 
+
+##############  PORTADAS ##############
 def listado_portadas():
     django_cursor = connection.cursor()
     cursor = django_cursor.connection.cursor()
@@ -1943,6 +2483,26 @@ def listado_portadas():
         lista.append(data)
 
     return lista
+
+
+def editar_portadas(id_portada, img_portada, titulo_portada, descripcion_portada):
+    django_cursor = connection.cursor()
+    cursor = django_cursor.connection.cursor()
+    salida = cursor.var(oracledb.NUMBER)
+
+    cursor.callproc('SP_EDIT_FRONT_PAGES', [
+        id_portada,
+        img_portada,
+        titulo_portada, 
+        descripcion_portada,
+
+        salida
+    ])
+
+    return salida.getvalue()
+
+#############################################
+
 
 def listado_solicitud():
     django_cursor = connection.cursor()
@@ -1983,10 +2543,14 @@ def listado_contacto():
 
 
 def listado_jugadores_por_disciplina(discipline_id):
+    """
+    Obtiene la lista de jugadores usando el procedimiento almacenado original
+    """
     try:
         django_cursor = connection.cursor()
         out_cur = django_cursor.connection.cursor()
-        # Ejecutar el procedimiento
+        
+        # Ejecutar el procedimiento almacenado original
         django_cursor.callproc("SP_LIST_PLAYERS_FOR_DISCIPLINE", [out_cur, str(discipline_id)])
         
         # Procesar resultados
@@ -1999,19 +2563,31 @@ def listado_jugadores_por_disciplina(discipline_id):
                 'apellido': fila[3],
                 'disciplina': fila[4],
                 'sede': fila[5],
-                'carrera': fila[6],
-                'promedio_asistencia': fila[7]
+                'carrera': fila[6]
             }
             lista.append(jugador)
+            
+        print(f"Jugadores encontrados: {lista}")  # Debug
         return lista
+        
     except Exception as e:
         print(f"Error al obtener jugadores: {str(e)}")
+        print(f"Tipo de error: {type(e)}")
+        import traceback
+        traceback.print_exc()
         return []
+        
     finally:
         if 'out_cur' in locals():
-            out_cur.close()
+            try:
+                out_cur.close()
+            except:
+                pass
         if 'django_cursor' in locals():
-            django_cursor.close()
+            try:
+                django_cursor.close()
+            except:
+                pass
 
 
 def registrar_asistencia(player_id, discipline_id, status, comments):
@@ -2183,6 +2759,20 @@ def editar_jugador_elite(id_jugador_elite, rut, nombre, apellido, disciplina, fe
     return salida.getvalue()
 #############################################
 
+def eliminar_jugador(id_jugador):
+    django_cursor = connection.cursor()
+    cursor = django_cursor.connection.cursor()
+
+    salida = cursor.var(oracledb.NUMBER)
+
+    cursor.callproc('SP_DELETE_PLAYER', [
+        id_jugador,
+        salida
+    ])
+
+    return salida.getvalue()
+
+
 def crear_disciplina( nombre, descripcion, imagen):
     django_cursor = connection.cursor()
     cursor = django_cursor.connection.cursor()
@@ -2192,5 +2782,374 @@ def crear_disciplina( nombre, descripcion, imagen):
     cursor.callproc('SP_CREATE_DISCIPLINA', [ nombre, descripcion, imagen, salida])
 
     return salida.getvalue()
+
+
+
+
+###### CONTRASEÑA ENTRENADOR #######
+
+
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.shortcuts import render, redirect
+from django.contrib.auth.hashers import check_password
+from django.contrib.auth import update_session_auth_hash
+
+@login_required
+def contrasena_entrenador(request):
+    if request.method == 'POST':
+        current_password = request.POST.get('current_password')
+        new_password = request.POST.get('new_password')
+        confirm_password = request.POST.get('confirm_password')
+        
+        # Verificar si la contraseña actual es correcta
+        if not check_password(current_password, request.user.password):
+            messages.error(request, 'La contraseña actual no es correcta')
+            return redirect('contrasena_entrenador')
+        
+        # Verificar si las nuevas contraseñas coinciden
+        if new_password != confirm_password:
+            messages.error(request, 'Las nuevas contraseñas no coinciden')
+            return redirect('contrasena_entrenador')
+        
+        # Cambiar la contraseña
+        try:
+            request.user.set_password(new_password)
+            request.user.save()
+            update_session_auth_hash(request, request.user)  # Mantener la sesión activa
+            messages.success(request, 'Contraseña cambiada exitosamente')
+            return redirect('contrasena_entrenador')
+        except Exception as e:
+            messages.error(request, 'Ocurrió un error al cambiar la contraseña')
+            return redirect('contrasena_entrenador')
+    
+    return render(request, 'intranet/entrenador/contrasena_entrenador.html')
+###################################################################################################
+
+
+
+def calcular_estadisticas_asistencia(request):
+    try:
+        discipline_id = request.GET.get('discipline_id')
+        training_id = request.GET.get('training_id')
+        period_id = request.GET.get('period_id')
+
+        with connection.cursor() as cursor:
+            query = """
+                WITH asistencia_diaria AS (
+                    SELECT 
+                        a.attendance_date,
+                        COUNT(*) as total_asistentes,
+                        SUM(CASE WHEN ast.status_name = 'present' THEN 1 ELSE 0 END) as presentes,
+                        SUM(CASE WHEN ast.status_name = 'absent' THEN 1 ELSE 0 END) as ausentes,
+                        SUM(CASE WHEN ast.status_name = 'justified' THEN 1 ELSE 0 END) as justificados,
+                        COUNT(DISTINCT a.player_id) as total_jugadores
+                    FROM attendance a
+                    JOIN attendance_status ast ON a.status_id = ast.status_id
+                    WHERE 1=1
+                    {% if discipline_id %}AND a.discipline_id = :discipline_id{% endif %}
+                    {% if training_id %}AND a.training_id = :training_id{% endif %}
+                    {% if period_id %}AND t.period_id = :period_id{% endif %}
+                    GROUP BY a.attendance_date
+                )
+                SELECT
+                    COUNT(DISTINCT attendance_date) as total_entrenamientos,
+                    ROUND(AVG(CAST(presentes AS FLOAT) / NULLIF(total_jugadores, 0) * 100), 2) as promedio_asistencia,
+                    MAX(CAST(presentes AS FLOAT) / NULLIF(total_jugadores, 0) * 100) as mejor_asistencia,
+                    MIN(CAST(presentes AS FLOAT) / NULLIF(total_jugadores, 0) * 100) as peor_asistencia,
+                    SUM(presentes) as total_presentes,
+                    SUM(ausentes) as total_ausentes,
+                    SUM(justificados) as total_justificados,
+                    MAX(CASE 
+                        WHEN CAST(presentes AS FLOAT) / NULLIF(total_jugadores, 0) = 
+                            (SELECT MAX(CAST(presentes AS FLOAT) / NULLIF(total_jugadores, 0))
+                            FROM asistencia_diaria)
+                        THEN (SELECT COUNT(*) 
+                            FROM asistencia_diaria ad2 
+                            WHERE CAST(ad2.presentes AS FLOAT) / NULLIF(ad2.total_jugadores, 0) = 
+                                    CAST(presentes AS FLOAT) / NULLIF(total_jugadores, 0))
+                    END) as dias_mejor_asistencia,
+                    MAX(CASE 
+                        WHEN CAST(presentes AS FLOAT) / NULLIF(total_jugadores, 0) = 
+                            (SELECT MIN(CAST(presentes AS FLOAT) / NULLIF(total_jugadores, 0))
+                            FROM asistencia_diaria)
+                        THEN (SELECT COUNT(*) 
+                            FROM asistencia_diaria ad2 
+                            WHERE CAST(ad2.presentes AS FLOAT) / NULLIF(ad2.total_jugadores, 0) = 
+                                    CAST(presentes AS FLOAT) / NULLIF(total_jugadores, 0))
+                    END) as dias_peor_asistencia
+                FROM asistencia_diaria
+            """
+
+            param_dict = {}
+            if discipline_id:
+                param_dict['discipline_id'] = discipline_id
+            if training_id:
+                param_dict['training_id'] = training_id
+            if period_id:
+                param_dict['period_id'] = period_id
+
+            cursor.execute(query, param_dict)
+            result = cursor.fetchone()
+
+            if result:
+                estadisticas = {
+                    'total_entrenamientos': result[0],
+                    'promedio_asistencia': f"{result[1]}%",
+                    'mejor_asistencia': f"{int(result[2])}% ({result[7]} días)",
+                    'peor_asistencia': f"{int(result[3])}% ({result[8]} días)",
+                    'total_presentes': result[4],
+                    'total_ausentes': result[5],
+                    'total_justificados': result[6]
+                }
+                return estadisticas
+            else:
+                return None
+
+    except Exception as e:
+        print(f"Error calculando estadísticas: {str(e)}")
+        return None
+###################################################################################################
+
+
+
+
+
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+from django.http import HttpResponse, HttpResponseForbidden
+from django.contrib import messages
+from django.db import connection
+import pandas as pd
+from datetime import datetime
+import traceback
+import numpy as np
+
+@login_required
+def descargar_asistencia(request):
+    try:
+        discipline_id = request.GET.get('discipline_id')
+        training_id = request.GET.get('training_id')
+        period_id = request.GET.get('period_id')
+
+        print(f"Filtros recibidos: discipline_id={discipline_id}, training_id={training_id}, period_id={period_id}")
+
+        with connection.cursor() as cursor:
+            query_params = []
+            where_clauses = []
+
+            base_query = """
+                SELECT 
+                    TO_CHAR(a.attendance_date, 'DD/MM/YYYY') as fecha,
+                    NVL(p.player_name, '') as nombre,
+                    NVL(p.player_last_name, '') as apellido,
+                    NVL(d.discipline_name, '') as disciplina,
+                    NVL(t.training_name, '') as entrenamiento,
+                    CASE 
+                        WHEN ast.status_name = 'present' THEN 'Presente'
+                        WHEN ast.status_name = 'absent' THEN 'Ausente'
+                        WHEN ast.status_name = 'justified' THEN 'Justificado'
+                        ELSE ast.status_name
+                    END as estado,
+                    NVL(a.attendance_comments, '') as comentarios,
+                    NVL(p.player_career, '') as carrera,
+                    NVL(p.player_headquarters, '') as sede
+                FROM attendance a
+                JOIN player p ON a.player_id = p.player_id
+                JOIN discipline d ON a.discipline_id = d.discipline_id
+                JOIN training t ON a.training_id = t.training_id
+                JOIN attendance_status ast ON a.status_id = ast.status_id
+                WHERE 1=1
+            """
+
+            if discipline_id:
+                where_clauses.append("a.discipline_id = :discipline_id")
+                query_params.append(discipline_id)
+            if training_id:
+                where_clauses.append("a.training_id = :training_id")
+                query_params.append(training_id)
+            if period_id:
+                where_clauses.append("t.period_id = :period_id")
+                query_params.append(period_id)
+
+            if where_clauses:
+                base_query += " AND " + " AND ".join(where_clauses)
+
+            # Consulta final con totales por jugador y disciplina
+            final_query = f"""
+                WITH base_data AS ({base_query})
+                SELECT 
+                    fecha,
+                    nombre,
+                    apellido,
+                    disciplina,
+                    entrenamiento,
+                    estado,
+                    comentarios,
+                    carrera,
+                    sede,
+                    COUNT(*) OVER (PARTITION BY disciplina) as total_asistencias,
+                    COUNT(*) OVER () as total_general,
+                    SUM(CASE WHEN estado = 'Presente' THEN 1 ELSE 0 END) OVER (PARTITION BY disciplina) as presentes_disciplina,
+                    SUM(CASE WHEN estado = 'Ausente' THEN 1 ELSE 0 END) OVER (PARTITION BY disciplina) as ausentes_disciplina,
+                    SUM(CASE WHEN estado = 'Justificado' THEN 1 ELSE 0 END) OVER (PARTITION BY disciplina) as justificados_disciplina,
+                    SUM(CASE WHEN estado = 'Presente' THEN 1 ELSE 0 END) OVER (PARTITION BY disciplina, nombre, apellido) as presentes_jugador,
+                    SUM(CASE WHEN estado = 'Ausente' THEN 1 ELSE 0 END) OVER (PARTITION BY disciplina, nombre, apellido) as ausentes_jugador,
+                    SUM(CASE WHEN estado = 'Justificado' THEN 1 ELSE 0 END) OVER (PARTITION BY disciplina, nombre, apellido) as justificados_jugador
+                FROM base_data
+                ORDER BY disciplina, nombre, apellido
+            """
+
+            print("Ejecutando consulta...")
+
+            param_dict = {}
+            if discipline_id:
+                param_dict['discipline_id'] = discipline_id
+            if training_id:
+                param_dict['training_id'] = training_id
+            if period_id:
+                param_dict['period_id'] = period_id
+
+            cursor.execute(final_query, param_dict)
+            results = cursor.fetchall()
+
+            if not results:
+                print("No se encontraron resultados")
+                messages.warning(request, 'No se encontraron registros de asistencia para los filtros seleccionados')
+                return redirect('asistencia_admin')
+
+            columns = [
+                'Fecha',
+                'Nombre',
+                'Apellido',
+                'Disciplina',
+                'Entrenamiento',
+                'Estado de Asistencia',
+                'Comentarios',
+                'Carrera',
+                'Sede',
+                'Total Asistencias',
+                'Total General',
+                'Presentes Disciplina',
+                'Ausentes Disciplina',
+                'Justificados Disciplina',
+                'Presentes Jugador',
+                'Ausentes Jugador',
+                'Justificados Jugador'
+            ]
+
+            # Crear DataFrame principal
+            df = pd.DataFrame(results, columns=columns)
+
+            # Crear resumen por jugador
+            resumen_jugador = df.groupby(['Disciplina', 'Nombre', 'Apellido']).agg({
+                'Presentes Jugador': 'first',
+                'Ausentes Jugador': 'first',
+                'Justificados Jugador': 'first'
+            }).reset_index()
+
+            # Renombrar columnas del resumen por jugador
+            resumen_jugador.columns = [
+                'Disciplina', 'Nombre', 'Apellido',
+                'Presentes', 'Ausentes', 'Justificados'
+            ]
+
+            # Crear resumen general por disciplina
+            resumen_general = pd.DataFrame({
+                'Disciplina': df['Disciplina'].unique(),
+                'Presentes': [df[df['Disciplina'] == d]['Presentes Disciplina'].iloc[0] 
+                        for d in df['Disciplina'].unique()],
+                'Ausentes': [df[df['Disciplina'] == d]['Ausentes Disciplina'].iloc[0] 
+                        for d in df['Disciplina'].unique()],
+                'Justificados': [df[df['Disciplina'] == d]['Justificados Disciplina'].iloc[0] 
+                            for d in df['Disciplina'].unique()],
+                'Total Asistencias': [df[df['Disciplina'] == d]['Total Asistencias'].iloc[0] 
+                                    for d in df['Disciplina'].unique()]
+            })
+
+            # Agregar fila de totales al resumen general
+            resumen_general.loc['Total'] = [
+                'Total General',
+                resumen_general['Presentes'].sum(),
+                resumen_general['Ausentes'].sum(),
+                resumen_general['Justificados'].sum(),
+                resumen_general['Total Asistencias'].sum()
+            ]
+
+            # Crear Excel
+            response = HttpResponse(
+                content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            )
+            filename = f'asistencia_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx'
+            response['Content-Disposition'] = f'attachment; filename="{filename}"'
+
+            print("Generando archivo Excel...")
+            with pd.ExcelWriter(response, engine='openpyxl') as writer:
+                resumen_jugador.to_excel(writer, sheet_name='Resumen por Jugador', index=False)
+                resumen_general.to_excel(writer, sheet_name='Resumen General', index=False)
+                df.to_excel(writer, sheet_name='Detalle Completo', index=False)
+
+            print("Archivo Excel generado con éxito")
+            return response
+
+    except Exception as e:
+        print(f"Error en descargar_asistencia: {str(e)}")
+        print(f"Tipo de error: {type(e)}")
+        import traceback
+        print(f"Traceback completo: {traceback.format_exc()}")
+        messages.error(request, 'Error al generar el archivo de asistencia')
+        return redirect('asistencia_admin')
+###################################################################################################
+
+
+
+
+
+
+from datetime import datetime
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.db import connection
+from django.http import HttpResponseForbidden
+
+def obtener_entrenamientos_activos(coach_id):
+    """
+    Obtiene los entrenamientos activos del entrenador
+    """
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT 
+                t.training_id,
+                t.training_name,
+                d.discipline_id,
+                d.discipline_name,
+                t.start_time,
+                t.end_time,
+                ap.period_id,
+                ap.period_name,
+                ap.is_active
+            FROM training t
+            JOIN discipline d ON t.discipline_id = d.discipline_id
+            JOIN academic_period ap ON t.period_id = ap.period_id
+            WHERE t.coach_id = :1
+            AND ap.is_active = 1
+            ORDER BY t.training_name
+        """, [coach_id])
+        
+        columns = [
+            'training_id',
+            'training_name',
+            'discipline_id',
+            'discipline_name',
+            'start_time',
+            'end_time',
+            'period_id',
+            'period_name',
+            'is_active'
+        ]
+        
+        return [dict(zip(columns, row)) for row in cursor.fetchall()]
+
 
 

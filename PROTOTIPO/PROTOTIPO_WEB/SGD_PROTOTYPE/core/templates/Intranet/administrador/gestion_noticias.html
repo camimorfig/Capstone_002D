@@ -6,6 +6,7 @@
 
 <!-- Enlace css -->
 {% block css %}
+<link rel="stylesheet" href="{% static 'core/css/administrador.css' %}">
 <link rel="stylesheet" href="{% static 'core/css/style-admin.css' %}">
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
@@ -59,16 +60,25 @@
                     <h4><i class="bi bi-journal-text text-primary"></i> Gestionar Noticias </h4>
                 
                     <br>                                                                           
-                    {% if messages %}
-                        <div class="alert-container">
-                            {% for message in messages %}
-                                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
-                                    {{ message }}
-                                </div>
-                            {% endfor %}
-                        </div>
-                    {% endif %}   
-                    <br>                                                                           
+
+                    <div class="alert-container">
+                        {% for message in messages %}
+                            <div class="alert 
+                                {% if message.tags == 'error' %}
+                                    alert-danger
+                                {% elif message.tags == 'success' %}
+                                    alert-success
+                                {% elif message.tags == 'info' %}
+                                    alert-info
+                                {% elif message.tags == 'warning' %}
+                                    alert-warning
+                                {% endif %}
+                            ">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <br>                                                                          
         
                     <div class="container">
                         <ul class="nav nav-tabs" id="myTab" role="tablist">
@@ -81,7 +91,7 @@
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link " id="subir-n-tab" data-bs-toggle="tab" data-bs-target="#subir-n"
                                     type="button" role="tab" aria-controls="subir-n" aria-selected="true">
-                                    <strong>Subir Noticia</strong></button>
+                                    Subir Noticia</button>
                             </li>
 
                         </ul>
@@ -157,7 +167,7 @@
                                     </div>
                                 {% else %}
                                     <div class="card py-2 px-2">
-
+                                        <div class="table-responsive">
                                         <table class="table table-striped table-hover">
                                             <thead>
                                                 <tr>
@@ -285,6 +295,7 @@
                                                 {% endfor %}   
                                             </tbody>
                                         </table>
+                                        </div> 
                                     </div>      
                                     <br>
                                     <!-- Paginador -->
@@ -299,35 +310,5 @@
                 </div>
             </div>
         </div>
-
-            
-        
     </main>
-        <!-- MENSAJES -->
-        {% if mensaje_error %}
-        {% for m_eror in mensaje_error %}
-            <script>
-                Swal.fire({
-                    "title": "Error!",
-                    "text": "{{m_eror}}",
-                    "icon": "error",
-                })
-            </script>
-        {% endfor %}
-        {% endif %}
-
-        {% if mensaje_exito %}
-        {% for m_exito in mensaje_exito %}
-            <script>
-                Swal.fire({
-                    "title": "Felicidades!",
-                    "text": "{{m_exito}}",
-                    "icon": "success",
-                })
-            </script>
-        {% endfor %}
-        {% endif %}
-
-
-
 {% endblock %}

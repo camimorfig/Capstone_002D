@@ -54,74 +54,92 @@
 {% endblock js %}
 
 {% block contenido %}
+
 <!-- Banner -->
-<section class="first-banner">
-  <img src="{% static 'core/media/media_selecciones/banner_galeria.png'%}" alt="selecciones" class="first-banner-img">
-  <div class="first-banner-content">
-    <div class="first-banner-text">
-      <h1>NUESTRA GALERÍA</h1>
-      <p>Revisa nuestros mejores momentos y revive la pasión y energía de cada competencia, evento y triunfo de Duoc UC.</p>
-    </div>
-  </div>
-</section>
+  {% if portada  %}
+    {% for p in portada %}
+      {% if  p.data.5  == "GALERY" %}
+        <section class="first-banner">
+          <img src="data:imagen/png;base64, {{ p.imagen }}" alt="selecciones" class="first-banner-img">
+          <div class="first-banner-content">
+            <div class="first-banner-text">
+              <h1>{{ p.data.3 }}</h1>
+              <p>{{ p.data.4 }}</p>
+            </div>
+          </div>
+        </section>
+      {% endif %}
+    {% endfor %}
+  {% else %}
+    <section class="first-banner">
+      <img src="{% static 'core/media/media_selecciones/banner_galeria.png'%}" alt="selecciones" class="first-banner-img">
+      <div class="first-banner-content">
+        <div class="first-banner-text">
+          <h1>NUESTRA GALERÍA</h1>
+          <p>Revisa nuestros mejores momentos y revive la pasión y energía de cada competencia, evento y triunfo de Duoc UC.</p>
+      </div>
+    </section>
+  {% endif %}
 
-<!-- Galería -->
-<section class="container mt-5">
-  {% if entity %}
-    <div class="row">
-      {% for g in entity %}
-        <div class="col-lg-4 col-md-6 mb-4">
-          <img src="data:imagen/png;base64, {{ g.imagen }}" 
-               alt="Imagen galería" 
-               class="gallery-item gallery-img rounded shadow"
-               loading="lazy">
-        </div>
-      {% endfor %}
-    </div>
 
-    <!-- Modal para ver imagen -->
-    <div class="modal fade" id="galleryModal" tabindex="-1" aria-labelledby="galleryModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content bg-transparent border-0">
-          <button type="button" class="btn-close bg-white position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
-          <img src="" id="imgModal" class="rounded" alt="Imagen ampliada">
+
+  <!-- Galería -->
+  <section class="container mt-5">
+    {% if entity %}
+      <div class="row">
+        {% for g in entity %}
+          <div class="col-lg-4 col-md-6 mb-4">
+            <img src="data:imagen/png;base64, {{ g.imagen }}" 
+                alt="Imagen galería" 
+                class="gallery-item gallery-img rounded shadow"
+                loading="lazy">
+          </div>
+        {% endfor %}
+      </div>
+
+      <!-- Modal para ver imagen -->
+      <div class="modal fade" id="galleryModal" tabindex="-1" aria-labelledby="galleryModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content bg-transparent border-0">
+            <button type="button" class="btn-close bg-white position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
+            <img src="" id="imgModal" class="rounded" alt="Imagen ampliada">
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Paginador -->
-    <div>
-      {% include 'core/paginator.html' %}
-    </div>
+      <!-- Paginador -->
+      <div>
+        {% include 'core/paginator.html' %}
+      </div>
 
-  {% else %}
-  <div class="first-banner"> <h1><strong> No hay Imagenes registradas </strong></h1> </div>  
+    {% else %}
+    <div class="first-banner"> <h1><strong> No hay Imagenes registradas </strong></h1> </div>  
 
+    {% endif %}
+  </section>
+
+  <!-- Mensajes de error y éxito -->
+  {% if mensaje_error %}
+    {% for m_error in mensaje_error %}
+      <script>
+        Swal.fire({
+          "title": "Error!",
+          "text": "{{m_error}}",
+          "icon": "error",
+        })
+      </script>
+    {% endfor %}
   {% endif %}
-</section>
 
-<!-- Mensajes de error y éxito -->
-{% if mensaje_error %}
-  {% for m_error in mensaje_error %}
-    <script>
-      Swal.fire({
-        "title": "Error!",
-        "text": "{{m_error}}",
-        "icon": "error",
-      })
-    </script>
-  {% endfor %}
-{% endif %}
-
-{% if mensaje_exito %}
-  {% for m_exito in mensaje_exito %}
-    <script>
-      Swal.fire({
-        "title": "Felicidades!",
-        "text": "{{m_exito}}",
-        "icon": "success",
-      })
-    </script>
-  {% endfor %}
-{% endif %}
+  {% if mensaje_exito %}
+    {% for m_exito in mensaje_exito %}
+      <script>
+        Swal.fire({
+          "title": "Felicidades!",
+          "text": "{{m_exito}}",
+          "icon": "success",
+        })
+      </script>
+    {% endfor %}
+  {% endif %}
 {% endblock %}

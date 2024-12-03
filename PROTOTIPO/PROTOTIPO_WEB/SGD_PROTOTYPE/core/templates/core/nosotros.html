@@ -21,20 +21,37 @@
 <!-- Contenido de la pagina NOSOTROS -->
 {% block contenido %}
 
+  {% if portada  %}
+    {% for p in portada %}
+        {% if  p.data.5  == "ABOUT" %}
+
+            <section class="first-banner">
+            <img src="data:imagen/png;base64, {{ p.imagen }}" alt="selecciones" class="first-banner-img">
+            <div class="first-banner-content">
+                <div class="first-banner-text">
+                    <h1>{{ p.data.3 }}</h1>
+                    <p>{{ p.data.4 }}</p>
+                </div>
+            </div>
+            </section>
+        {% endif %}
+    {% endfor %}
+  {% else %}
+    <section class="first-banner">
+      <img src="{% static 'core/media/media_selecciones/banner_nosotros.png'%}" alt="selecciones" class="first-banner-img">
+      <div class="first-banner-content">
+        <div class="first-banner-text">
+          <h1>NOSOTROS</h1>
+          <p>Conoce al equipo que hace posible el éxito deportivo de Duoc UC: coordinadores, entrenadores y preparadores
+            físicos, todos comprometidos con impulsar A nuestros atletas hacia la victoria.
+          </p>
+        </div>
+      </div>
+    </section>
+  {% endif %}
 
   <!-- banner -->
-  <section class="first-banner">
-    <img src="{% static 'core/media/media_selecciones/banner_nosotros.png'%}" alt="selecciones" class="first-banner-img">
-    <div class="first-banner-content">
-      <div class="first-banner-text">
-        <h1>NOSOTROS</h1>
-        <p>Conoce al equipo que hace posible el éxito deportivo de Duoc UC: coordinadores, entrenadores y preparadores
-          físicos, todos comprometidos con impulsar A nuestros atletas hacia la victoria.
-        </p>
-      </div>
-    </div>
-    </div>
-  </section>
+
 
   <section class="team-section">
     <div class="team-container">

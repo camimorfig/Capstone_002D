@@ -11,7 +11,7 @@ create or replace PROCEDURE sp_delete_discipline(
         SELECT p.player_id
         FROM player p
         WHERE p.discipline_id = p_discipline_id;
-        
+
     CURSOR coach_discipline_cursor IS
         SELECT d.coach_id
         FROM COACH_DISCIPLINE d
@@ -39,33 +39,14 @@ BEGIN
     DELETE FROM PLAYER 
     WHERE DISCIPLINE_ID = p_discipline_id;
 
-    
+
     FOR cd_cursor IN coach_discipline_cursor LOOP
         DELETE FROM coach_discipline 
         WHERE coach_id = cd_cursor.coach_id;
 
-    END LOOP;
-
-
-    -- Si se encontró un coach, eliminamos registros relacionados
-    IF v_coach_id IS NOT NULL THEN
-        BEGIN
-            SELECT c.user_id
-            INTO v_main_user_id
-            FROM coach c
-            WHERE c.coach_id = v_coach_id;
-        EXCEPTION
-            WHEN NO_DATA_FOUND THEN
-                v_main_user_id := NULL;
-        END;
-
         DELETE FROM requests WHERE coach_id = v_coach_id;
-        DELETE FROM coach WHERE coach_id = v_coach_id;
 
-        IF v_main_user_id IS NOT NULL THEN
-            DELETE FROM main_user WHERE user_id = v_main_user_id;
-        END IF;
-    END IF;
+    END LOOP;
 
     -- Eliminar otras tablas relacionadas con la disciplina
     DELETE FROM PLAYER_ELITE WHERE discipline_id = p_discipline_id;

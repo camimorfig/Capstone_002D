@@ -57,13 +57,21 @@ class Coach(models.Model):
 
 
 class CoachDiscipline(models.Model):
-    coach = models.ForeignKey(Coach, models.DO_NOTHING)
-    discipline = models.ForeignKey('Discipline', models.DO_NOTHING)
+    coach_id = models.ForeignKey(
+        'Coach', 
+        on_delete=models.CASCADE, 
+        db_column='COACH_ID'  # Ajusta el nombre de la columna
+    )
+    discipline_id = models.ForeignKey(
+        'Discipline', 
+        on_delete=models.CASCADE, 
+        db_column='DISCIPLINE_ID'  # Ajusta el nombre de la columna
+    )
 
     class Meta:
         managed = False
-        db_table = 'coach_discipline'
-        unique_together = (('coach', 'discipline'),)
+        db_table = 'COACH_DISCIPLINE'
+
 
 
 class CoachType(models.Model):
@@ -89,15 +97,14 @@ class Contact(models.Model):
 
 
 class Discipline(models.Model):
-    discipline_id = models.BigAutoField(primary_key=True)
-    discipline_name = models.CharField(max_length=50)
-    discipline_description = models.CharField(max_length=500)
-    galery_img = models.BinaryField(blank=True, null=True)
+    discipline_id = models.BigAutoField(primary_key=True, db_column='DISCIPLINE_ID') 
+    discipline_name = models.CharField(max_length=50, db_column='DISCIPLINE_NAME')
+    discipline_description = models.CharField(max_length=500, db_column='DISCIPLINE_DESCRIPTION')
+    galery_img = models.BinaryField(blank=True, null=True, db_column='GALERY_IMG')
 
     class Meta:
         managed = False
-        db_table = 'discipline'
-
+        db_table = 'DISCIPLINE'
 
 class Events(models.Model):
     events_id = models.AutoField(primary_key=True)

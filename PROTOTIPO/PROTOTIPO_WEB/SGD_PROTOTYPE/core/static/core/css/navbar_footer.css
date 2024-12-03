@@ -9,6 +9,15 @@
     --secondary-grey: #666666;
     --tertiary-black: #000000;
 }
+.alert-error {
+    color: #721c24; /* Texto rojo */
+    background-color: #f8d7da; /* Fondo rosado claro */
+    border: 1px solid #f5c6cb; /* Borde rojo */
+    padding: 0.75rem 1.25rem;
+    border-radius: 0.25rem;
+    margin-bottom: 1rem;
+}
+
 
 /* Reset y base */
 * {

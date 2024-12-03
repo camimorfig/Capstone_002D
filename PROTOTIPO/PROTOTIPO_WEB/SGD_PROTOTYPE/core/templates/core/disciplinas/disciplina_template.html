@@ -22,7 +22,24 @@
 {% block js %}
 <link rel="stylesheet" href="{% static 'core/javascript/script-team-gallery.js' %}">
 <link rel="stylesheet" href="{% static 'core/javascript/script.js' %}">
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+
+<script>  
+
+function openModal(modalId) {
+    document.getElementById(modalId).style.display = "block";
+}
+
+function closeModal(modalId) {
+    document.getElementById(modalId).style.display = "none";
+}
+
+
+
+</script>
+
+
+
 {% endblock js %}
 
 {% block contenido %}
@@ -51,20 +68,7 @@
                     </a>
 
                     <!-- Estadísticas -->
-                    <div class="stats-container">
-                        <div class="stat-item">
-                            <div class="stat-number">8</div>
-                            <div class="stat-label">SELECCIONADOS</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-number">200+</div>
-                            <div class="stat-label">VICTORIAS</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-number">5+</div>
-                            <div class="stat-label">CAMPEONATOS</div>
-                        </div>
-                    </div>
+
                 </div>
 
                 <!-- Contenedor de imagen -->
@@ -79,8 +83,7 @@
                     <div class="roster-container">
                         <header class="roster-header">
                             <h2 class="roster-title">PLANTEL OFICIAL</h2>
-                            <div class="roster-season">Temporada 2024</div>
-                        </header>
+                            </header>
 
                         <div class="cards-container">
                             <!-- Card 1 -->
@@ -108,10 +111,18 @@
                                             </span>
                                             <span class="detail-item">
                                                 <i class="bi bi-clock"></i>
-                                                {{ jugador.jugador.player_horary }}
+                                                {% if jugador.jugador.player_horary == 'D' %}
+                                                    DIURNO
+                                                {% elif jugador.jugador.player_horary == 'V'%}
+                                                    VESPERTINO
+                                                {% elif jugador.jugador.player_horary == 'O'%}
+                                                    ONLINE
+                                                {% else %}
+                                                    NO DEFINIDO
+                                                {% endif %}
                                             </span>
                                         </div>
-                                        <button class="view-details-btn"data-bs-toggle="modal" data-bs-target="#playerModal{{ n.data.0 }}">
+                                        <button type="button" class="view-details-btn" onclick="openModal('customModal{{ jugador.jugador.player_id }}')">
                                             Ver detalles
                                             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                                                 <path d="M3.33334 8H12.6667M12.6667 8L8.00001 3.33333M12.6667 8L8.00001 12.6667"
@@ -119,41 +130,46 @@
                                                     stroke-linejoin="round" />
                                             </svg>
                                         </button>
+
                                     </div>
-                                </div>
+                                </div>                                   
                                 <!-- Modal -->
-                                <div id="playerModal{{ n.data.0 }}" class="modal fade" tabindex="-1" aria-labelledby="viewNewModalLabel{{ n.data.0 }}" aria-hidden="true">
+
+                                
+                                <div id="customModal{{ jugador.jugador.player_id }}" class="custom-modal">
                                     <div class="modal-content">
-                                        <div class="modal-header">
-                                            <button class="modal-close">&times;</button>
-                                        </div>
-                                        <div class="player-profile">
-                                            <img src="data:image/png;base64,{{ jugador.imagen_base64 }}" alt="" class="profile-image">
-                                            <div class="profile-info">
-                                                <h2 class="player-name">{{ jugador.jugador.player_name }}</h2>
-                                                <h3 class="player-name">{{ jugador.jugador.player_last_name }}</h3>
-                                                <div class="info-grid">
-                                                    <div class="info-item">
-                                                        <span class="info-label">Sede</span>
-                                                        <span class="info-value sede">{{ jugador.jugador.player_headquarters }}</span>
-                                                    </div>
-                                                    <div class="info-item">
-                                                        <span class="info-label">Jornada</span>
-                                                        <span class="info-value jornada">{{ jugador.jugador.player_horary }}</span>
-                                                    </div>
-                                                    <div class="info-item">
-                                                        <span class="info-label">Carrera</span>
-                                                        <span class="info-value carrera">{{ jugador.jugador.player_career }}</span>
-                                                    </div>
-                                                    <div class="info-item">
-                                                        <span class="info-label">Año de nacimiento</span>
-                                                        <span class="info-value ingreso">{{ jugador.jugador.player_birthday }}</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        <span class="close-btn" onclick="closeModal('customModal{{ jugador.jugador.player_id }}')">&times;</span>
+                                        <h2>{{ jugador.jugador.player_name }} {{ jugador.jugador.player_last_name }}</h2>
+                                        
+                                        {% if jugador.imagen_base64 %}
+
+                                            <img src="data:image/png;base64,{{ jugador.imagen_base64 }}" alt="{{ jugador.jugador.player_name }}" class="modal-image">
+
+                                            {% else %}
+            
+                                            <img src="{% static 'core/media/avatar.png'%}" alt="Player Image" class="modal-image">
+            
+                                        {% endif %}
+
+                                        <p><strong>Sede:</strong> {{ jugador.jugador.player_headquarters }}</p>
+                                        <p><strong>Jornada:</strong>                                                 
+                                            {% if jugador.jugador.player_horary == 'D' %}
+                                                DIURNO
+                                            {% elif jugador.jugador.player_horary == 'V'%}
+                                                VESPERTINO
+                                            {% elif jugador.jugador.player_horary == 'O'%}
+                                                ONLINE
+                                            {% else %}
+                                                NO DEFINIDO
+                                            {% endif %}
+                                        </p>
+                                        <p><strong>Carrera:</strong> {{ jugador.jugador.player_career }}</p>
+                                        <p><strong>Año de nacimiento:</strong> {{ jugador.jugador.player_birthday }}</p>
                                     </div>
                                 </div>
+                                
+                                
+                                
 
                             {% endfor %}
 

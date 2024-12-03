@@ -13,22 +13,37 @@
 {% endblock js %}
 
 {% block contenido %}
-
-    <!-- banner -->
-    <section class="first-banner">
-        <img src="{% static 'core/media/media_selecciones/banner_talento.jpg'%}" alt="selecciones" class="first-banner-img">
-        <div class="first-banner-content">
-            <div class="first-banner-text">
-                <h1>Deportista Elite</h1>
-                <p>Conoce nuestros Deportista Elite que representan
-                    con orgullo a la institución.
-                    Conoce el corazón y la pasión de Duoc UC: nuestros talentos deportivos que con
-                    esfuerzo y dedicación nos llenan de orgullo en cada competencia.
-                </p>
+    <!-- Banner -->
+    {% if portada  %}
+        {% for p in portada %}
+            {% if  p.data.5  == "ELITE" %}
+                <section class="first-banner">
+                    <img src="data:imagen/png;base64, {{ p.imagen }}" alt="selecciones" class="first-banner-img">
+                    <div class="first-banner-content">
+                        <div class="first-banner-text">
+                            <h1>{{ p.data.3 }}</h1>
+                            <p>{{ p.data.4 }}</p>
+                        </div>
+                    </div>
+                </section>
+            {% endif %}
+        {% endfor %}
+    {% else %}
+        <section class="first-banner">
+            <img src="{% static 'core/media/media_selecciones/banner_talento.jpg'%}" alt="selecciones" class="first-banner-img">
+            <div class="first-banner-content">
+                <div class="first-banner-text">
+                    <h1>Deportista Elite</h1>
+                    <p>Conoce nuestros Deportista Elite que representan
+                        con orgullo a la institución.
+                        Conoce el corazón y la pasión de Duoc UC: nuestros talentos deportivos que con
+                        esfuerzo y dedicación nos llenan de orgullo en cada competencia.
+                    </p>
+                </div>
             </div>
-        </div>
-        </div>
-    </section>
+        </section>
+    {% endif %}
+
     <!-- sección principal -->
     <section class="team-section">
         <div class="team-container">

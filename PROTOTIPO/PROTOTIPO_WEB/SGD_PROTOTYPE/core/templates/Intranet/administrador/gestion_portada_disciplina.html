@@ -5,6 +5,7 @@
 
 <!-- Enlace css -->
 {% block css %}
+<link rel="stylesheet" href="{% static 'core/css/administrador.css' %}">
 <link rel="stylesheet" href="{% static 'core/css/style-admin.css' %}">
 
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
@@ -85,15 +86,24 @@
                     <div class="card-body">
                         <h4><i class="bi bi-journal-text text-primary"></i> Gestion Portada Disciplina </h4>
                         <br>                                                                           
-                        {% if messages %}
-                            <div class="alert-container">
-                                {% for message in messages %}
-                                    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
-                                        {{ message }}
-                                    </div>
-                                {% endfor %}
-                            </div>
-                        {% endif %}   
+
+                        <div class="alert-container">
+                            {% for message in messages %}
+                                <div class="alert 
+                                    {% if message.tags == 'error' %}
+                                        alert-danger
+                                    {% elif message.tags == 'success' %}
+                                        alert-success
+                                    {% elif message.tags == 'info' %}
+                                        alert-info
+                                    {% elif message.tags == 'warning' %}
+                                        alert-warning
+                                    {% endif %}
+                                ">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        </div>
                         <br>   
                         <div class="container">
                             <ul class="nav nav-tabs" id="myTab" role="tablist">
@@ -186,137 +196,138 @@
                                         </div> 
                                     {% else %}
                                         <div class="card py-2 px-2">
-
-                                            <table class="table table-striped table-hover">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Id</th>
-                                                        <th>Etiqueta</th>
-                                                        <th>Fecha de creación</th>
-                                                        <th>Imagen</th>
-                                                        <th>Opciones</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {% for g in entity %}
+                                            <div class="table-responsive">
+                                                <table class="table table-striped table-hover">
+                                                    <thead>
                                                         <tr>
-                                                            <td>{{g.data.0}}</td>
-                                                            <td>{{g.data.2}}</td>
-                                                            <td>{{g.data.4}}</td>
-                                                            <td><button class="btn btn-danger btn-sm" data-bs-toggle="modal"
-                                                                data-bs-target="#viewNewModal{{g.data.0}}">Ver</button></td>
-                                                            <td>
-                                                                <div class="dropdown">
-                                                                    <button class="btn btn-primary btn-sm dropdown-toggle"
-                                                                        type="button" id="dropdownMenuButton1"
-                                                                        data-bs-toggle="dropdown" aria-expanded="false">
-                                                                        Ver Opciones
-                                                                    </button>
-                                                                    <ul class="dropdown-menu"
-                                                                        aria-labelledby="dropdownMenuButton1" data-bs-toggle="modal"
-                                                                        data-bs-target="#deleteModal{{ g.data.0 }}">
-                                                                        <li><a class="dropdown-item" href="#"><i
-                                                                                    class="bi bi-trash text-danger"></i> Borrar
-                                                                            </a></li>
-                                                                        <li><a class="dropdown-item" data-bs-toggle="modal" 
-                                                                            data-bs-target="#editarModal{{ g.data.0 }}">
-                                                                            <i class="bi bi-pencil text-primary"></i> Editar </a></li>
-                                                                    </ul>
-                                                                </div>
-                                                            </td>
+                                                            <th>Id</th>
+                                                            <th>Etiqueta</th>
+                                                            <th>Fecha de creación</th>
+                                                            <th>Imagen</th>
+                                                            <th>Opciones</th>
                                                         </tr>
-                                                        <!-- Modal for Ver -->
-                                                        <div class="modal fade" id="viewNewModal{{g.data.0}}" tabindex="-1" aria-labelledby="viewPhotoModalLabel" aria-hidden="true">
-                                                            <div class="modal-dialog">
-                                                                <div class="modal-content">
-                                                                    <div class="modal-header">
-                                                                        <h4 class="modal-title" id="viewPhotoModalLabel">{{g.data.2}}</h4>
+                                                    </thead>
+                                                    <tbody>
+                                                        {% for g in entity %}
+                                                            <tr>
+                                                                <td>{{g.data.0}}</td>
+                                                                <td>{{g.data.2}}</td>
+                                                                <td>{{g.data.4}}</td>
+                                                                <td><button class="btn btn-danger btn-sm" data-bs-toggle="modal"
+                                                                    data-bs-target="#viewNewModal{{g.data.0}}">Ver</button></td>
+                                                                <td>
+                                                                    <div class="dropdown">
+                                                                        <button class="btn btn-primary btn-sm dropdown-toggle"
+                                                                            type="button" id="dropdownMenuButton1"
+                                                                            data-bs-toggle="dropdown" aria-expanded="false">
+                                                                            Ver Opciones
+                                                                        </button>
+                                                                        <ul class="dropdown-menu"
+                                                                            aria-labelledby="dropdownMenuButton1" data-bs-toggle="modal"
+                                                                            data-bs-target="#deleteModal{{ g.data.0 }}">
+                                                                            <li><a class="dropdown-item" href="#"><i
+                                                                                        class="bi bi-trash text-danger"></i> Borrar
+                                                                                </a></li>
+                                                                            <li><a class="dropdown-item" data-bs-toggle="modal" 
+                                                                                data-bs-target="#editarModal{{ g.data.0 }}">
+                                                                                <i class="bi bi-pencil text-primary"></i> Editar </a></li>
+                                                                        </ul>
                                                                     </div>
-                                                                    <div class="modal-body">
-                                                                        <img src="data:imagen/png;base64, {{ g.imagen }}" alt="" srcset="">
-                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                            <!-- Modal for Ver -->
+                                                            <div class="modal fade" id="viewNewModal{{g.data.0}}" tabindex="-1" aria-labelledby="viewPhotoModalLabel" aria-hidden="true">
+                                                                <div class="modal-dialog">
+                                                                    <div class="modal-content">
+                                                                        <div class="modal-header">
+                                                                            <h4 class="modal-title" id="viewPhotoModalLabel">{{g.data.2}}</h4>
+                                                                        </div>
+                                                                        <div class="modal-body">
+                                                                            <img src="data:imagen/png;base64, {{ g.imagen }}" alt="" srcset="">
+                                                                        </div>
 
-                                                                    <div class="modal-footer">
-                                                                        <h6 class="modal-title" id="viewPhotoModalLabel">{{g.data.4}}</h6>
-                                                                    </div>
+                                                                        <div class="modal-footer">
+                                                                            <h6 class="modal-title" id="viewPhotoModalLabel">{{g.data.4}}</h6>
+                                                                        </div>
 
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-
-                                                        <!-- Modal Editar -->
-                                                        <div class="modal fade" id="editarModal{{ g.data.0 }}" tabindex="-1" aria-labelledby="editarNoticiaModalLabel{{ g.data.0 }}" aria-hidden="true">
-                                                            <div class="modal-dialog">
-                                                                <div class="modal-content">
-                                                                    <div class="modal-header">
-                                                                        <h5 class="modal-title" id="editarNoticiaModalLabel{{ g.data.0 }}">Editar Noticia</h5>
-                                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                                    </div>
-                                                                    <div class="modal-body">
-                                                                        <form id="editarNoticiaForm{{ g.data.0 }}" method="POST" enctype="multipart/form-data">
-                                                                            {% csrf_token %}
-
-                                                                            <input type="hidden" id="id" name="id" value="{{ g.data.0 }}">
-                                                                            <br>
-                                                                            <div class="form-group">
-                                                                                <label for="imagen">Imagen de perfil</label>
-                                                                                <input type="file" id="imagen{{ g.data.0 }}" name="imagen" accept="image/*" onchange="previewImage(event)">
-                                                                                <img id="preview" src="data:imagen/png;base64, {{ g.imagen }}" alt="Vista previa de imagen" style="width: 150px; height: 150px; object-fit: cover; margin-top: 10px; border-radius: 8px;">
-                                                                            </div>
-                                                                            <br>
-                                                                            <div class="form-group">
-                                                                                <label for="edit_titulo">Título</label>
-                                                                                <input type="text" class="form-control" id="edit_titulo{{ g.data.0 }}" name="titulo" value="{{ g.data.2 }}" required>
-                                                                            </div>
-                                                                            <br>
-
-                                                                            <div class="form-group">
-                                                                                <label for="fecha">Fecha</label>
-                                                                                <input type="datetime-local" class="form-control" name="fecha" id="fecha{{ g.data.0 }}" value="{{ g.data.4|date:"Y-m-d\TH:i" }}">
-                                                                            </div>
-                                                                            <br>
-                                                                            <div class="modal-footer">
-                                                                                <button type="submit" class="btn btn-primary" name="form_editar">Guardar cambios</button>
-                                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                                                            </div>
-                                                                        </form>
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
 
 
-                                                        <!-- Modal Borrar -->
-                                                        <div class="modal fade" id="deleteModal{{ g.data.0 }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ g.data.0 }}" aria-hidden="true">
-                                                            <div class="modal-dialog">
-                                                                <div class="modal-content">
-                                                                    <div class="modal-header">
-                                                                        <h5 class="modal-title" id="deleteModalLabel{{ g.data.0 }}">Borrar Noticia</h5>
-                                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                                    </div>
-                                                                    <div class="modal-body">
-                                                                        <p>¿Estás seguro de que deseas borrar esta Imagen?</p>
+                                                            <!-- Modal Editar -->
+                                                            <div class="modal fade" id="editarModal{{ g.data.0 }}" tabindex="-1" aria-labelledby="editarNoticiaModalLabel{{ g.data.0 }}" aria-hidden="true">
+                                                                <div class="modal-dialog">
+                                                                    <div class="modal-content">
+                                                                        <div class="modal-header">
+                                                                            <h5 class="modal-title" id="editarNoticiaModalLabel{{ g.data.0 }}">Editar Noticia</h5>
+                                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                        </div>
+                                                                        <div class="modal-body">
+                                                                            <form id="editarNoticiaForm{{ g.data.0 }}" method="POST" enctype="multipart/form-data">
+                                                                                {% csrf_token %}
 
-                                                                        
-                                                                        <form id="deleteModalForm{{ g.data.0 }}" method="POST">
-                                                                            {% csrf_token %}
-                                                                            <input type="hidden" id="id" name="id" value="{{ g.data.0 }}">
-                                                                            <div class="modal-footer">
-                                                                                <button type="submit" class="btn btn-danger" name="form_eliminar">Confirmar</button>
-                                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                                                            </div>
-                                                                        </form>
+                                                                                <input type="hidden" id="id" name="id" value="{{ g.data.0 }}">
+                                                                                <br>
+                                                                                <div class="form-group">
+                                                                                    <label for="imagen">Imagen de perfil</label>
+                                                                                    <input type="file" id="imagen{{ g.data.0 }}" name="imagen" accept="image/*" onchange="previewImage(event)">
+                                                                                    <img id="preview{{ g.data.0 }}" src="data:imagen/png;base64, {{ g.imagen }}" alt="Vista previa de imagen" style="width: 150px; height: 150px; object-fit: cover; margin-top: 10px; border-radius: 8px;">
+                                                                                </div>
+                                                                                <br>
+                                                                                <div class="form-group">
+                                                                                    <label for="edit_titulo">Título</label>
+                                                                                    <input type="text" class="form-control" id="edit_titulo{{ g.data.0 }}" name="titulo" value="{{ g.data.2 }}" required>
+                                                                                </div>
+                                                                                <br>
+
+                                                                                <div class="form-group">
+                                                                                    <label for="fecha">Fecha</label>
+                                                                                    <input type="datetime-local" class="form-control" name="fecha" id="fecha{{ g.data.0 }}" value="{{ g.data.4|date:"Y-m-d\TH:i" }}">
+                                                                                </div>
+                                                                                <br>
+                                                                                <div class="modal-footer">
+                                                                                    <button type="submit" class="btn btn-primary" name="form_editar">Guardar cambios</button>
+                                                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                                                </div>
+                                                                            </form>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
-                                                    
-                                                    
 
-                                                    {% endfor %}
-                                                </tbody>
-                                            </table>
+
+                                                            <!-- Modal Borrar -->
+                                                            <div class="modal fade" id="deleteModal{{ g.data.0 }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ g.data.0 }}" aria-hidden="true">
+                                                                <div class="modal-dialog">
+                                                                    <div class="modal-content">
+                                                                        <div class="modal-header">
+                                                                            <h5 class="modal-title" id="deleteModalLabel{{ g.data.0 }}">Borrar Noticia</h5>
+                                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                        </div>
+                                                                        <div class="modal-body">
+                                                                            <p>¿Estás seguro de que deseas borrar esta Imagen?</p>
+
+                                                                            
+                                                                            <form id="deleteModalForm{{ g.data.0 }}" method="POST">
+                                                                                {% csrf_token %}
+                                                                                <input type="hidden" id="id" name="id" value="{{ g.data.0 }}">
+                                                                                <div class="modal-footer">
+                                                                                    <button type="submit" class="btn btn-danger" name="form_eliminar">Confirmar</button>
+                                                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                                                </div>
+                                                                            </form>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        
+                                                        
+
+                                                        {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
                                         </div>      
                                         <br>
                                         <!-- Paginador -->

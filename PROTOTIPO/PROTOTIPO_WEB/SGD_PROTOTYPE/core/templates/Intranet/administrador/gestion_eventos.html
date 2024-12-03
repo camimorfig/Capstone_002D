@@ -5,6 +5,7 @@
 
 <!-- Enlace css -->
 {% block css %}
+<link rel="stylesheet" href="{% static 'core/css/administrador.css' %}">
 <link rel="stylesheet" href="{% static 'core/css/style-admin.css' %}">
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
@@ -24,14 +25,33 @@
     <div class="card">
         <div class="card-body">
             <h4><i class="bi bi-journal-text text-primary"></i> Gestion Eventos </h4>
-            <br>
+            <br>                                                                           
+
+            <div class="alert-container">
+                {% for message in messages %}
+                    <div class="alert 
+                        {% if message.tags == 'error' %}
+                            alert-danger
+                        {% elif message.tags == 'success' %}
+                            alert-success
+                        {% elif message.tags == 'info' %}
+                            alert-info
+                        {% elif message.tags == 'warning' %}
+                            alert-warning
+                        {% endif %}
+                    ">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+            <br>   
             <div class="container">
                 <ul class="nav nav-tabs" id="myTab" role="tablist">
                     <li class="nav-item" role="presentation">
                         <button class="nav-link active" id="ges-evento-tab" data-bs-toggle="tab"
                             data-bs-target="#ges-evento" type="button" role="tab" aria-controls="ges-evento"
                             aria-selected="false">
-                            <strong>Gestionar Evento</strong></button>
+                            Gestionar Evento</button>
                     </li>
                     <li class="nav-item" role="presentation">
                         <button class="nav-link " id="subir-evento-tab" data-bs-toggle="tab"
@@ -45,77 +65,77 @@
                     <div class="tab-pane fade show active " id="ges-evento" role="tabpanel" aria-labelledby="ng-tab">
                         <hr>
                         <div class="card py-2 px-2">
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Nombre</th>
+                                            <th>Tipo</th>
+                                            <th>Disciplina</th>
+                                            <th>Fecha Inicio</th>
+                                            <th>Fecha Fin</th>
+                                            <th>Estado</th>
+                                            <th>Opciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for evento in eventos %}
+                                        <tr>
+                                            <td>{{ evento.events_name }}</td>
+                                            <td>{{ evento.events_type }}</td>
+                                            <td>{{ evento.discipline_name }}</td>
+                                            <td>
+                                                {% if evento.events_recurring == "0" %}
+                                                {% if evento.events_start %}
+                                                {{ evento.events_start|date:"d/m/Y H:i" }}
+                                                {% else %}
+                                                -
+                                                {% endif %}
+                                                {% else %}
+                                                Evento recurrente
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if evento.events_recurring == "0" %}
+                                                {% if evento.events_end %}
+                                                {{ evento.events_end|date:"d/m/Y H:i" }}
+                                                {% else %}
+                                                -
+                                                {% endif %}
+                                                {% else %}
+                                                -
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ evento.events_status }}</td>
+                                            <td>
+                                                <div class="dropdown">
+                                                    <button class="btn btn-primary btn-sm dropdown-toggle" type="button"
+                                                        id="dropdownMenuButton1" data-bs-toggle="dropdown"
+                                                        aria-expanded="false">
+                                                        Ver Opciones
+                                                    </button>
+                                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1"
+                                                        data-bs-toggle="modal" data-bs-target="#deleteModal">
+                                                        <li><a class="dropdown-item" href="#"><i
+                                                                    class="bi bi-trash text-danger"></i> Borrar
+                                                            </a></li>
+                                                        <li><a class="dropdown-item" data-bs-toggle="modal"
+                                                                data-bs-target="#EditModal"><i
+                                                                    class="bi bi-pencil text-primary"></i>
+                                                                Editar </a></li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% empty %}
+                                        <tr>
+                                            <td colspan="7" class="text-center">No hay eventos registrados</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
 
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>Nombre</th>
-                                        <th>Tipo</th>
-                                        <th>Disciplina</th>
-                                        <th>Fecha Inicio</th>
-                                        <th>Fecha Fin</th>
-                                        <th>Estado</th>
-                                        <th>Opciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for evento in eventos %}
-                                    <tr>
-                                        <td>{{ evento.events_name }}</td>
-                                        <td>{{ evento.events_type }}</td>
-                                        <td>{{ evento.discipline_name }}</td>
-                                        <td>
-                                            {% if evento.events_recurring == "0" %}
-                                            {% if evento.events_start %}
-                                            {{ evento.events_start|date:"d/m/Y H:i" }}
-                                            {% else %}
-                                            -
-                                            {% endif %}
-                                            {% else %}
-                                            Evento recurrente
-                                            {% endif %}
-                                        </td>
-                                        <td>
-                                            {% if evento.events_recurring == "0" %}
-                                            {% if evento.events_end %}
-                                            {{ evento.events_end|date:"d/m/Y H:i" }}
-                                            {% else %}
-                                            -
-                                            {% endif %}
-                                            {% else %}
-                                            -
-                                            {% endif %}
-                                        </td>
-                                        <td>{{ evento.events_status }}</td>
-                                        <td>
-                                            <div class="dropdown">
-                                                <button class="btn btn-primary btn-sm dropdown-toggle" type="button"
-                                                    id="dropdownMenuButton1" data-bs-toggle="dropdown"
-                                                    aria-expanded="false">
-                                                    Ver Opciones
-                                                </button>
-                                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1"
-                                                    data-bs-toggle="modal" data-bs-target="#deleteModal">
-                                                    <li><a class="dropdown-item" href="#"><i
-                                                                class="bi bi-trash text-danger"></i> Borrar
-                                                        </a></li>
-                                                    <li><a class="dropdown-item" data-bs-toggle="modal"
-                                                            data-bs-target="#EditModal"><i
-                                                                class="bi bi-pencil text-primary"></i>
-                                                            Editar </a></li>
-                                                </ul>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    {% empty %}
-                                    <tr>
-                                        <td colspan="7" class="text-center">No hay eventos registrados</td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-
-
+                            </div>
                         </div>
                         <!-- Modal for Borrar -->
                         <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel"
@@ -178,12 +198,9 @@
                                                         <div class="form-group mb-2">
                                                             <label class="form-label"><strong>Tipo de
                                                                     evento:</strong></label>
-                                                            <select class="form-select" name="events_type"
-                                                                id="eventType" required>
-                                                                <option value="">Seleccione tipo de evento</option>
-                                                                <option value="Entrenamiento">Entrenamiento</option>
-                                                                <option value="Partido">Partido</option>
-                                                            </select>
+                                                            <input class="form-control form-control-sm" type="text"
+                                                                    name="events_type" required
+                                                                    maxlength="50">
                                                         </div>
 
                                                         <!-- Nombre del evento -->

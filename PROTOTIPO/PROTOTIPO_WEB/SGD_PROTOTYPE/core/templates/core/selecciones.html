@@ -20,19 +20,36 @@
 <!-- Contenido de la pagina Noticias -->
 {% block contenido %}
 
-
-    <!-- Sección principal -->
-    <!-- banner -->
-    <section class="first-banner">
-        <img src="{% static 'core/media/selecciones2024.jpg' %}" alt="selecciones" class="first-banner-img">
-        <div class="first-banner-content">
-            <div class="first-banner-text">
-                <h1>NUESTRAS DISCIPLINAS</h1>
-                <p> Promovemos selecciones deportivas en campeonatos nacionales, ofreciendo becas de hasta el 100% de arancel en disciplinas como fútbol, básquetbol, voleibol y muchos más! </p>
+    <!-- Banner -->
+    {% if portada  %}
+        {% for p in portada %}
+            {% if  p.data.5  == "DISCIPLINES" %}
+                <section class="first-banner">
+                    <img src="data:imagen/png;base64, {{ p.imagen }}" alt="selecciones" class="first-banner-img">
+                    <div class="first-banner-content">
+                        <div class="first-banner-text">
+                            <h1>{{ p.data.3 }}</h1>
+                            <p>{{ p.data.4 }}</p>
+                        </div>
+                    </div>
+                </section>
+            {% endif %}
+        {% endfor %}
+    {% else %}
+        <section class="first-banner">
+            <img src="{% static 'core/media/banner_eventos.png' %}" alt="selecciones" class="first-banner-img">
+            <div class="first-banner-content">
+                <div class="first-banner-text">
+                    <h1>NUESTRAS DISCIPLINAS</h1>
+                    <p> Promovemos selecciones deportivas en campeonatos nacionales, ofreciendo becas de hasta el 100% de arancel en disciplinas como fútbol, básquetbol, voleibol y muchos más! </p>
+                </div>
             </div>
-        </div>
-        </div>
-    </section>
+        </section>
+    {% endif %}
+    <!-- banner -->
+
+
+
     <main>
         <!-- selecciones - descripción -->
 

@@ -3,13 +3,12 @@
     {% for j in jugadores %}
     <tbody>
         <tr>
-            <td>{{ j.0 }}</td> 
-            <td>{{ j.1 }}</td>               
-            <td>{{ j.2 }}</td> 
-            <td>{{ j.3 }}</td> 
-            <td>{{ j.4 }}</td> 
-            <td>{{ j.5 }}</td> 
-            <td>{{ j.6 }}</td>
+            <td>{{ j.1|upper }}</td>               
+            <td>{{ j.2|upper }}</td> 
+            <td>{{ j.3|upper }}</td> 
+            <td>{{ j.4|upper }}</td> 
+            <td>{{ j.5|upper  }}</td> 
+            <td>{{ j.6|upper  }}</td>
              
             <td>
                 <span class="badge bg-success">{{ j.7 }}</span> 
@@ -17,11 +16,6 @@
 
             <td>{{ j.8 }}</td>
 
-            <td>
-                <div class="dropdown">
-                    <button class="dropdown-item" href="#"><i class="bi bi-trash text-danger"></i> Borrar</button>
-                </div>
-            </td>
         </tr>
     <tbody>
 

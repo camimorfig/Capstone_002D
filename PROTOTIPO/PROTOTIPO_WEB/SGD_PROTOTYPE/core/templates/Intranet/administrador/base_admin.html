@@ -2,6 +2,8 @@
 
 {% block contenido %}
 
+
+
     <main>
         <div class="row">
             <!-- Sidebar a la izquierda -->
@@ -20,8 +22,10 @@
                                         class="bi bi-people"></i> Gestionar Entrenador</a></li>
                             <li class="nav-item"><a class="nav-link" href="{% url 'gestion_noticias' %}"><i
                                         class="bi bi-graph-up"></i> Gestionar Noticias</a></li>
-                            <li class="nav-item"><a class="nav-link" href="{% url 'gestion_galeria' %}"><i
-                                        class="bi bi-graph-up"></i> Gestionar Galeria</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{% url 'gestion_galeria' %}">
+                            <i class="bi bi-graph-up"></i> Gestionar Galeria</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="{% url 'gestion_portada' %}"><i
+                                    class="bi bi-graph-up"></i> Gestionar Portada</a></li>
                             <li class="nav-item"><a class="nav-link" href="{% url 'gestion_disciplina' %}"><i
                                         class="bi bi-calendar-check"></i>
                                     Gestionar Disciplina</a></li>
@@ -35,7 +39,7 @@
                                 class="bi bi-calendar-check"></i>
                             Gestionar Periodos</a></li>
                             <li class="nav-item"><a class="nav-link" href="{% url 'gestion_Jugador_elite' %}"><i
-                                class="bi bi-calendar-check"></i>
+                                class="bi bi-people"></i>
                             Gestionar Jugadores de Elite</a></li>
                             
                         </ul>

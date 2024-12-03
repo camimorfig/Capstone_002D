@@ -27,22 +27,58 @@ rel="stylesheet">
 
 
     <main>
-        <section class="hero">
-            <div class="hero-image">
-                <div class="hero-image-container">
-                    <img src="{% static 'core/media/selecciones2024.jpg' %}" alt="Jugadores de fútbol">
+
+
+    <!-- Banner -->
+    {% if portada  %}
+        {% for p in portada %}
+            {% if  p.data.5  == "INDEX" %}
+
+
+            <section class="hero">
+                <div class="hero-image">
+                    <div class="hero-image-container">
+                        <img src="data:imagen/png;base64, {{ p.imagen }}" alt="Jugadores de fútbol">
+                    </div>
+                    <div class="hero-overlay"></div>
                 </div>
-                <div class="hero-overlay"></div>
+                <div class="hero-content">
+                    <h1>{{ p.data.3 }}</h1>
+                    <p>{{ p.data.4 }}</p>
+                    <a href="{% url 'selecciones' %}" class="cta-button">
+                        VER MÁS <span>→</span>
+                    </a>
+                </div>
+            </section>
+            
+            {% endif %}
+        {% endfor %}
+    {% else %}
+    <section class="hero">
+        <div class="hero-image">
+            <div class="hero-image-container">
+                <img src="{% static 'core/media/selecciones2024.jpg' %}" alt="Jugadores de fútbol">
             </div>
-            <div class="hero-content">
-                <h1>¡SUPÉRATE Y HAZ HISTORIA CON NOSOTROS!</h1>
-                <p>Únete a nuestras selecciones deportivas y sé parte de una comunidad que trasciende. Tu pasión por el
-                    deporte comienza aquí.</p>
-                <a href="{% url 'selecciones' %}" class="cta-button">
-                    VER MÁS <span>→</span>
-                </a>
-            </div>
-        </section>
+            <div class="hero-overlay"></div>
+        </div>
+        <div class="hero-content">
+            <h1>¡SUPÉRATE Y HAZ HISTORIA CON NOSOTROS!</h1>
+            <p>Únete a nuestras selecciones deportivas y sé parte de una comunidad que trasciende. Tu pasión por el
+                deporte comienza aquí.</p>
+            <a href="{% url 'selecciones' %}" class="cta-button">
+                VER MÁS <span>→</span>
+            </a>
+        </div>
+    </section>
+    {% endif %}
+
+        
+
+
+
+
+
+    
         <!-- sección nosotros -->
         <div class="about-container">
             <div class="about-content">

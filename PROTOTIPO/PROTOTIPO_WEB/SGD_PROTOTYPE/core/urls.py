@@ -6,7 +6,6 @@ from.views import *
 urlpatterns = [
     path('', index, name="index"),
     path('contacto/', contacto, name="contacto"),
-    path('eventos/', eventos, name="eventos"),
     path('galeria/', galeria, name="galeria"),
     path('nosotros/', nosotros, name="nosotros"),
     path('noticias/', noticias, name="noticias"),
@@ -15,7 +14,7 @@ urlpatterns = [
     path('entrenador/', CoachDashboardView.as_view() , name="entrenador_dashboard"),
     path('administrador/', AdminDashboardView.as_view() , name="admin_dashboard"),
     path('accounts/profile/', profile_redirect, name='profile'),
-    path('crear_perfil_entrenador/', crear_perfil_entrenador, name='crear_perfil_entrenador'),   
+    path('gestion_entrenador/', crear_perfil_entrenador, name='crear_perfil_entrenador'),   
     path('gestion_noticias/', gestion_noticias, name='gestion_noticias'),   
     path('asistencia_admin/', asistencia_admin, name='asistencia_admin'),   
     path('perfil_jugadores/', perfil_jugadores, name='perfil_jugadores'),   
@@ -42,7 +41,7 @@ urlpatterns = [
 
     path('gestion_portada/', gestion_portada, name='gestion_portada'),   
 
-
+    path('contrasena_entrenador/', contrasena_entrenador, name='contrasena_entrenador'), 
 
 
 ]
