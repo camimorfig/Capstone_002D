@@ -1,0 +1,96 @@
+<!-- HEATER Y FOOTER -->
+{% extends 'core/base_core.html' %}
+
+<!-- Cargar Statics -->
+{% load static %}
+
+<!-- Enlace css -->
+{% block css %}
+<link rel="stylesheet" href="{% static 'core/css/style.css' %}">
+<link rel="stylesheet" href="{% static 'core/css/style-news.css' %}">
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+{% endblock css %}
+
+<!-- Enlace JS -->
+{% block js %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{% static 'core/javascript/script-news.js' %}"></script>
+{% endblock js %}
+
+<!-- Contenido de la pagina Noticias -->
+{% block contenido %}
+
+    <!-- Sección Principal del Portal de Noticias -->
+    <!-- banner -->
+
+    {% if portada  %}
+        {% for p in portada %}
+            {% if  p.data.5  == "NEWS" %}
+
+                <section class="first-banner">
+                <img src="data:imagen/png;base64, {{ p.imagen }}" alt="selecciones" class="first-banner-img">
+                <div class="first-banner-content">
+                    <div class="first-banner-text">
+                        <h1>{{ p.data.3 }}</h1>
+                        <p>{{ p.data.4 }}</p>
+                    </div>
+                </div>
+                </section>
+            {% endif %}
+        {% endfor %}
+    {% else %}
+        <section class="first-banner">
+            <img src="{% static 'core/media/media_selecciones/banner_noticias.png'%}" alt="selecciones" class="first-banner-img">
+            <div class="first-banner-content">
+                <div class="first-banner-text">
+                    <h1>NUESTRAS NOTICIAS</h1>
+                    <p>Entérate e infórmate de cada paso en nuestra comunidad deportiva: Torneos, eventos, talleres y las hazañas de
+                        nuestros seleccionados.
+                    </p>
+                </div>
+            </div>
+        </section>
+    {% endif %}
+
+
+    <main role="main">
+        
+        {% if entity %}
+            <div class="card-group">
+                {% for n in entity %} 
+                    <article class="card" news-id="{{ n.data.0 }}">
+                    <span class="card-category">{{ n.data.6 }}</span>
+                    <div class="card-img-container">
+                        <img src="data:imagen/png;base64, {{ n.imagen }}" class="card-img-top" alt="">
+
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ n.data.1 }}</h5>
+                        <p class="card-text">{{ n.data.3|truncatechars:95 }}</p>
+                        <button class="read-more">Leer más</button>
+                    </div>
+                    <div class="card-footer">
+                        {{ n.data.4 }}
+                    </div>
+                    <div class="full-news-content" style="display: none;">
+                        <img src="data:imagen/png;base64, {{ n.imagen }}" class="card-img-top" alt="">
+                        <h2>{{ n.data.1 }}</h2>
+                        <p>{{ n.data.3 }}</p>
+                    </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+
+            <div class="first-banner"> <h1><strong> No hay Noticias registradas </strong></h1> </div>  
+        
+        {% endif %}  
+        <!-- Paginador -->
+        <div>
+            {% include 'core/paginator.html' %}
+        </div>
+    </main>
+
+
+{% endblock %}

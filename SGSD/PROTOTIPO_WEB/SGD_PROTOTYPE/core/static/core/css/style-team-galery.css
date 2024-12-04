@@ -1,0 +1,16 @@
+.galeria .col-lg-4{
+    margin: 0 !important;
+    padding: 15px;
+}
+.galeria img{
+    width: 100%;
+    height: 260px;
+}
+
+.galeria img:hover{
+   border: 2px solid white;
+}
+
+.text-center{
+    color: white;
+}

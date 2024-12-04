@@ -1,0 +1,212 @@
+/* Sección de equipos */
+.teams-section {
+    text-align: center;
+    padding: 20px 0;
+}
+
+/* Título de la sección de equipos */
+.title-teams, .section-title {
+    font-size: 72px;
+    color: #000; 
+    font-family: 'Impact', sans-serif;
+    letter-spacing: 2px;
+    padding: 30px;
+    position: relative;
+    display: inline-block;
+    text-align: center;
+    width: 100%;
+}
+
+.title-teams::after, .section-title::after {
+    content: '';
+    width: 100%; 
+    height: 2px;
+    background-color: #ffffff; 
+    position: absolute;
+    bottom: 0; 
+    left: 0;
+}
+
+/* Barra de navegación */
+.navbar-teams {
+    background-color: rgb(255, 255, 255);
+    border-bottom: 2px solid #e0e0e0;
+    padding: 10px 0;
+}
+
+.nav-section-link {
+    display: flex;
+    justify-content: center;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.nav-section-link li {
+    margin: 0 20px;
+}
+
+.nav-section-link a {
+    text-decoration: none;
+    font-size: 18px;
+    color: #000; 
+    text-transform: uppercase;
+    padding: 10px;
+    position: relative;
+    font-weight: bold;
+}
+
+.nav-section-link a::after {
+    content: '';
+    display: block;
+    width: 0;
+    height: 2px;
+    background: #f0a500;
+    transition: width 0.3s;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.nav-section-link a:hover::after, 
+.nav-section-link a.active::after {
+    width: 100%;
+}
+
+.nav-section-link a:hover {
+    color: #f0a500;
+}
+
+/* Sección de jugadores */
+.team-sections {
+    max-width: 1350px;
+    margin: 20px auto;
+    padding: 30px;
+    text-align: left;
+    background-color: #faf9f9;
+}
+
+/* Categorías (Goalkeepers, Defenders, etc.) */
+.player-section {
+    margin-bottom: 40px;
+    display: flex;
+    flex-direction: column;
+    border-top: 2px solid #e0e0e0; 
+    padding-top: 20px;
+    align-items: flex-start; 
+}
+
+.player-section:first-of-type {
+    border-top: none;
+}
+
+/* Cards de los jugadores */
+.player-cards {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); 
+    gap: 20px;
+    align-items: start;
+    width: 100%;
+}
+
+.player-card {
+    background-color: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    padding: 15px;
+}
+
+.player-card:hover {
+    transform: translateY(-5px);
+}
+
+.player-image {
+    width: 100%;
+    height: auto;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+
+.player-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center; 
+    width: 100%;
+}
+
+.player-name-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
+    text-align: center; 
+}    
+
+.player-first-name {
+    font-size: 15px;
+    font-weight: 400;
+    color: #a0a0a0; 
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 0; 
+    line-height: 1; 
+    margin-bottom: -4px; 
+    text-align: center;
+}
+
+.player-last-name {
+    font-size: 23px;
+    font-weight: bold;
+    color: #000;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 0; 
+    line-height: 1; 
+    text-align: center;
+}
+
+.player-number {
+    font-size: 57px;
+    font-weight: bold;
+    color: #000;
+    font-family: 'Arial Black', sans-serif;
+    text-align: right;    
+    margin-left: auto; 
+    line-height: 1; 
+}
+
+/* Responsividad / Mediaquery*/
+@media (max-width: 1200px) {
+    .player-cards {
+        grid-template-columns: repeat(4, 1fr); /* 4 cards por fila */
+    }
+}
+
+@media (max-width: 992px) {
+    .player-cards {
+        grid-template-columns: repeat(3, 1fr); /* 3 cards por fila */
+    }
+}
+
+@media (max-width: 768px) {
+    .player-cards {
+        grid-template-columns: repeat(2, 1fr); /* 2 cards por fila */
+    }
+}
+
+@media (max-width: 576px) {
+    .player-cards {
+        grid-template-columns: repeat(1, 1fr); /* 1 card por fila */
+    }
+    .title-teams, .section-title {
+        text-align: center; /* Centra el título en pantallas pequeñas */
+    }
+}

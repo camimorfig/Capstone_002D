@@ -1,0 +1,19 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Página No Encontrada</title>
+    <link rel="stylesheet" href="{% static 'core/css/error.css' %}">
+</head>
+<body>
+    <div class="container">
+        <img src="{% static 'core/media/error.png' %}" alt="Hombre de las cavernas">
+        <h1>Error 404</h1>
+        <p>La página que buscas no está disponible</p>
+        <a href="{% url 'index' %}">Volver al Inicio</a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,314 @@
+
+{% extends 'intranet/administrador/base_admin.html' %}
+
+<!-- Cargar Statics -->
+{% load static %}
+
+<!-- Enlace css -->
+{% block css %}
+<link rel="stylesheet" href="{% static 'core/css/administrador.css' %}">
+<link rel="stylesheet" href="{% static 'core/css/style-admin.css' %}">
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+
+<style>
+    #preview {
+        display: none;
+        width: 150px; /* Ancho máximo de la vista previa */
+        height: 150px; /* Alto máximo de la vista previa */
+        object-fit: cover; /* Para que la imagen se ajuste al espacio sin deformarse */
+        margin-top: 10px;
+        border-radius: 8px; /* Opcional: bordes redondeados */
+    }
+</style>
+
+{% endblock css %}
+
+<!-- Enlace JS -->
+{% block js %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    function previewImage(event) {
+        const preview = document.getElementById('preview');
+        const file = event.target.files[0];
+
+        if (file) {
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            };
+
+            reader.readAsDataURL(file);
+        } else {
+            preview.src = "";
+            preview.style.display = 'none';
+        }
+    }
+</script>
+{% endblock js %}
+
+<!-- Contenido de la pagina Eventos -->
+{% block sub_contenido %}
+
+        <div class="col-md-9">
+            <div class="card">
+                <div class="card-body">
+                    <h4><i class="bi bi-journal-text text-primary"></i> Gestionar Noticias </h4>
+                
+                    <br>                                                                           
+
+                    <div class="alert-container">
+                        {% for message in messages %}
+                            <div class="alert 
+                                {% if message.tags == 'error' %}
+                                    alert-danger
+                                {% elif message.tags == 'success' %}
+                                    alert-success
+                                {% elif message.tags == 'info' %}
+                                    alert-info
+                                {% elif message.tags == 'warning' %}
+                                    alert-warning
+                                {% endif %}
+                            ">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <br>                                                                          
+        
+                    <div class="container">
+                        <ul class="nav nav-tabs" id="myTab" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="ng-tab" data-bs-toggle="tab"
+                                    data-bs-target="#ng" type="button" role="tab" aria-controls="ng"
+                                    aria-selected="false">Gestión Noticia</button>
+                            </li>
+
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link " id="subir-n-tab" data-bs-toggle="tab" data-bs-target="#subir-n"
+                                    type="button" role="tab" aria-controls="subir-n" aria-selected="true">
+                                    Subir Noticia</button>
+                            </li>
+
+                        </ul>
+
+                        
+                        <div class="tab-content" id="myTabContent">
+                            <!-- SUBIR NOTICIA PAG -->
+                            <div class="tab-pane fade show " id="subir-n" role="tabpanel" aria-labelledby="subir-tab">
+                                <div class="container-fluid">
+                                <hr>
+
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="card">
+                                                <div class="card-body pb-0">
+                                                    <div class="row d-flex justify-content-center">
+                                                        <br>
+                                                        <div style="max-width:50%">
+                                                            <form method="POST" enctype="multipart/form-data">
+                                                                {% csrf_token %}
+                                                                <div class="form-outline mb-4 d-flex align-items-center">
+                                                                    <div class="overflow-hidden" style="width: 70px; height: 70px;">
+                                                                        <img id="avatar-preview" src="{% static 'core/media/equipo.png'%}"
+                                                                            alt="Avatar" class="img-fluid rounded-circle border border-3">
+                                                                    </div>
+                                                                    <div class="ms-2">
+                                                                        <label for="avatar" class="custom-label-class">Subir imagen de
+                                                                            perfil</label>
+                                                                        <input type="file" name="img" id="img"
+                                                                            class="form-control form-control-sm" accept="image/*" required>
+                                                                    </div>
+                                                                </div>
+                    
+                                                                <div class="form-group">
+                                                                    <label for="titulo"><strong>Título</strong></label>
+                                                                    <input type="text" class="form-control" id="nombre" name="nombre"
+                                                                        placeholder="Título dela noticia" required>
+                                                                </div>
+                    
+                                                                <div class="form-group">
+                                                                    <label for="titulo"><strong>Etiqueta</strong></label>
+                                                                    <input type="text" class="form-control" id="etiqueta" name="etiqueta"
+                                                                        placeholder="Etiqueta" required>
+                                                                </div>
+
+                                                                <div class="form-group">
+                                                                    <label for="descripcion"><strong>Descripción</strong></label>
+                                                                    <textarea class="form-control" id="descripcion" name="descripcion"
+                                                                        rows="6" placeholder="Descripción del evento" required></textarea>
+                                                                </div>
+                    
+                                                                <hr>
+                                                                <button type="submit" name="form_crear"
+                                                                    class="btn btn-primary btn-block mb-4">Agregar</button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+    
+                            </div>
+                            
+                            <!-- GESTIONAR NOTICIA GENERAL -->
+                            <div class="tab-pane fade show active" id="ng" role="tabpanel" aria-labelledby="ng-tab">
+                                <hr>
+                                {% if not entity %}
+                                    <div class="card py-2 px-2">
+
+                                        <div> <h4><strong> No hay Noticias registradas </strong></h4> </div>  
+                                    </div>
+                                {% else %}
+                                    <div class="card py-2 px-2">
+                                        <div class="table-responsive">
+                                        <table class="table table-striped table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Id</th>
+                                                    <th>Título</th>
+                                                    <th>Etiqueta</th>
+                                                    <th>Descripción</th>
+                                                    <th>Fecha de creación</th>
+                                                    <th>Visualización</th>
+                                                    <th>Opciones</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for n in entity %} 
+                                                    <tr>
+                                                        <td>{{ n.data.0 }}</td>
+                                                        <td>{{ n.data.1 }}</td>
+                                                        <td>{{ n.data.6 }}</td>
+                                                        <td>{{ n.data.3|truncatechars:70 }}</td>
+                                                        <td>{{ n.data.4 }}</td>
+                                                        <td>
+                                                            <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#viewNewModal{{ n.data.0 }}">Ver</button>
+                                                        </td>
+                                                        <td>
+                                                            <div class="dropdown">
+                                                                <button class="btn btn-primary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton{{ n.data.0 }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                                                    Ver Opciones
+                                                                </button>
+                                                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton{{ n.data.0 }}">
+                                                                    <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#deleteModal{{ n.data.0 }}"><i class="bi bi-trash text-danger"></i> Borrar</a></li>
+                                                                    <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#editarNoticiaModal{{ n.data.0 }}"><i class="bi bi-pencil text-primary"></i> Editar</a></li>
+                                                                </ul>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    
+                                                    <!-- Modal for Ver -->
+                                                    <div class="modal fade" id="viewNewModal{{ n.data.0 }}" tabindex="-1" aria-labelledby="viewNewModalLabel{{ n.data.0 }}" aria-hidden="true">
+                                                        <div class="modal-dialog">
+                                                            <div class="modal-content">
+                                                                <div class="modal-header">
+                                                                    <h5 class="modal-title" id="viewNewModalLabel{{ n.data.0 }}">{{ n.data.1 }}</h5>
+                                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                </div>
+                                                                <img src="data:imagen/png;base64,{{ n.imagen }}" class="card-img-top" alt="Imagen de la noticia">
+                                                                <div class="modal-body">
+                                                                    <p>{{ n.data.3 }}</p>
+                                                                    <p>{{ n.data.6 }}</p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                        
+                                                    <!-- Modal Editar -->
+                                                    <div class="modal fade" id="editarNoticiaModal{{ n.data.0 }}" tabindex="-1" aria-labelledby="editarNoticiaModalLabel{{ n.data.0 }}" aria-hidden="true">
+                                                        <div class="modal-dialog">
+                                                            <div class="modal-content">
+                                                                <div class="modal-header">
+                                                                    <h5 class="modal-title" id="editarNoticiaModalLabel{{ n.data.0 }}">Editar Noticia</h5>
+                                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                </div>
+                                                                <div class="modal-body">
+                                                                    <form id="editarNoticiaForm{{ n.data.0 }}" method="POST" enctype="multipart/form-data">
+                                                                        {% csrf_token %}
+                                                                        <input type="hidden" id="id" name="id" value="{{ n.data.0 }}">
+                                                                        <br>
+                                                                        <div class="form-group">
+                                                                            <label for="imagen">Imagen de perfil</label>
+                                                                            <input type="file" id="imagen{{ n.data.0 }}" name="imagen" accept="image/*" onchange="previewImage(event)">
+                                                                            <img id="preview" src="data:imagen/png;base64, {{ n.imagen }}" alt="Vista previa de imagen" style="width: 150px; height: 150px; object-fit: cover; margin-top: 10px; border-radius: 8px;">
+                                                                        </div>
+                                                                        <br>
+                                                                        <div class="form-group">
+                                                                            <label for="edit_titulo">Título</label>
+                                                                            <input type="text" class="form-control" id="edit_titulo{{ n.data.0 }}" name="titulo" value="{{ n.data.1 }}" required>
+                                                                        </div>
+                                                                        <br>
+                                                                        <div class="form-group">
+                                                                            <label for="edit_etiqueta">Etiqueta</label>
+                                                                            <input type="text" class="form-control" id="edit_etiqueta{{ n.data.0 }}" name="etiqueta" value="{{ n.data.6 }}" required>
+                                                                        </div>
+                                                                        <br>
+                                                                        <div class="form-group">
+                                                                            <label for="edit_descripcion">Descripción</label>
+                                                                            <textarea class="form-control" id="edit_descripcion{{ n.data.0 }}" name="descripcion" rows="3" required>{{ n.data.3 }}</textarea>
+                                                                        </div>
+                                                                        <br>
+                                                                        <div class="form-group">
+                                                                            <label for="fecha">Fecha</label>
+                                                                            <input type="datetime-local" class="form-control" name="fecha" id="fecha{{ n.data.0 }}" value="{{ n.data.4|date:"Y-m-d\TH:i" }}">
+                                                                        </div>
+                                                                        <br>
+                                                                        <div class="modal-footer">
+                                                                            <button type="submit" class="btn btn-primary" name="form_editar">Guardar cambios</button>
+                                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                                        </div>
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>                                  
+                                                    <!-- Modal Borrar -->
+                                                    <div class="modal fade" id="deleteModal{{ n.data.0 }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ n.data.0 }}" aria-hidden="true">
+                                                        <div class="modal-dialog">
+                                                            <div class="modal-content">
+                                                                <div class="modal-header">
+                                                                    <h5 class="modal-title" id="deleteModalLabel{{ n.data.0 }}">Borrar Noticia</h5>
+                                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                </div>
+                                                                <div class="modal-body">
+                                                                    <p>¿Estás seguro de que deseas borrar esta noticia?</p>
+                                                                    <form id="deleteModalForm{{ n.data.0 }}" method="POST">
+                                                                        {% csrf_token %}
+                                                                        <input type="hidden" id="id" name="id" value="{{ n.data.0 }}">
+                                                                        <div class="modal-footer">
+                                                                            <button type="submit" class="btn btn-danger" name="form_eliminar">Confirmar</button>
+                                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                                        </div>
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                        
+                                                {% endfor %}   
+                                            </tbody>
+                                        </table>
+                                        </div> 
+                                    </div>      
+                                    <br>
+                                    <!-- Paginador -->
+                                    <div>
+                                    {% include 'core/paginator.html' %}
+                                    </div>                                      
+                                    {% endif %}   
+                                </div>
+                            </div> 
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+{% endblock %}

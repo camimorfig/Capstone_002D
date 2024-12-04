@@ -1,0 +1,273 @@
+<!-- HEATER Y FOOTER -->
+{% extends 'core/base_core.html' %}
+
+
+<!-- Cargar Statics -->
+{% load static %}
+
+<!-- Enlace css -->
+{% block css %}
+<link rel="stylesheet" href="{% static 'core/css/style.css' %}">
+<link rel="stylesheet" href="{% static 'core/css/style-team-us.css' %}">
+<link rel="stylesheet" href="{% static 'core/css/style-selecciones-simple.css' %}">
+<link rel="stylesheet" href="{% static 'core/css/style-team-galery.css' %}">
+<link rel="stylesheet" href="{% static 'core/css/nosotros.css' %}">
+
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+{% endblock css %}
+
+<!-- Enlace JS -->
+{% block js %}
+<link rel="stylesheet" href="{% static 'core/javascript/script-team-gallery.js' %}">
+<link rel="stylesheet" href="{% static 'core/javascript/script.js' %}">
+
+
+<script>  
+
+function openModal(modalId) {
+    document.getElementById(modalId).style.display = "block";
+}
+
+function closeModal(modalId) {
+    document.getElementById(modalId).style.display = "none";
+}
+
+
+
+</script>
+
+
+
+{% endblock js %}
+
+{% block contenido %}
+
+    {% if seccion == "acerca" %}
+        
+        <!-- Main -->
+        <main class="main-section">
+            <div class="main-container">
+                <!-- Contenido de texto -->
+                <div class="main-content">
+                    <div class="decorative-cross"></div>
+                    <h1 class="main-title">
+                        <span class="title-accent">{{ disciplina.discipline_name }}</span>
+
+                    </h1>
+                    <p class="main-subtitle">
+                        {{ disciplina.discipline_description }}
+                    </p>
+                    <a href="#plantel" class="cta-button">
+                        CONÓCENOS
+                    </a>
+
+                    <a href="{% url 'disciplina_view' disciplina.discipline_name 'galeria' %}" class="cta-button_owo">
+                        GALERÍA
+                    </a>
+
+                    <!-- Estadísticas -->
+
+                </div>
+
+                <!-- Contenedor de imagen -->
+                <div class="main-image-container">
+                    <img src="{% static 'core/media/new3.png'%}" alt="Deportes DuocUC" class="main-image">
+                </div>
+            </div>
+            <!-- sección del plantel  -->
+
+            {% if jugadores %}
+                <section class="team-roster" id="plantel">
+                    <div class="roster-container">
+                        <header class="roster-header">
+                            <h2 class="roster-title">PLANTEL OFICIAL</h2>
+                            </header>
+
+                        <div class="cards-container">
+                            <!-- Card 1 -->
+                            {% for jugador in jugadores %}
+
+                                <div class="card" data-player-id="{{ jugador.jugador.player_id }}">
+                                    <div class="player-image-container">
+                                        {% if jugador.imagen_base64 %}
+
+                                        <img src="data:image/png;base64,{{ jugador.imagen_base64 }}" alt="{{ jugador.jugador.player_name }}" class="player-image">
+
+                                        {% else %}
+        
+                                        <img src="{% static 'core/media/avatar.png'%}" alt="Player Image" class="player-image">
+        
+                                        {% endif %}
+                                    </div>
+                                    <div class="card-content">
+                                        <h3 class="player-name">{{ jugador.jugador.player_name }}</h3>
+                                        <h4 class="player-name">{{ jugador.jugador.player_last_name }}</h4>
+                                        <div class="player-details">
+                                            <span class="detail-item">
+                                                <i class="bi bi-geo-alt"></i>
+                                                {{ jugador.jugador.player_headquarters }}
+                                            </span>
+                                            <span class="detail-item">
+                                                <i class="bi bi-clock"></i>
+                                                {% if jugador.jugador.player_horary == 'D' %}
+                                                    DIURNO
+                                                {% elif jugador.jugador.player_horary == 'V'%}
+                                                    VESPERTINO
+                                                {% elif jugador.jugador.player_horary == 'O'%}
+                                                    ONLINE
+                                                {% else %}
+                                                    NO DEFINIDO
+                                                {% endif %}
+                                            </span>
+                                        </div>
+                                        <button type="button" class="view-details-btn" onclick="openModal('customModal{{ jugador.jugador.player_id }}')">
+                                            Ver detalles
+                                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                                <path d="M3.33334 8H12.6667M12.6667 8L8.00001 3.33333M12.6667 8L8.00001 12.6667"
+                                                    stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                                                    stroke-linejoin="round" />
+                                            </svg>
+                                        </button>
+
+                                    </div>
+                                </div>                                   
+                                <!-- Modal -->
+
+                                
+                                <div id="customModal{{ jugador.jugador.player_id }}" class="custom-modal">
+                                    <div class="modal-content">
+                                        <span class="close-btn" onclick="closeModal('customModal{{ jugador.jugador.player_id }}')">&times;</span>
+                                        <h2>{{ jugador.jugador.player_name }} {{ jugador.jugador.player_last_name }}</h2>
+                                        
+                                        {% if jugador.imagen_base64 %}
+
+                                            <img src="data:image/png;base64,{{ jugador.imagen_base64 }}" alt="{{ jugador.jugador.player_name }}" class="modal-image">
+
+                                            {% else %}
+            
+                                            <img src="{% static 'core/media/avatar.png'%}" alt="Player Image" class="modal-image">
+            
+                                        {% endif %}
+
+                                        <p><strong>Sede:</strong> {{ jugador.jugador.player_headquarters }}</p>
+                                        <p><strong>Jornada:</strong>                                                 
+                                            {% if jugador.jugador.player_horary == 'D' %}
+                                                DIURNO
+                                            {% elif jugador.jugador.player_horary == 'V'%}
+                                                VESPERTINO
+                                            {% elif jugador.jugador.player_horary == 'O'%}
+                                                ONLINE
+                                            {% else %}
+                                                NO DEFINIDO
+                                            {% endif %}
+                                        </p>
+                                        <p><strong>Carrera:</strong> {{ jugador.jugador.player_career }}</p>
+                                        <p><strong>Año de nacimiento:</strong> {{ jugador.jugador.player_birthday }}</p>
+                                    </div>
+                                </div>
+                                
+                                
+                                
+
+                            {% endfor %}
+
+                        </div>
+                    </div>
+                </section>
+            {% endif %}
+
+
+        </main>
+
+    {% elif seccion == "galeria" %}
+
+    <div class="main-container">
+        <!-- Contenido de texto -->
+        <div class="main-content">
+            <div class="decorative-cross"></div>
+            <h1 class="main-title">
+                <span class="title-accent">{{ disciplina.discipline_name }}</span>
+
+            </h1>
+            <p class="main-subtitle">
+                {{ disciplina.discipline_description }}
+            </p>
+            <a href="{% url 'disciplina_view' disciplina.discipline_name 'acerca' %}" class="cta-button">
+                CONÓCENOS
+            </a>
+
+            <a href="#galeria" class="cta-button_owo">
+                GALERÍA
+            </a>
+
+        </div>
+        <!-- Contenedor de imagen -->
+        <div class="main-image-container">
+            <img src="{% static 'core/media/new3.png'%}" alt="Deportes DuocUC" class="main-image">
+        </div>
+    </div>
+
+
+    <section class="container galeria" id="galeria">
+        {% if imagenes %}
+            {% for i in imagenes %}
+            <div class="col-lg-4 col-md-6 mb-4">
+                <img src="data:imagen/png;base64, {{ i.imagen }}" 
+                    alt="Imagen galería" 
+                    class="gallery-item gallery-img rounded shadow"
+                    loading="lazy">
+            </div>
+            {% endfor %}
+
+            <!-- Modal para ver imagen -->
+            <div class="modal fade" id="galleryModal" tabindex="-1" aria-labelledby="galleryModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content bg-transparent border-0">
+                    <button type="button" class="btn-close bg-white position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <img src="" id="imgModal" class="rounded" alt="Imagen ampliada">
+                </div>
+                </div>
+            </div>
+        {% else %}             
+            <div class="row">
+                <div class="col-lg-4">
+                    <img src="{% static 'core/media/img-horiz.png' %}" alt="Imagenes" class="rounded img">
+                </div>
+                <div class="col-lg-4">
+                    <img src="{% static 'core/media/img-horiz.png' %}" alt="Imagenes" class="rounded img">
+                </div>
+                <div class="col-lg-4">
+                    <img src="{% static 'core/media/img-horiz.png' %}" alt="Imagenes" class="rounded img">
+                </div>
+                <div class="col-lg-4">
+                    <img src="{% static 'core/media/img-horiz.png' %}" alt="Imagenes" class="rounded img">
+                </div>
+                <div class="col-lg-4">
+                    <img src="{% static 'core/media/img-horiz.png' %}" alt="Imagenes" class="rounded img">
+                </div>
+                <div class="col-lg-4">
+                    <img src="{% static 'core/media/img-horiz.png' %}" alt="Imagenes" class="rounded img">
+                </div>                
+                <div class="col-lg-4">
+                    <img src="{% static 'core/media/img-horiz.png' %}" alt="Imagenes" class="rounded img">
+                </div>
+                <div class="col-lg-4">
+                    <img src="{% static 'core/media/img-horiz.png' %}" alt="Imagenes" class="rounded img">
+                </div>
+                <div class="col-lg-4">
+                    <img src="{% static 'core/media/img-horiz.png' %}" alt="Imagenes" class="rounded img">
+                </div>
+            </div>
+        {% endif %}
+
+    </section>
+
+<br>
+
+    {% endif %}
+{% endblock %}
+
+
+

@@ -1,1 +1,0 @@
-create or replace NONEDITIONABLE TYPE T_sports AS TABLE OF NUMBER;

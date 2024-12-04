@@ -1,0 +1,365 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    /* border: 1px dashed #b240ff;    */
+}
+
+body {
+    font-family: Arial, sans-serif;
+}
+
+/* Header */
+header {
+    background-color: #000000;
+    color: #fff;
+    padding: 10px 0;
+}
+
+.logo-navbar img {
+    width: 150px; 
+    height: auto;
+}
+
+/* Barra de navegación */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Barra de navegación - Logo */
+
+.logo a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+/* Barra de navegación - Enlaces */
+.nav-links {
+    list-style: none;
+    display: flex;
+    flex-grow: 1;
+    justify-content: center;
+}
+
+.nav-links li {
+    margin-left: 20px;
+}
+
+.nav-links a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 18px;
+    transition: color 0.3s;
+}
+
+.nav-links a:hover {
+    color: #f0a500;
+}
+
+/* icono menú - dispositivos móviles */
+.nav-menu {
+    display: none; 
+    flex-direction: column;
+    cursor: pointer;
+}
+
+.nav-menu span {
+    background-color: #fff;
+    height: 3px;
+    width: 25px;
+    margin: 4px;
+    transition: all 0.3s;
+}
+
+/* Main */
+main {
+    flex: 1; 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    width: 100%;
+}
+/* Noticias */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+h1.display-5 {
+    color: #333;
+}
+
+p.fs-4 {
+    color: #666;
+}
+
+.bg-dark h2 {
+    color: #fff;
+}
+
+.bg-light h2 {
+    color: #333;
+}
+
+/* Selecciones */
+.section-team {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 columnas */
+    grid-template-rows: repeat(2, 200px); /* 2 filas */
+    gap: 10px;
+    width: 80%;
+}
+
+.section-team-tittle {
+    text-align: center;
+    width: 100%; 
+    margin-bottom: 20px; 
+}
+
+.section-team-tittle h2 {
+    font-size: 36px;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.section-team-tittle p {
+    font-size: 18px;
+    color: #666;
+    font-style: italic;
+}
+
+.flex-content-team {
+    background-color: #a4a3a3;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.flex-content-team img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.7;
+}
+
+.team-content {
+    position: relative;
+    text-align: center;
+    color: white;
+    z-index: 2;
+}
+
+.team-content h3 {
+    margin-bottom: 10px;
+    font-size: 18px;
+}
+
+.team-content p {
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+.team-content button {
+    padding: 10px 20px;
+    background-color: transparent;
+    border: 2px solid white;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.team-content button:hover {
+    background-color: white;
+    color: #333;
+}
+/* footer */
+.footer {
+    background-color: #000;
+    padding: 10px 20px;
+    border-top: 1px solid #e5e5e5;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.footer-logo-left img {
+    width: 200px; 
+    height: auto;
+}
+
+.footer-redes {
+    display: flex;
+    gap: 20px;
+}
+
+.footer-redes svg {
+    width: 15px; 
+    height: auto;
+}
+
+.footer-logo-right img {
+    width: 300px; 
+    height: auto;
+    margin-left: 15px;
+}
+
+
+/* INICIO, SELECION DE PERFIL ENTRENADOR Y ADMIN */
+.container-q{
+    background-color: rgb(0, 0, 0);
+    padding: 50px;
+    color: rgb(255, 255, 255);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.logo-main img {
+    width: 250px; 
+    height: auto;
+}
+
+.perfil-seleccion{
+    /* background-color: aqua; */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+/* botones seleccion perfil */
+.btn-perfil{
+    margin-top:30px;
+}
+.perfil-card{
+    border: #000;
+    margin:10px;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    
+} 
+
+/* ENTRENADOR INICIO */
+.General{
+    padding: 10px;
+}
+
+.nav-link{
+    text-decoration: none;
+    color: white;
+    
+}
+
+/* ASISTENCIA */
+
+.container-asistencia{
+    width: 800px;
+}
+.container-fecha{
+    width: 300px;
+}
+.media{
+    justify-content: space-between;
+}
+
+
+.diciplinas{
+    display: flex;
+    flex-direction: column;
+    align-self:self-start;
+    text-align: left;
+    align-content:space-around;
+}
+
+/* TOMAR ASISTENCIA */
+
+.containerdatos{
+    width: 1200px;
+}
+
+.check-ausente{
+    accent-color: #007bff;
+}
+
+/* PERFIL JUGADOR */
+
+/* .jugador{
+    width: 1000px;
+} */
+
+
+
+
+
+
+
+/* Media Query para dispositivos móviles */
+@media (max-width: 768px) {
+    .nav-links {
+        display: none; 
+        flex-direction: column;
+        width: 100%;
+        position: absolute;
+        top: 60px;
+        left: 0;
+        background-color: #000; 
+        text-align: center;
+    }
+
+    .nav-links.nav-active {
+        display: flex; 
+    }
+
+    .nav-links li {
+        margin: 0;
+        padding: 15px;
+        text-align: center;
+    }
+
+    .nav-menu {
+        display: flex; 
+    }
+
+
+
+
+    /* Galería en modo móvil (1 columna) */
+    .section-team {
+        grid-template-columns: 1fr; /* Cambia a una columna */
+        grid-template-rows: auto; /* Filas automáticas */
+    }
+
+    .flex-content-team {
+        
+        height: auto; /* Ajuste automático de la altura */
+        margin-bottom: 20px; /* Espacio entre ítems */
+    }
+}
+
+/* Clase para activar el menú */
+.nav-active {
+    display: flex;
+}

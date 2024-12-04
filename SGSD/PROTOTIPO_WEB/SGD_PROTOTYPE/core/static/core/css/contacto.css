@@ -1,0 +1,110 @@
+/* Estilos globales */
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    overflow-x: hidden; /* Evita el scroll horizontal */
+}
+
+
+/* Estilo del contenido principal */
+.main-content {
+    padding-top: 100px; 
+}
+
+/* Contenedor principal */
+.container {
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    height: calc(100vh - 120px); 
+    box-sizing: border-box;
+    gap: 20px; 
+    padding: 40px; 
+}
+
+/* Franja horizontal naranja */
+.horizontal-banner {
+    position: absolute;
+    width: 100%;
+    height: 150px; 
+    background-color: #f0a500; 
+    z-index: 0; 
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* imagen */
+.image-container {
+    z-index: 1; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+}
+
+.image-container img {
+    width: 400px;
+    height: auto;
+    max-height: 500px; 
+    object-fit: cover;
+}
+
+/* Contenedor del formulario */
+.form-container {
+    z-index: 2; 
+    background-color: #fff;
+    padding: 40px;
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    max-width: 400px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Formulario */
+.contact-form h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #333;
+    text-align: center; 
+}
+
+.contact-form input, 
+.contact-form textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    box-sizing: border-box;
+    resize: none; 
+    overflow: hidden; 
+}
+.contact-form textarea {
+    height: 100px; /
+}
+
+.contact-form button {
+    width: 100%;
+    padding: 10px;
+    background-color: #f0a500;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+/* Estilos para dispositivos móviles */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column; 
+        gap: 0;
+    }
+
+    .form-container {
+        width: calc(100% - 40px); 
+        margin-top: 20px; 
+    }
+
+    .image-container img {
+        width: 100%;
+        max-height: none;
+    }
+}

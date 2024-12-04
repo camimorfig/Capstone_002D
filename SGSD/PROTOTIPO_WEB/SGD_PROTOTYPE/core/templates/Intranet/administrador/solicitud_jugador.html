@@ -1,0 +1,196 @@
+{% extends 'intranet/administrador/base_admin.html' %}
+
+<!-- Cargar Statics -->
+{% load static %}
+
+<!-- Enlace css -->
+{% block css %}
+<link rel="stylesheet" href="{% static 'core/css/administrador.css' %}">
+<link rel="stylesheet" href="{% static 'core/css/style-admin.css' %}">
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+{% endblock css %}
+
+<!-- Enlace JS -->
+{% block js %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock js %}
+
+<!-- Contenido de la pagina Eventos -->
+{% block sub_contenido %}
+
+        <div class="col-md-9">
+            <div class="card">
+                <div class="card-body">
+                    <h4><i class="bi bi-journal-text text-primary"></i> Gestionar Solicitudes </h4>
+                    <br>                                                                           
+
+                    <div class="alert-container">
+                        {% for message in messages %}
+                            <div class="alert 
+                                {% if message.tags == 'error' %}
+                                    alert-danger
+                                {% elif message.tags == 'success' %}
+                                    alert-success
+                                {% elif message.tags == 'info' %}
+                                    alert-info
+                                {% elif message.tags == 'warning' %}
+                                    alert-warning
+                                {% endif %}
+                            ">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <br>  
+                    <div class="container">
+                        <ul class="nav nav-tabs" id="myTab" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="sol-tab" data-bs-toggle="tab"
+                                    data-bs-target="#sol" type="button" role="tab" aria-controls="sol"
+                                    aria-selected="true">Solicitudes</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="mess-tab" data-bs-toggle="tab" data-bs-target="#mess"
+                                    type="button" role="tab" aria-controls="mess" aria-selected="false">
+                                    Mensajes</button>
+                            </li>
+                        </ul>
+                        <div class="tab-content" id="myTabContent">
+                            <div class="tab-pane fade show active" id="sol" role="tabpanel" aria-labelledby="sol-tab">
+                                <hr>
+                                <div class="card py-2 px-2">
+                                    {% if not solicitud %}
+                                        <div> <h4><strong> No hay Solicitudes registradas </strong></h4> </div>  
+
+                                    {% else %}
+                                    <div class="table-responsive">
+                                        <table class="table table-striped table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Id Solicitud</th>
+                                                    <th>Nombre De Entrendaor</th>
+                                                    <th>Rut</th>
+                                                    <th>Nombre</th>
+                                                    <th>Apellido</th>
+                                                    <th>Disciplina</th>
+                                                    <th>Sede</th>
+                                                    <th>Carrera</th>
+                                                    <th>Fecha De Solicitud</th>
+                                                    <th>Estado</th>
+                                                    <th>Opciones</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+
+                                                {% for s in solicitud %}
+                                                    <tr>
+                                                        <td>{{s.data.0}}</td>
+                                                        <td>{{s.data.1}}</td>
+                                                        <td>{{s.data.2}}</td>
+                                                        <td>{{s.data.3}}</td>
+                                                        <td>{{s.data.4}}</td>
+                                                        <td>{{s.data.5}}</td>
+                                                        <td>{{s.data.6}}</td>
+                                                        <td>{{s.data.7}}</td>
+                                                        <td>{{s.data.9}}</td>
+                                                        <td><span class="badge bg-danger">{{s.data.8}}</span></td>
+                                                        <td>
+                                                            <div class="dropdown">
+                                                                <button class="btn btn-primary btn-sm dropdown-toggle"
+                                                                    type="button" id="dropdownMenuButton{{s.data.0}}"
+                                                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                                                    Ver Opciones
+                                                                </button>
+                                                                <ul class="dropdown-menu"
+                                                                    aria-labelledby="dropdownMenuButton{{s.data.0}}" data-bs-toggle="modal"
+                                                                    data-bs-target="#deleteModal">
+                                                                    <li><a class="dropdown-item" href="#"><i
+                                                                                class="bi bi-trash text-danger"></i> Borrar
+                                                                        </a></li>   
+                                                                        <li><a class="dropdown-item" href="{% url 'aceptar_solicitud' id=s.data.0 %}">
+                                                                            <i class="bi bi-pencil text-primary"></i> Aceptar
+                                                                        </a></li>
+                                                                        
+                                                                </ul>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    {% endif %}
+
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="mess" role="tabpanel" aria-labelledby="mess-tab">
+                                <hr>
+                                <div class="card py-2 px-2">
+                                    {% if not contacto %}
+                                        <div> <h4><strong> No hay Mensajes registradas </strong></h4> </div>  
+
+                                    {% else %}
+                                        <table class="table table-striped table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Id</th>
+                                                    <th>Nombre</th>
+                                                    <th>Correo</th>
+                                                    <th>Correo</th>
+                                                    <th>Opción</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for c in contacto %}
+                                                    <tr>
+                                                        <td>{{c.data.0}}</td>
+                                                        <td>{{c.data.1}}</td>
+                                                        <td>{{c.data.2}}</td>
+                                                        <td>...</td>
+                                                        <td><button class="btn btn-danger btn-sm" data-bs-toggle="modal"
+                                                            data-bs-target="#viewNewModal{{c.data.0}}">Ver</button></td>
+                                                    </tr>
+
+                                                    <div class="modal fade" id="viewNewModal{{c.data.0}}" tabindex="-1" aria-labelledby="viewModalLabel" aria-hidden="true">
+                                                        <div class="modal-dialog">
+                                                            <div class="modal-content">
+                                                                <div class="modal-header">
+                                                                    <h5 class="modal-title" id="viewModalLabel">Mensaje Contactanos</h5>
+                                                                </div>
+                                                                
+                                                                <div class="modal-body">
+                                                                    <h6>{{c.data.1}}</h6>
+                                                                    <p>{{c.data.2}}</p>
+                                                                    <p>{{c.data.3}}</p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    {% endif %}
+                                </div>
+                            </div>   
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de solicitudes -->
+    <div class="table-responsive">
+        <table class="table">
+            <!-- Tu tabla actual -->
+        </table>
+    </div>
+</main>
+
+
+{% endblock %}

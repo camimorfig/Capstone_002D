@@ -1,0 +1,314 @@
+{% extends 'intranet/administrador/base_admin.html' %}
+
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'core/css/administrador.css' %}">
+<link rel="stylesheet" href="{% static 'core/css/style-admin.css' %}">
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock css %}
+
+{% block js %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock js %}
+
+{% block sub_contenido %}
+<div class="col-md-9">
+    <div class="card">
+        <div class="card-body">
+            <div class="row d-flex justify-content-center">
+                <h4 class="mb-4"><i class="bi bi-journal-text text-primary font-size-22"></i> Análisis de Asistencia</h4>
+                
+                <div class="container">
+                    
+                        
+
+                    <!-- Sección de Análisis -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Tipo de Análisis</h5>
+                        </div>
+                        <div class="card-body">
+                            <!-- Botones de navegación -->
+                            <div class="btn-group w-100 mb-4" role="group">
+                                <button type="button" class="btn btn-primary" onclick="cambiarAnalisis('general')">
+                                    <i class="bi bi-graph-up"></i> Análisis General
+                                </button>
+                                <button type="button" class="btn btn-primary" onclick="cambiarAnalisis('disciplina')">
+                                    <i class="bi bi-list-check"></i> Por Disciplina
+                                </button>
+                                <button type="button" class="btn btn-primary" onclick="cambiarAnalisis('tendencia')">
+                                    <i class="bi bi-graph-up-arrow"></i> Tendencia
+                                </button>
+                            </div>
+
+                            <!-- Análisis General -->
+                            <div id="analisis-general" class="analisis-section">
+                                <div class="row">
+                                    <!-- Resumen de Asistencias -->
+                                    <div class="col-md-6 mb-4">
+                                        <div class="card h-100">
+                                            <div class="card-header">
+                                                <h6 class="mb-0">Resumen de Asistencias</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="progress mb-3" style="height: 30px;">
+                                                    <div class="progress-bar bg-success" style="width: {{ estadisticas.porcentaje_presentes }}%">
+                                                        {{ estadisticas.total_presentes }} Presentes
+                                                    </div>
+                                                    <div class="progress-bar bg-danger" style="width: {{ estadisticas.porcentaje_ausentes }}%">
+                                                        {{ estadisticas.total_ausentes }} Ausentes
+                                                    </div>
+                                                    <div class="progress-bar bg-warning" style="width: {{ estadisticas.porcentaje_justificados }}%">
+                                                        {{ estadisticas.total_justificados }} Justificados
+                                                    </div>
+                                                </div>
+                                                <p class="text-center mb-0">
+                                                    Total de estudiantes: <strong>{{ estadisticas.total_estudiantes }}</strong>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Regularidad de Asistencia -->
+                                    <div class="col-md-6 mb-4">
+                                        <div class="card h-100">
+                                            <div class="card-header">
+                                                <h6 class="mb-0">Regularidad de Asistencia</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <ul class="list-group">
+                                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                        Asistencia Alta (>75%)
+                                                        <span class="badge bg-success rounded-pill">{{ estadisticas.asistencia_alta }}</span>
+                                                    </li>
+                                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                        Asistencia Media (50-75%)
+                                                        <span class="badge bg-warning rounded-pill">{{ estadisticas.asistencia_media }}</span>
+                                                    </li>
+                                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                        Asistencia Baja (<50%)
+                                                        <span class="badge bg-danger rounded-pill">{{ estadisticas.asistencia_baja }}</span>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Métricas Generales -->
+                                    <div class="col-12">
+                                        <div class="row">
+                                            <div class="col-md-3 mb-3">
+                                                <div class="card bg-light">
+                                                    <div class="card-body text-center">
+                                                        <h6 class="card-title">Total Entrenamientos</h6>
+                                                        <h2 class="mb-0">{{ estadisticas.total_entrenamientos }}</h2>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3 mb-3">
+                                                <div class="card bg-light">
+                                                    <div class="card-body text-center">
+                                                        <h6 class="card-title">Promedio Asistencia</h6>
+                                                        <h2 class="mb-0">{{ estadisticas.promedio_asistencia }}</h2>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3 mb-3">
+                                                <div class="card bg-light">
+                                                    <div class="card-body text-center">
+                                                        <h6 class="card-title">Mejor Asistencia</h6>
+                                                        <h2 class="mb-0">{{ estadisticas.mejor_asistencia }}</h2>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3 mb-3">
+                                                <div class="card bg-light">
+                                                    <div class="card-body text-center">
+                                                        <h6 class="card-title">Peor Asistencia</h6>
+                                                        <h2 class="mb-0">{{ estadisticas.peor_asistencia }}</h2>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Análisis por Disciplina -->
+                            <div id="analisis-disciplina" class="analisis-section" style="display: none;">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Disciplina</th>
+                                                <th class="text-center">Total Estudiantes</th>
+                                                <th class="text-center">Promedio Asistencia</th>
+                                                <th class="text-center">Presentes</th>
+                                                <th class="text-center">Ausentes</th>
+                                                <th class="text-center">Justificados</th>
+                                                <th>Regularidad</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for disciplina in estadisticas_disciplina %}
+                                            <tr>
+                                                <td>{{ disciplina.nombre }}</td>
+                                                <td class="text-center">{{ disciplina.total_estudiantes }}</td>
+                                                <td class="text-center">{{ disciplina.promedio_asistencia }}%</td>
+                                                <td class="text-center">{{ disciplina.presentes }}</td>
+                                                <td class="text-center">{{ disciplina.ausentes }}</td>
+                                                <td class="text-center">{{ disciplina.justificados }}</td>
+                                                <td>
+                                                    <div class="progress" style="height: 20px;">
+                                                        <div class="progress-bar bg-success" 
+                                                             style="width: {{ disciplina.regularidad }}%" 
+                                                             role="progressbar"
+                                                             aria-valuenow="{{ disciplina.regularidad }}" 
+                                                             aria-valuemin="0" 
+                                                             aria-valuemax="100">
+                                                            {{ disciplina.regularidad }}%
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Tendencia de Asistencia -->
+                            <div id="analisis-tendencia" class="analisis-section" style="display: none;">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6 class="mb-0">Evolución de Asistencia por Mes</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <canvas id="tendenciaChart" height="100"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mensajes -->
+                    {% if messages %}
+                    <div class="messages mb-4">
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+  <!-- Mensajes -->
+  {% if messages %}
+      {% for message in messages %}
+          <div class="alert alert-{{ message.tags }}">
+              {{ message }}
+          </div>
+      {% endfor %}
+  {% endif %}
+</div>
+</main>
+<!-- Script para filtrar entrenamientos según disciplina -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const disciplineSelect = document.getElementById('discipline_select');
+  const trainingSelect = document.getElementById('training_select');
+  const allTrainingOptions = Array.from(trainingSelect.options);
+
+  function filterTrainings() {
+      const selectedDiscipline = disciplineSelect.value;
+
+      // Guardar la opción seleccionada actual
+      const currentSelection = trainingSelect.value;
+
+      // Limpiar select
+      trainingSelect.innerHTML = '';
+
+      // Agregar opción "Todos los entrenamientos"
+      const defaultOption = document.createElement('option');
+      defaultOption.value = '';
+      defaultOption.textContent = 'Todos los entrenamientos';
+      trainingSelect.appendChild(defaultOption);
+
+      // Filtrar y agregar opciones
+      allTrainingOptions.forEach(option => {
+          if (!selectedDiscipline || option.dataset.discipline === selectedDiscipline) {
+              trainingSelect.appendChild(option.cloneNode(true));
+          }
+      });
+
+      // Restaurar selección si aún es válida
+      if (currentSelection) {
+          trainingSelect.value = currentSelection;
+      }
+  }
+
+  disciplineSelect.addEventListener('change', filterTrainings);
+
+  // Aplicar filtro inicial
+  filterTrainings();
+});
+</script>
+<script>
+    function cambiarAnalisis(tipo) {
+        // Ocultar todas las secciones
+        document.querySelectorAll('.analisis-section').forEach(section => {
+            section.style.display = 'none';
+        });
+        
+        // Mostrar la sección seleccionada
+        document.getElementById('analisis-' + tipo).style.display = 'block';
+    
+        // Si es tendencia, inicializar el gráfico
+        if (tipo === 'tendencia' && !window.tendenciaChartInitialized) {
+            initializeTendenciaChart();
+        }
+    }
+    
+    function initializeTendenciaChart() {
+        const ctx = document.getElementById('tendenciaChart').getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: {{ estadisticas_tendencia.labels|safe }},
+                datasets: [{
+                    label: 'Porcentaje de Asistencia',
+                    data: {{ estadisticas_tendencia.datos|safe }},
+                    borderColor: '#FFB800',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100
+                    }
+                }
+            }
+        });
+        window.tendenciaChartInitialized = true;
+    }
+    
+    // Mostrar análisis general por defecto
+    document.addEventListener('DOMContentLoaded', function() {
+        cambiarAnalisis('general');
+    });
+</script>
+{% endblock %}
