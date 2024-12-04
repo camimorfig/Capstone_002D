@@ -28,11 +28,11 @@ DEBUG = True
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
-    'e76b-186-106-133-183.ngrok-free.app',  # Tu dominio de ngrok
+    '4cad-2800-300-6f35-1b90-5473-3f17-d8d-9314.ngrok-free.app',  # Tu dominio de ngrok
     '.ngrok-free.app',  # Permite cualquier subdominio de ngrok-free.app
 ]
 
-CSRF_TRUSTED_ORIGINS = ['https://e76b-186-106-133-183.ngrok-free.app']
+CSRF_TRUSTED_ORIGINS = ['https://4cad-2800-300-6f35-1b90-5473-3f17-d8d-9314.ngrok-free.app']
 
 
 # Application definition
